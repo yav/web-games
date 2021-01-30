@@ -1,0 +1,69 @@
+cabal-version:       >=2.0
+
+name:                ht-hs
+version:             0.1.0.0
+license-file:        LICENSE
+author:              Iavor Diatchki
+maintainer:          iavor.diatchki@gmail.com
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+
+
+library
+  hs-source-dirs:      src
+  exposed-modules:
+    Basics, Player, Edge, Node, Stats, Bonus,
+    Question, Game, Turn, Board, Geometry, Event
+    Board.Index
+    Board.Builder,
+    Board.Britannia45,
+    Board.Britannia3,
+    Board.East,
+    Board.Hansa45,
+    Board.Hansa3,
+    AppTypes
+  default-extensions:
+    BlockArguments, OverloadedStrings, NamedFieldPuns, RecordWildCards,
+    ParallelListComp, DeriveGeneric
+
+  build-depends:
+    common-utils,
+    base >=4.13,
+    containers, text, tf-random, aeson
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+
+
+executable ht-hs
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  other-modules:
+    Actions
+    Actions.Common
+    Actions.Place
+    Actions.Move
+    Actions.Hire
+    Actions.Complete
+    Actions.Bonus
+    Actions.FixedBonus
+  build-depends:
+    base >=4.13,
+    common-utils,
+    common-interact,
+    containers,
+    bytestring,
+    text,
+    tf-random,
+    ht-hs
+
+  default-language:    Haskell2010
+  default-extensions:
+    BlockArguments, OverloadedStrings, MultiWayIf, TemplateHaskell,
+    RecordWildCards
+
+  ghc-options:         -Wall
+
+
+
+

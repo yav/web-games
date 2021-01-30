@@ -1,0 +1,27 @@
+cabal-version:       >=2.0
+name:                common-interact
+version:             0.1.0.0
+license-file:        LICENSE
+author:              Iavor Diatchki
+maintainer:          iavor.diatchki@gmail.com
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+library
+  hs-source-dirs: src
+  signatures:
+    AppTypes
+  exposed-modules:
+    Common.Interact,
+    Common.Server
+  build-depends:
+    base >=4.13,
+    common-utils,
+    containers, text, aeson, bytestring,
+    websockets-snap, snap-core, websockets, snap-server
+  ghc-options:         -Wall
+  default-language:    Haskell2010
+  default-extensions:
+    BlockArguments, OverloadedStrings, DeriveGeneric
+
+
