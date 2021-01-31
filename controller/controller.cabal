@@ -1,0 +1,25 @@
+cabal-version:       >=1.10
+name:                controller
+version:             0.1.0.0
+-- synopsis:
+-- description:
+-- bug-reports:
+-- license:
+license-file:        LICENSE
+author:              Iavor Diatchki
+maintainer:          iavor.diatchki@gmail.com
+-- copyright:
+-- category:
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+executable controller
+  main-is:             Main.hs
+  hs-source-dirs:      src
+  -- other-modules:
+  default-extensions:  BlockArguments, RecordWildCards, OverloadedStrings
+  build-depends:       base, containers, bytestring,
+                       tf-random, directory, filepath, process,
+                       snap-server, snap-core
+  default-language:    Haskell2010
+  ghc-options:         -Wall -threaded

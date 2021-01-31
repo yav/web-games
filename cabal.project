@@ -1,4 +1,5 @@
 packages:
+  controller/
   common-utils/
   common-interact/
   ht-hs/
