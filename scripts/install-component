@@ -1,0 +1,11 @@
+#!/bin/bash
+
+COMPONENT=$1
+DIR=install/$COMPONENT
+
+mkdir -p $DIR
+cabal build $COMPONENT
+cp `cabal exec which $COMPONENT` $DIR/$COMPONENT
+strip $DIR/$COMPONENT
+upx $DIR/$COMPONENT
+cp -r $COMPONENT/ui $DIR/

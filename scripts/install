@@ -1,0 +1,11 @@
+#!/bin/bash
+
+COMPONENT=controller
+DIR=install
+mkdir -p $DIR
+cabal build $COMPONENT
+cp `cabal exec which $COMPONENT` $DIR/$COMPONENT
+strip $DIR/$COMPONENT
+upx $DIR/$COMPONENT
+
+./scripts/install-component ht-hs

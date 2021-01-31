@@ -28,7 +28,7 @@ sessionDir :: ByteString -> FilePath
 sessionDir x = "sessions" </> BS8.unpack x
 
 templates :: FilePath
-templates = "install"
+templates = "."
 
 type Component = Map ByteString [ByteString] -> Either ByteString CreateSession
 
