@@ -23,6 +23,7 @@ import Data.IORef(IORef,newIORef,atomicModifyIORef',modifyIORef',readIORef)
 
 import qualified Snap.Http.Server as Snap
 import qualified Snap.Core as Snap
+import qualified Snap.Util.FileServe as Snap
 
 sessionDir :: ByteString -> FilePath
 sessionDir x = "sessions" </> BS8.unpack x
@@ -138,6 +139,7 @@ main =
            ("/status/:session", getStatus state)
          : ("/start/:session", startSession state)
          : ("/stop/:session", stopSession state)
+         : ("/", Snap.serveDirectory "ui")
          : [ ( "/new/" <> path, newSession state checkParams)
            | (path,checkParams) <- components
            ]

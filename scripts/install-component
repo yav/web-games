@@ -1,7 +1,7 @@
 #!/bin/bash
 
 COMPONENT=$1
-DIR=install/$COMPONENT
+DIR=$2
 
 mkdir -p $DIR
 cabal build $COMPONENT

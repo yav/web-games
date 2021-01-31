@@ -1,0 +1,46 @@
+<html>
+<head>
+<script>
+function create() {
+  const b = document.getElementById('board')
+  const ps = []
+  let next = 0
+  for (let i = 0; i < 5; ++i) {
+    const el = document.getElementById('player' + (i+1))
+    const val = el.value.trim()
+    if (val.length > 0) {
+      ps[next++] = val
+    }
+  }
+  let map = b.value
+  switch (map) {
+    case 'ht':        map = map + (ps.length < 4 ? '_23' : '_45'); break
+    case 'britannia': map = map + (ps.length < 4 ? '_23' : '_45'); break
+  }
+  let url = '/new/ht/' + map
+  let sep = '?'
+  for (let i = 0; i < ps.length; ++i) {
+    url = url + sep + 'player=' + ps[i]
+    sep = '&'
+  }
+  window.location.replace(url)
+}
+</script>
+</head>
+<body>
+<table>
+<tr><td>Map</td>
+<td><select id="board" name="board">
+  <option value="ht">Basic Map</option>
+  <option value="east">East Expnasion</option>
+  <option value="britannia">Britannia</option>
+</select></td></tr>
+<tr><td>Player 1:</td><td><input id="player1"></input></td></tr>
+<tr><td>Player 2:</td><td><input id="player2"></input></td></tr>
+<tr><td>Player 3:</td><td><input id="player3"></input></td></tr>
+<tr><td>Player 4:</td><td><input id="player4"></input></td></tr>
+<tr><td>Player 5:</td><td><input id="player5"></input></td></tr>
+</table>
+<button type="button" onclick="create()">Create</button>
+</body>
+</html>
