@@ -119,6 +119,10 @@ function drawLog() {
         el.appendChild(box)
       }
     }
+
+    , prepend: function(x) {
+      dom.prepend(x)
+    }
   }
 }
 

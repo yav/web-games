@@ -119,10 +119,11 @@ body {
 
 .score {
   background-color: white;
-  position: absolute;
+ /* position: absolute; */
   padding: 0.5em;
   border: 0.2em solid black;
   border-radius: 0.5em;
+  overflow: auto;
 }
 
 .score table {
@@ -148,8 +149,6 @@ body {
   display: inline-block;
   font-size: smaller;
   padding: 1em;
-  overflow: auto;
-  width: 20em;
 }
 
 .log-item {

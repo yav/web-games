@@ -198,10 +198,11 @@ function uiRedraw(ws,state) {
   gui.container.appendChild(gui.panel)
 
 
+  let score = null
   { // Current turn
     const stat = game.status
     if (stat.tag === 'finished') {
-      drawScore(game.turnOrder, game.score)
+      score = drawScore(game.turnOrder, game.score)
     } else
       gui.turn = drawTurn(game.status)
   }
@@ -211,6 +212,9 @@ function uiRedraw(ws,state) {
     const n = game.log.length
     for (let i = n-1; i >= 0; --i) {
       gui.log.addLog(game.log[i])
+    }
+    if (score) {
+      gui.log.prepend(score)
     }
   }
 

@@ -1,6 +1,7 @@
 function drawScore(ps,score) {
   const dom = document.createElement('div')
   dom.classList.add('score')
+  dom.classList.add('log-turn')
 
   const tab = document.createElement('table')
 
@@ -53,5 +54,5 @@ function drawScore(ps,score) {
   }
   dom.appendChild(tab)
 
-  gui.container.appendChild(dom)
+  return dom
 }
