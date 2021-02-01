@@ -20,6 +20,14 @@ showText = Text.pack . show
 enumAll :: (Bounded a,Enum a) => [a]
 enumAll = [ minBound .. maxBound ]
 
+-- | Assumes non-empty input
+pickWeighted :: [(a,Int)] -> TFGen -> (a, TFGen)
+pickWeighted xs rng = (head $ drop i $ concatMap expand xs, rng1)
+  where
+  (i,rng1) = randomR (0,tot-1) rng
+  tot = sum (map snd xs)
+  expand (a,n) = replicate n a
+
 shuffle :: [a] -> TFGen -> ([a],TFGen)
 shuffle xs g0
   | null xs = ([],g0)

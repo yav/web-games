@@ -15,8 +15,8 @@ import Resource
 data TileName =
     TileNum Int
   | Capital
-  | NE (Maybe Resource)
-  | NW (Maybe Resource)
+  | TNE (Maybe Resource)
+  | TNW (Maybe Resource)
     deriving (Eq,Ord)
 
 
@@ -228,65 +228,65 @@ startTiles =
       [ defCity $ Action [ Move 1, Develop Any 1 ] ]
       []
 
-  , defTile' (NW Nothing) Plains
+  , defTile' (TNW Nothing) Plains
       []
       [ defRuin Bronze ]
 
-  , defTile' (NE Nothing ) Plains
+  , defTile' (TNE Nothing ) Plains
       [ defCity $ Action [ Move 1 ] `Or` Action [ Develop Any 1 ] ]
       []
 
 
-  , defTile' (NW (Just Blue)) Swamp
+  , defTile' (TNW (Just Blue)) Swamp
       []
       [ defRuin Bronze ]
 
-  , defTile' (NE (Just Blue)) Plains
+  , defTile' (TNE (Just Blue)) Plains
       [ defCity $ Action [ Move 1 ] `Or` Action [ DrawResource  1] ]
       []
 
 
-  , defTile' (NW (Just Purple)) Plains
+  , defTile' (TNW (Just Purple)) Plains
       [ defCity $ Action [ Develop Any 1 ] ]
       []
 
-  , defTile' (NE (Just Purple)) Plains
+  , defTile' (TNE (Just Purple)) Plains
       [ defCity $ Action [ Move 1 ] ]
       []
 
 
-  , defTile' (NW (Just Red)) Plains
+  , defTile' (TNW (Just Red)) Plains
       []
       [ defRuin Bronze ]
 
-  , defTile' (NE (Just Red)) Plains
+  , defTile' (TNE (Just Red)) Plains
       [ defCity $ Action [ Move 1 ] `Or` Action [ Attack 1 ] ]
       []
 
 
-  , defTile' (NW (Just Orange)) Mountain
+  , defTile' (TNW (Just Orange)) Mountain
       []
       [ defRuin Bronze, defRuin Bronze ]
 
-  , defTile' (NE (Just Orange)) Plains
+  , defTile' (TNE (Just Orange)) Plains
       [ defCity $ Action [ Move 1 ] `Or` Action [ Develop Same 2 ] ]
       []
 
 
-  , defTile' (NW (Just Yellow)) Plains
+  , defTile' (TNW (Just Yellow)) Plains
       [ defCity $ Action [ Move 1 ] `Or` Action [ Develop Any 1 ] ]
       []
 
-  , defTile' (NE (Just Yellow)) Plains
+  , defTile' (TNE (Just Yellow)) Plains
       []
       [ defRuin Bronze ]
 
 
-  , defTile' (NW (Just Green)) Plains
+  , defTile' (TNW (Just Green)) Plains
       []
       [ defRuin Bronze ]
 
-  , defTile' (NE (Just Green)) Plains
+  , defTile' (TNE (Just Green)) Plains
       [ defCity $ Action [Move 2] `Or` Action [Develop Any 1 ] ]
       []
   ]

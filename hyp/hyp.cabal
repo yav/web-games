@@ -23,13 +23,18 @@ library
     Terrain,
     Tile,
     Tech,
-    BoardActions
+    BoardActions,
+    Bag,
+    PlayerState,
+    Geometry
 
   build-depends:
     base, containers, text,
+    tf-random,
     common-utils
 
   ghc-options: -Wall
 
   default-language:    Haskell2010
-  default-extensions: DeriveGeneric, OverloadedStrings, TemplateHaskell
+  default-extensions: DeriveGeneric, OverloadedStrings, TemplateHaskell,
+                      BlockArguments
