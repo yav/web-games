@@ -47,6 +47,26 @@ body {
   position: absolute;
 }
 
+.upgrade-action.help {
+  opacity: 0;
+  overflow: visible;
+}
+
+.upgrade-action.help .label {
+  position: absolute;
+  display: inline-block;
+  top: -4ex;
+  background-color: white;
+  border: 1px solid black;
+  padding: 0.2em;
+  border-radius: 0.2em;
+  z-index: 0;
+  text-align: center;
+}
+
+.upgrade-action.help:hover {
+  opacity: 100;
+}
 
 @keyframes pulse {
   from { background-color: rgba(255,255,255,0);   color: #000; }

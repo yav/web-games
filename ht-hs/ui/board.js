@@ -243,6 +243,41 @@ function drawBoard(opts) {
 
   }
 
+  { // help for actions
+    const stats =
+      { Actions:   'Actions'
+      , Movement:  'Movement'
+      , Hiring:    'Hiring'
+      , Privilege: 'Privilege'
+      , Keys:      'Keys'
+      }
+
+    const makeBox = function(loc,n,lab) {
+      const el = document.createElement('div')
+      el.classList.add('upgrade-action')
+      el.classList.add('help')
+
+      const help = document.createElement('div')
+      el.appendChild(help)
+      help.classList.add('label')
+      help.textContent = lab
+
+      const style  = el.style
+      style.width  = n * board.upgradeSize
+      style.height = board.upgradeSize
+      style.left   = loc.x
+      style.top    = loc.y
+      dom.appendChild(el)
+    }
+
+    for (stat in stats) {
+      makeBox(board.upgradeSpot(stat), 1, stats[stat])
+    }
+    const loc = board.ptsSpot(1)
+    makeBox(loc, 3, "End game VP")
+
+  }
+
   { // nodes
     const nodeBox = {}
     ui.hilightNode = function(node) {
