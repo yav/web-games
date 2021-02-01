@@ -135,6 +135,17 @@ body {
   border-radius: 100%;
 }
 
+.score.help {
+  position: absolute;
+  left: 0;
+  top: 2em;
+}
+
+.score.help div {
+  border-left: 1px solid black;
+  padding-left: 0.5em;
+  margin-bottom: 0.5em;
+}
 
 
 .score {
@@ -431,6 +442,7 @@ body {
   border-radius: 0.2em;
   padding-left: 0.2em;
   padding-right: 0.2em;
+  margin: 0.2em;
 }
 
 .node-highlight {
