@@ -109,9 +109,10 @@ geoHasPath geo usable from to = search Set.empty [from]
 type Reps = IntMap NodeId
 
 -- | Compute the size of the largest connected component, when only
--- considering the nodes selected by the predicate.
-geoLargestComponent :: Geometry -> (NodeId -> Bool) -> Int
-geoLargestComponent Geometry { edgeNeighbours, nodeNeighbours } belongs =
+-- considering the nodes with +ve presence.  The result is the sum
+-- of the values in the largest component.
+geoLargestComponent :: Geometry -> (NodeId -> Int) -> Int
+geoLargestComponent Geometry { edgeNeighbours, nodeNeighbours } presence =
      largest
    $ Map.toList
    $ Map.fromListWith (+)
@@ -135,7 +136,7 @@ geoLargestComponent Geometry { edgeNeighbours, nodeNeighbours } belongs =
 
   maybeUnion :: (NodeId,NodeId) -> Reps -> Reps
   maybeUnion (n1,n2) reps =
-    if belongs n1 && belongs n2
+    if presence n1 > 0 && presence n2 > 0
       then union n1 n2 reps
       else reps
 
@@ -143,7 +144,7 @@ geoLargestComponent Geometry { edgeNeighbours, nodeNeighbours } belongs =
   classes = foldr maybeUnion Map.empty (Map.elems edgeNeighbours)
 
   count :: Reps -> NodeId -> (Reps,(NodeId,Int))
-  count reps n = (reps1, (r, if belongs n then 1 else 0))
+  count reps n = (reps1, (r, presence n))
     where (r,reps1) = find n reps
 
   cmp (_,x) (_,y) = compare x y

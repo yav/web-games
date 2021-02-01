@@ -144,8 +144,8 @@ nodeAcceptsAnnex :: Node -> Bool
 nodeAcceptsAnnex n = nodeIsGreen n || not (null (fullSpots n))
 
 -- | Does this player have presence in the node?
-nodeHasPresence :: PlayerId -> Node -> Bool
-nodeHasPresence p = any ((p ==) . owner) . nodeAllWorkers
+nodeHasPresence :: PlayerId -> Node -> Int
+nodeHasPresence p = length . filter ((p ==) . owner) . nodeAllWorkers
 
 nodeAllWorkers :: Node -> [Worker]
 nodeAllWorkers n = nodeExtra n ++ fullSpots n

@@ -263,7 +263,7 @@ scoreProvince provinceId board =
 hasRouteBonus :: PlayerId -> Board -> Bool
 hasRouteBonus playerId board = geoHasPath (boardGeometry board) consider a b
   where
-  consider n = nodeHasPresence playerId (getField (boardNode n) board)
+  consider n = nodeHasPresence playerId (getField (boardNode n) board) > 0
   (a,b)      = boardBonusRoute board
 
 --------------------------------------------------------------------------------
