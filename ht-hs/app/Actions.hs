@@ -28,7 +28,8 @@ nextAction =
   do state <- getState
      end   <- checkEndGame
      if end
-        then do update (Log EndTurn)
+        then do save
+                update (Log EndTurn)
                 update (Log StartTurn)
                 evLog [ "Game Over" ]
                 update EndGame
