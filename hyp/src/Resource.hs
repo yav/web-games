@@ -1,12 +1,14 @@
 module Resource where
 
+import Data.Maybe(isNothing)
 import GHC.Generics(Generic)
-import Common.Field(declareFields)
+import Data.Aeson(ToJSON,ToJSONKey)
 
 data Resource = Blue | Yellow | Orange | Purple | Red | Green | Gray
-  deriving (Eq,Ord,Enum,Bounded,Generic)
+  deriving (Eq,Ord,Enum,Bounded,Generic,ToJSON,ToJSONKey)
 
 data ResourceReq = Exact Resource | AnyNormal
+  deriving (Generic,ToJSON)
 
 isNormal :: Resource -> Bool
 isNormal r =
@@ -28,11 +30,28 @@ resourceAmount r
 
 data ResourceSpot = ResourceSpot
   { spotRequires  :: ResourceReq
-  , _spotResource :: Maybe Resource
-  }
+  , spotResource  :: Maybe Resource
+  } deriving (Generic,ToJSON)
 
 emptySpot :: ResourceReq -> ResourceSpot
-emptySpot r = ResourceSpot { spotRequires = r, _spotResource = Nothing }
+emptySpot r = ResourceSpot { spotRequires = r, spotResource = Nothing }
 
-declareFields ''ResourceSpot
+
+type ResourceCost = [ ResourceSpot ]
+
+costFreeSpots :: ResourceCost -> [(Int,ResourceReq)]
+costFreeSpots c = [ (n,spotRequires s) | (n,s) <- zip [ 0 .. ] c
+                                       , isNothing (spotResource s) ]
+
+costFullSpots :: ResourceCost -> [(Int,Resource)]
+costFullSpots c = [ (n,r) | (n,s)  <- zip [ 0 .. ] c
+                          , Just r <- [ spotResource s ] ]
+
+costSetResource :: Int -> Maybe Resource -> ResourceCost -> ResourceCost
+costSetResource n r c =
+  case splitAt n c of
+    (as,b:bs) -> as ++ b { spotResource = r } : bs
+    _ -> c
+
+
 

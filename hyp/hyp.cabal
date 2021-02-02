@@ -26,15 +26,34 @@ library
     BoardActions,
     Bag,
     PlayerState,
-    Geometry
+    Geometry,
+    AppTypes
 
   build-depends:
     base, containers, text,
     tf-random,
+    aeson,
     common-utils
 
   ghc-options: -Wall
 
   default-language:    Haskell2010
   default-extensions: DeriveGeneric, OverloadedStrings, TemplateHaskell,
-                      BlockArguments
+                      BlockArguments, DeriveAnyClass
+
+executable hyp
+  hs-source-dirs: app
+  main-is: Main.hs
+  build-depends:
+    base,
+    containers,
+    bytestring,
+    common-utils,
+    common-interact,
+    hyp
+
+  ghc-options: -Wall
+  default-language: Haskell2010
+  default-extensions:
+    BlockArguments, OverloadedStrings, TemplateHaskell
+

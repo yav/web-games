@@ -1,6 +1,9 @@
 module Tech where
 
 import Data.Text(Text)
+import GHC.Generics(Generic)
+import Data.Aeson(ToJSON)
+
 import Resource
 import Action
 
@@ -8,10 +11,19 @@ import Action
 data Tech = Tech
   { techName      :: Text
   , techVP        :: Int
-  , techCost      :: [ResourceSpot]
+  , techCost      :: ResourceCost
   , techBenefit   :: TechBenefit
-  }
+  } deriving (Generic,ToJSON)
 
+techFreeSpots :: Tech -> [(Int,ResourceReq)]
+techFreeSpots = costFreeSpots . techCost
+
+techSetResource :: Int -> Maybe Resource -> Tech -> Tech
+techSetResource n r t = t { techCost = costSetResource n r (techCost t) }
+
+
+
+--------------------------------------------------------------------------------
 defTech ::
   Int           {-^ VP -} ->
   Text          {-^ Name -} ->
@@ -28,7 +40,7 @@ defTech vp name cost benefit =
 data TechBenefit =
     OneTime Action
   | Continuous ContinuousAciton
-
+    deriving (Generic,ToJSON)
 
 deck1 :: [Tech]
 deck1 =

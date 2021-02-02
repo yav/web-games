@@ -1,5 +1,8 @@
 module Action where
 
+import Data.Aeson(ToJSON)
+import GHC.Generics(Generic)
+
 import Resource
 
 data BasicAction =
@@ -19,14 +22,17 @@ data BasicAction =
   | Spy Int
 
   | Neighbours BasicAction
+    deriving (Generic,ToJSON)
 
 data DevelopConstratint = Same | Different | Any
+    deriving (Generic,ToJSON)
 
 
 data Action =
     If BasicAction [BasicAction]
   | Action [BasicAction]
   | Or Action Action
+    deriving (Generic,ToJSON)
 
 data Event =
     GainAttack
@@ -35,6 +41,7 @@ data Event =
   | GainGem
   | GainDevelop
   | StartTurn
+    deriving (Generic,ToJSON)
 
 
 -- Bonus actions do not trigger the effect again
@@ -42,4 +49,7 @@ data ContinuousAciton =
     On Event BasicAction
   | UseMoveAsFly
   | UseWorkerAsClone
+    deriving (Generic,ToJSON)
+
+
 

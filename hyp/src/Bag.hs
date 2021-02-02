@@ -3,12 +3,18 @@ module Bag where
 import Data.Map(Map)
 import qualified Data.Map as Map
 import System.Random.TF(TFGen)
+import GHC.Generics(Generic)
+import Data.Aeson(ToJSON)
 
 import Common.Utils
 import Resource
 
 
 newtype Bag = Bag (Map Resource Int)
+  deriving (Generic,ToJSON)
+
+bagEmpty :: Bag
+bagEmpty = Bag Map.empty
 
 bagAdd :: Resource -> Bag -> Bag
 bagAdd r (Bag b) = Bag (Map.insertWith (+) r 1 b)
