@@ -60,6 +60,8 @@ function srvConnect() {
   const obj = new URL(window.location)
   const info = obj.searchParams
   const url = 'ws://' + obj.host + '/ws'
+  const s = Number(info.get('size'))
+  if (s) { boardSize = s }
   console.log("Connecting to: " + url)
   const ws = new WebSocket(url)
 

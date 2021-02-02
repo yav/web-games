@@ -155,9 +155,7 @@ function drawBoard(opts) {
     }
 
     const askAnnex = function(node,shape,q) {
-      console.log('before',lastAnnex[node])
       const loc = nextAnnexLoc(node,shape)
-      console.log('after',lastAnnex[node])
       const worker = { owner: playerId, shape: shape }
       const el  = drawWorkerAt(loc,board.workerSize,worker)
       el.classList.add('empty')
@@ -346,7 +344,6 @@ function drawBoard(opts) {
     const placedBonuses = {}
 
     const placeBonus = function(edge,bonus) {
-      console.log('bonus on edge ' + edge + ' ' + bonus)
       const loc = board.bonusSpot(edge)
       const el  = drawBonusTokenAt(loc, board.bonusSize, bonus)
       dom.appendChild(el)

@@ -1,5 +1,6 @@
 let playerId
 let gui
+let boardSize = 800
 
 function main() { srvConnect() }
 
@@ -120,7 +121,7 @@ function uiRedraw(ws,state) {
 
   { // Board
     const board = game.board
-    board.size = 800
+    board.size = boardSize
     gui.board = drawBoard(board)
   }
 
@@ -164,7 +165,7 @@ function uiRedraw(ws,state) {
 
 
   { // Players
-    const height = 120
+    const height = boardSize / 6.5
     const width  = 3 * height
 
     gui.players = {}
