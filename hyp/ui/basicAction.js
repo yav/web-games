@@ -1,6 +1,9 @@
+
+const uiBasicAction = function() {
+
 const iconSize = 32
 
-function badge(n) {
+const badge = function(n) {
   const dom       = div('badge')
   const size      = 0.4 * iconSize
   setDim(dom,size,size)
@@ -9,25 +12,35 @@ function badge(n) {
   return dom
 }
 
-function tooltip(el,n) {
+const tooltip = function(el,above,n) {
   const dom  = div('tooltip')
   const size = 0.4 * iconSize
-  setDim(dom,size,size)
   setSize(dom,'fontSize',0.8 * size)
-  dom.textContent = n
-  return dom
+  dom.innerHTML = n
+  el.addEventListener('mouseenter',() => dom.style.display = 'inline-block')
+  el.addEventListener('mouseleave',() => dom.style.display = 'none')
+  el.appendChild(dom)
+  setSize(dom,'left',0)
+  setSize(dom,'top', above? -size * 0.9 : 1.1 * iconSize)
 }
 
-function actionIcon(n,action,help) {
+const actionIcon = function(n,action,help) {
   const dom     = div('icon ' + action)
   const style   = dom.style
   setDim(dom,iconSize,iconSize)
+  setSize(dom,'margin',2)
   if (n != 1) dom.appendChild(badge(n))
-  tooltip(dom,help)
+  tooltip(dom,false,help)
   return dom
 }
 
-function cube(color) {
+const neighbours = function() {
+  const dom = div('icon Neighbours')
+  tooltip(dom,true,'Neighbors')
+  return dom
+}
+
+const cube = function(color) {
   const dom    = div('pic ' + color)
   const size   = iconSize * 0.75
   setDim(dom,size,size)
@@ -35,8 +48,22 @@ function cube(color) {
   return dom
 }
 
-const uiBasicAction = hsBasicAction(
-  { Move: (n) => gui.container.appendChild(actionIcon(n,'move','Movement'))
-  })
-
+const f = function(c,t) {
+  hsBasicAction(
+    { Move: (n) => c.appendChild(actionIcon(n,'Move','Movement'))
+    , Fly: (n) => c.appendChild(actionIcon(n,'Fly','Fly'))
+    , Fortify: (n) => c.appendChild(actionIcon(n,'Fortify','Fortify'))
+    , RangedAttack: (n) =>
+        c.appendChild(actionIcon(n,'RangedAttack','Ranged Attack'))
+    , Attack: (n) => c.appendChild(actionIcon(n,'Attack','Attack'))
+    , Neighbours: (n) => {
+        const c1 = neighbours()
+        f(c1,n)
+        c.appendChild(c1)
+      }
+    , Gem: (n) => c.appendChild(actionIcon(n,'Gem','Gem'))
+    })(t)
+  }
+  return f
+}()
 

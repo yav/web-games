@@ -1,3 +1,8 @@
+body {
+  background-color: red;
+  font-family: arial;
+}
+
 
 .red    { background-color: #c00 }
 .green  { background-color: #090 }
@@ -18,11 +23,7 @@
   text-align: center;
 }
 
-.big.icon {
-  width: 64px;
-}
-
-.badge {
+.icon .badge {
   position: absolute;
   left: 0px;
   top: 0px;
@@ -32,6 +33,24 @@
   border-radius: 12.5%;
   font-weight: bold;
 }
+
+.icon .tooltip {
+  background-color: white;
+  border: 0.1em solid black;
+  border-radius: 0.2em;
+  position: absolute;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  text-align: left;
+  white-space: nowrap;
+  display: none;
+  z-index: 1;
+}
+
+.icon .tooltip ul {
+  padding-left: 1em;
+}
+
 
 .pic {
   border-radius: 12.5%;
@@ -50,11 +69,11 @@
   top: 0px;
 }
 
-.move          { background-image: url('img/walking-boot.svg'); }
-.fly           { background-image: url('img/liberty-wing.svg'); }
-.attack        { background-image: url('img/plain-dagger.svg'); }
-.ranged-attack { background-image: url('img/high-shot.svg'); }
-.fortify       { background-image: url('img/shield.svg'); }
+.Move          { background-image: url('img/walking-boot.svg'); }
+.Fly           { background-image: url('img/liberty-wing.svg'); }
+.Attack        { background-image: url('img/plain-dagger.svg'); }
+.RangedAttack  { background-image: url('img/high-shot.svg'); }
+.Fortify       { background-image: url('img/shield.svg'); }
 .gem           { background-image: url('img/seven-pointed-star.svg'); }
 .draw          { background-image: url('img/swap-bag.svg'); }
 .return        { background-image: url('img/return.svg'); }
@@ -66,6 +85,15 @@
 .gain-tech     { background-image: url('img/card-draw.svg'); }
 .swap          { background-image: url('img/cycle.svg'); }
 .spy           { background-image: url('img/eye-target.svg'); }
+.Neighbours    {
+  border: dotted 1px black;
+  display: inline-block;
+  background-color: white;
+}
+
+.Neighbours .icon {
+  transform: scale(0.8);
+}
 
 
 .spot {
