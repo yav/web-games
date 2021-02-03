@@ -1,0 +1,103 @@
+<html>
+<head>
+<style>
+body {
+  background-color: #000;
+  color: white;
+}
+
+.red    { background-color: #c00 }
+.green  { background-color: #090 }
+.purple { background-color: #909 }
+.blue   { background-color: #09f }
+.orange { background-color: #f60 }
+.yellow { background-color: #fc0 }
+.gray   { background-color: #ccc  }
+.wild   { background-image: conic-gradient(#c00,#909,#09f,#090,#fc0,#f60,#c00) }
+
+.icon {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  background-size: 100%;
+  vertical-align: top;
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  width:  16px;
+  height: 16px;
+  font-size: 14px;
+  text-align: center;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  border-radius: 16px;
+  font-weight: bold;
+}
+
+.move   { background-image: url('img/walking-boot.svg'); }
+.fly    { background-image: url('img/liberty-wing.svg'); }
+.attack { background-image: url('img/plain-dagger.svg'); }
+.gem    { background-image: url('img/seven-pointed-star.svg'); }
+.draw   { background-image: url('img/swap-bag.svg'); }
+.deploy { background-image: url('img/person.svg'); }
+
+
+.spot {
+  margin: 4px;
+  display: inline-block;
+  width:  32px;
+  height: 32px;
+  border-radius: 4px;
+  text-align: center;
+  position: relative;
+}
+
+.cube {
+  width:  24px;
+  height: 24px;
+  border-radius: 4px;
+  background-color: rgba(0,0,0,0.66);
+  left: 4px;
+  top: 4px;
+  position: absolute;
+}
+</style>
+<script>
+function main() {
+  const c = [ 'red', 'green', 'purple', 'blue', 'orange', 'yellow', 'gray', 'wild' ]
+  const b = document.getElementById('bod')
+  for (let i = 0; i < c.length; ++i) {
+    const x = document.createElement('div')
+    x.classList.add(c[i])
+    x.classList.add('spot')
+    b.appendChild(x)
+
+    const y = document.createElement('div')
+    y.classList.add(c[i])
+    y.classList.add('spot')
+    b.appendChild(y)
+
+    const z = document.createElement('div')
+    z.classList.add('cube')
+    y.appendChild(z)
+
+    y.classList.add(c[i])
+
+    b.appendChild(document.createElement('br'))
+  }
+}
+</script>
+</head>
+<body id="bod" onload="main()">
+<div class="move icon"><div class="badge">2</div></div>
+<div class="attack icon"><div class="badge">2</div></div>
+<div class="fly icon"><div class="badge">2</div></div>
+<div class="gem icon"><div class="badge">2</div></div>
+<div class="draw icon"><div class="badge">2</div></div>
+<div class="deploy icon"><div class="badge">2</div></div>
+<br>
+</body>
+</html>
+
