@@ -7,6 +7,7 @@ import Data.Aeson(FromJSON,ToJSON(..))
 import GHC.Generics
 
 import Common.Basics
+import Action
 import PlayerState
 
 data Input = XXXInput
@@ -18,6 +19,7 @@ data Update = XXXUpdate
 data State = State
   { _gamePlayers  :: Map PlayerId PlayerState
   , gameTurnOrder :: [PlayerId]
+  , test :: BasicAction
   -- map
   -- tech market
   } deriving (Generic,ToJSON)
@@ -31,4 +33,5 @@ initialState :: [PlayerId] -> State
 initialState ps = State
   { gameTurnOrder = ps
   , _gamePlayers  = Map.fromList [ (p,emptyPlayerState) | p <- ps ]
+  , test = Move 2
   }

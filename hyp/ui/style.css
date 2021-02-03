@@ -1,0 +1,81 @@
+
+.red    { background-color: #c00 }
+.green  { background-color: #090 }
+.purple { background-color: #909 }
+.blue   { background-color: #09f }
+.orange { background-color: #f60 }
+.yellow { background-color: #fc0 }
+.gray   { background-color: #ccc  }
+.wild   { background-image: conic-gradient(#c00,#909,#09f,#090,#fc0,#f60,#c00) }
+
+.icon {
+  display: inline-block;
+  background-size: 100%;
+  vertical-align: top;
+  position: relative;
+  background-color: black;
+  border-radius: 12.5%;
+  text-align: center;
+}
+
+.big.icon {
+  width: 64px;
+}
+
+.badge {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  text-align: center;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  border-radius: 12.5%;
+  font-weight: bold;
+}
+
+.pic {
+  border-radius: 12.5%;
+  background-size: 100%;
+  border: 1px solid black;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+}
+
+.pic img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+.move          { background-image: url('img/walking-boot.svg'); }
+.fly           { background-image: url('img/liberty-wing.svg'); }
+.attack        { background-image: url('img/plain-dagger.svg'); }
+.ranged-attack { background-image: url('img/high-shot.svg'); }
+.fortify       { background-image: url('img/shield.svg'); }
+.gem           { background-image: url('img/seven-pointed-star.svg'); }
+.draw          { background-image: url('img/swap-bag.svg'); }
+.return        { background-image: url('img/return.svg'); }
+.deploy        { background-image: url('img/person.svg'); }
+.clone         { background-image: url('img/backup.svg'); }
+.upgrade       { background-image: url('img/plain-arrow.svg'); }
+.upgrade-eq    { background-image: url('img/plain-arrow-equal.svg'); }
+.upgrade-diff  { background-image: url('img/plain-arrow-not-equal.svg'); }
+.gain-tech     { background-image: url('img/card-draw.svg'); }
+.swap          { background-image: url('img/cycle.svg'); }
+.spy           { background-image: url('img/eye-target.svg'); }
+
+
+.spot {
+  margin: 4px;
+  display: inline-block;
+  width:  32px;
+  height: 32px;
+  border-radius: 12.5%;
+  position: relative;
+  vertical-align: top;
+}
+
+
