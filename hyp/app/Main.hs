@@ -11,12 +11,14 @@ import Common.Interact
 
 import AppTypes
 import Action
+import Resource
 
 main :: IO ()
 main =
   newServer options \_opts ->
     pure
-      ( BS8.pack $(jsHandlers [ ''OutMsg, ''Update, ''Input, ''BasicAction ])
+      ( BS8.pack $(jsHandlers [ ''OutMsg, ''Update, ''Input
+                              , ''BasicAction ])
       , let players = [ PlayerId "One" ]
         in startGame GameInfo
               { gPlayers = Set.fromList players

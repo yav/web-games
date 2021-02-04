@@ -1,5 +1,5 @@
 body {
-  background-color: red;
+  background-color: #999;
   font-family: arial;
 }
 
@@ -11,7 +11,9 @@ body {
 .orange { background-color: #f60 }
 .yellow { background-color: #fc0 }
 .gray   { background-color: #ccc  }
-.wild   { background-image: conic-gradient(#c00,#909,#09f,#090,#fc0,#f60,#c00) }
+.AnyNormal {
+  background-image: conic-gradient(#c00,#909,#09f,#090,#fc0,#f60,#c00)
+}
 
 .icon {
   display: inline-block;
@@ -32,6 +34,10 @@ body {
   color: white;
   border-radius: 12.5%;
   font-weight: bold;
+}
+
+.icon .badge.negative {
+  color: red !important;
 }
 
 .icon .tooltip {
@@ -77,7 +83,7 @@ body {
 .gem           { background-image: url('img/seven-pointed-star.svg'); }
 .draw          { background-image: url('img/swap-bag.svg'); }
 .return        { background-image: url('img/return.svg'); }
-.deploy        { background-image: url('img/person.svg'); }
+.Deploy        { background-image: url('img/person.svg'); }
 .clone         { background-image: url('img/backup.svg'); }
 .upgrade       { background-image: url('img/plain-arrow.svg'); }
 .upgrade-eq    { background-image: url('img/plain-arrow-equal.svg'); }
@@ -86,24 +92,53 @@ body {
 .swap          { background-image: url('img/cycle.svg'); }
 .spy           { background-image: url('img/eye-target.svg'); }
 .Neighbours    {
-  border: dotted 1px black;
   display: inline-block;
-  background-color: white;
 }
 
 .Neighbours .icon {
-  transform: scale(0.8);
+  transform: scale(0.9);
 }
 
 
 .spot {
-  margin: 4px;
   display: inline-block;
-  width:  32px;
-  height: 32px;
   border-radius: 12.5%;
   position: relative;
   vertical-align: top;
 }
 
+
+.tech {
+  background-color: white;
+  display: inline-block;
+}
+
+.tech .heading {
+  background-color: black;
+  color: white;
+  padding-left: 0.5em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tech .heading .vp {
+  background-color: gold;
+  color: black;
+  font-size: smaller;
+  margin: 0.2em;
+  border-radius: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+.activation {
+  display: flex;
+  justify-content: space-between;
+}
+
+.part {
+  display: inline-block;
+  position: relative;
+  white-space: nowrap;
+}
 

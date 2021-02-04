@@ -34,5 +34,5 @@ initialState :: [PlayerId] -> State
 initialState ps = State
   { gameTurnOrder = ps
   , _gamePlayers  = Map.fromList [ (p,emptyPlayerState) | p <- ps ]
-  , test = deck2
+  , test = deck3
   }
