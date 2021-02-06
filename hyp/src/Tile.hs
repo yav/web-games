@@ -26,7 +26,16 @@ data Tile = Tile
   , _tileCities   :: Map Int City
   , _tileRuins    :: Map Int Ruin
   , _tileVisible  :: Bool
+  , tilePlayers   :: Map PlayerId Int   -- how many units a player has
   }
+
+addPlayer :: PlayerId -> Tile -> Tile
+addPlayer p t = t { tilePlayers = Map.insertWith (+) p 1 (tilePlayers t) }
+
+removePlayer :: PlayerId -> Tile -> Tile
+removePlayer p t = t { tilePlayers = Map.insertWith (+) p (-1) (tilePlayers t) }
+
+
 
 
 data TileSpot =
@@ -55,6 +64,7 @@ defTile' name ter cs rs = Tile
   , _tileCities   = Map.fromList (zip [ 0 .. ] cs)
   , _tileRuins    = Map.fromList (zip [ 0 .. ] rs)
   , _tileVisible  = False
+  , tilePlayers   = Map.empty
   }
 
 defTile :: Int -> Terrain -> [City] -> [Ruin] -> Tile
