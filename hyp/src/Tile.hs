@@ -34,21 +34,6 @@ data Tile = Tile
   , tilePlayers   :: Map PlayerId Int   -- how many units a player has
   }
 
-
-addPlayer :: PlayerId -> Tile -> Tile
-addPlayer p t = t { tilePlayers = Map.insertWith (+) p 1 (tilePlayers t) }
-
-removePlayer :: PlayerId -> Tile -> Tile
-removePlayer p t = t { tilePlayers = Map.insertWith (+) p (-1) (tilePlayers t) }
-
-isStartTile :: Tile -> Bool
-isStartTile t =
-  case tileNumber t of
-    TileNum _ -> False
-    _         -> True
-
-
-
 data TileSpot =
     Empty
   | Ghost
@@ -58,7 +43,7 @@ data TileSpot =
 data City = City
   { citySpot    :: TileSpot
   , cityActions :: Action
-  , cityCapital :: Bool
+  , cityCapital :: Maybe PlayerId
   } deriving (Generic, ToJSON)
 
 data Ruin = Ruin
@@ -67,6 +52,26 @@ data Ruin = Ruin
   , ruinTokens :: [Token]
   }
 declareFields ''Tile
+
+
+addPlayer :: PlayerId -> Tile -> Tile
+addPlayer p t = t { tilePlayers = Map.insertWith (+) p 1 (tilePlayers t) }
+
+removePlayer :: PlayerId -> Tile -> Tile
+removePlayer p t = t { tilePlayers = Map.insertWith (+) p (-1) (tilePlayers t) }
+
+setCapital :: Maybe PlayerId -> Tile -> Tile
+setCapital p = updField tileCities (fmap citySetCapital)
+  where
+  citySetCapital c = c { cityCapital = p }
+
+isStartTile :: Tile -> Bool
+isStartTile t =
+  case tileNumber t of
+    TileNum _ -> False
+    _         -> True
+
+
 
 
 instance ToJSON Tile where
@@ -100,11 +105,8 @@ defTile' name ter cs rs = Tile
 defTile :: Int -> Terrain -> [City] -> [Ruin] -> Tile
 defTile n = defTile' (TileNum n)
 
-defCity' :: Bool -> Action -> City
-defCity' c as = City { citySpot = Empty, cityActions = as, cityCapital = c }
-
 defCity :: Action -> City
-defCity = defCity' False
+defCity as = City { citySpot = Empty, cityActions = as, cityCapital = Nothing  }
 
 defRuin :: TokenType -> Ruin
 defRuin t = Ruin { ruinSpot = Empty, ruinType = t, ruinTokens = [] }
@@ -268,7 +270,7 @@ peripheralTiles =
 startTiles :: [Tile]
 startTiles =
   [ defTile' Capital Plains
-      [ defCity' True $ Action [ Move 1, Develop Any 1 ] ]
+      [ defCity $ Action [ Move 1, Develop Any 1 ] ]
       []
 
   , defTile' (TNW Nothing) Plains

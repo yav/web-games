@@ -53,6 +53,7 @@ executable hyp
     tf-random,
     common-utils,
     common-interact,
+    aeson,
     hyp
 
   ghc-options: -Wall

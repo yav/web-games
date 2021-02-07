@@ -42,4 +42,4 @@ initialState rng useFog ps = State
   , test = deck3
   }
   where
-  brd = setupBoard rng useFog (map (const Nothing) ps)
+  brd = setupBoard rng useFog [ (Just p, Nothing) | p <- ps ]

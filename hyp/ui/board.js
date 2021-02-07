@@ -14,7 +14,7 @@ const uiSoldier = (n,p) => {
   setDim(dom,iconSize,iconSize)
 
   const pic = svg('img/crested-helmet.svg#helmet')
-  pic.classList.add('player-' + p)
+  pic.classList.add('player-' + playerColors[p])
   setDim(pic,iconSize,iconSize)
   dom.appendChild(pic)
 
@@ -28,10 +28,22 @@ const uiSoldier = (n,p) => {
   return dom
 }
 
+
+
+
 const uiCity = (cityId, city) => {
   const dom = div('icon')
-  dom.classList.add(city.cityCapital ? 'capitol' : 'city')
   setDim(dom,iconSize,iconSize)
+
+  const capital = city.cityCapital
+  if (capital) {
+    const pic = svg('img/capitol.svg#capitol')
+    pic.classList.add('player-' + playerColors[capital])
+    setDim(pic,iconSize,iconSize)
+    dom.appendChild(pic)
+  }
+  else dom.classList.add('city')
+
   const h = div('part')
   const help = uiAction(city.cityActions)
   h.appendChild(help)

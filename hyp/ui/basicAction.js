@@ -78,7 +78,7 @@ const actionIcon = (n,action,help) => {
   return dom
 }
 
-const neighbours = function() {
+const neighbours = () => {
   const dom = div('icon Neighbours')
   const txt =
     'repeating-linear-gradient(0deg,#ccc,#ccc ' + (iconSize/4) + 'px, ' +
@@ -88,13 +88,34 @@ const neighbours = function() {
   return dom
 }
 
-const cube = function(color) {
-  const dom    = div('pic ' + color)
+const resourceName = (r) => {
+  switch (r.tag) {
+    case 'Exact': return r.contents
+    case 'AnyNormal': return 'non-gray'
+  }
+}
+
+const cube = (color,withCube) => {
+  let cl = ''
+  switch (color.tag) {
+    case 'Exact': cl = r.contents; break
+    case 'AnyNormal': cl = 'AnyNormal'; break
+  }
+
+  const dom    = div('pic ' + cl)
   const size   = iconSize * 0.75
   setDim(dom,size,size)
-  dom.appendChild(img('img/cube.svg'))
+  if (withCube) (dom.appendChild(img('img/cube.svg')))
   return dom
 }
+
+const gainResource = (n,r) => {
+  const help = n > 0 ? 'Gain ' : 'Loose '
+  const dom = actionIcon(n,'',help + resourceName(r))
+  dom.appendChild(cube(r,false))
+  return dom
+}
+
 
 const f = function(c,t) {
   hsBasicAction(
@@ -133,6 +154,7 @@ const f = function(c,t) {
       }
       c.appendChild(actionIcon(n,cl,help))
       }
+    , LooseResource: (r,n) => c.appendChild(gainResource(-n,r))
     })(t)
   }
   return f

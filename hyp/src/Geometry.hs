@@ -7,6 +7,7 @@ import Data.List(find)
 
 import Data.Aeson(ToJSON(..))
 
+import Common.Basics(PlayerId)
 import Common.Utils(enumAll)
 import Common.Field
 
@@ -67,10 +68,10 @@ emptyBoard = Board Map.empty
 placeTile :: Loc -> Tile -> Board -> Board
 placeTile l t (Board b) = Board (Map.insert l t b)
 
-placeStart :: Loc -> Dir -> Maybe Resource -> Board -> Board
-placeStart l d r = placeTile (neighbour (rot 1 d) l) b
-                 . placeTile (neighbour d l) a
-                 . placeTile l p
+placeStart :: Maybe PlayerId -> Loc -> Dir -> Maybe Resource -> Board -> Board
+placeStart pl l d r = placeTile (neighbour (rot 1 d) l) b
+                    . placeTile (neighbour d l) a
+                    . placeTile l (setCapital pl p)
   where
   findStart x = case find ((x ==) . tileNumber) startTiles of
                   Just t  -> setField tileVisible True t

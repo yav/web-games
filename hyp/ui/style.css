@@ -35,6 +35,7 @@ body {
   color: white;
   border-radius: 12.5%;
   font-weight: bold;
+  z-index: 1;
 }
 
 .icon .badge.negative {

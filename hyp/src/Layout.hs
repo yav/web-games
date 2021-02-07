@@ -3,6 +3,7 @@ module Layout (setupBoard) where
 import System.Random.TF(TFGen)
 import Common.Utils(shuffle,enumAll)
 import Common.Field
+import Common.Basics(PlayerId)
 
 
 import Resource
@@ -10,7 +11,7 @@ import Geometry
 import Tile
 
 
-setupBoard :: TFGen -> Bool -> [Maybe Resource] -> Board
+setupBoard :: TFGen -> Bool -> [(Maybe PlayerId,Maybe Resource)] -> Board
 setupBoard rng0 useFog rs = foldr placePlayer core' (startLocs `zip` rs')
   where
   n = length rs
@@ -35,10 +36,10 @@ setupBoard rng0 useFog rs = foldr placePlayer core' (startLocs `zip` rs')
     | n == 5    = foldr (uncurry placeTile) core (zip extraSpots sometimes)
     | otherwise = core
 
-  rs' = rs ++ repeat Nothing    -- so we can test with 1 player
+  rs' = rs ++ repeat (Nothing,Nothing)    -- so we can test with 1 player
 
 
-  placePlayer ((d,p),r) = placeStart (path p) d r
+  placePlayer ((d,p),(pl,r)) = placeStart pl (path p) d r
 
   startLocs
 {-
