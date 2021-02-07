@@ -4,6 +4,7 @@ body {
 }
 
 
+/* Resources */
 .red    { background-color: #c00 }
 .green  { background-color: #090 }
 .purple { background-color: #909 }
@@ -83,7 +84,7 @@ body {
 .gem           { background-image: url('img/seven-pointed-star.svg'); }
 .draw          { background-image: url('img/swap-bag.svg'); }
 .return        { background-image: url('img/return.svg'); }
-.Deploy        { background-image: url('img/person.svg'); }
+.Deploy        { background-image: url('img/person.svg'); } /* helmet */
 .clone         { background-image: url('img/backup.svg'); }
 .upgrade       { background-image: url('img/plain-arrow.svg'); }
 .upgrade-eq    { background-image: url('img/plain-arrow-equal.svg'); }
@@ -145,7 +146,7 @@ body {
 
 /* --- board ---------------------------------------------------------------- */
 .board {
-  background-color: blue;
+  background-color: black;
 }
 
 .hex {
@@ -167,5 +168,22 @@ body {
 
 .forest   { background-image: url("img/terrain/forest.jpg"); }
 .mountain { background-image: url("img/terrain/mountain.jpg"); }
-.desert   { background-image: url("img/terrain/desert.jpg"); }
+.swamp    { background-image: url("img/terrain/desert.jpg"); }
 .plains   { background-image: url("img/terrain/plains.jpg"); }
+.fog      { background-image: url("img/terrain/fog.jpg"); }
+.ruins    { background-image: url("img/ancient-columns.svg"); }
+.soldier  { background-image: url("img/crested-helmet.svg"); }
+
+.icon svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.player-red    { fill: #c00 }
+.player-green  { fill: #090 }
+.player-purple { fill: #909 }
+.player-blue   { fill: #09f }
+.player-orange { fill: #f60 }
+.player-yellow { fill: #fc0 }
+

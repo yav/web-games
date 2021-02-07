@@ -1,7 +1,12 @@
 module Tile where
 
+import Data.Text(Text)
 import Data.Map(Map)
 import qualified Data.Map as Map
+import GHC.Generics(Generic)
+
+import qualified Data.Aeson as JS
+import Data.Aeson (ToJSON(..), (.=))
 
 import Common.Basics
 import Common.Field
@@ -29,12 +34,18 @@ data Tile = Tile
   , tilePlayers   :: Map PlayerId Int   -- how many units a player has
   }
 
+
 addPlayer :: PlayerId -> Tile -> Tile
 addPlayer p t = t { tilePlayers = Map.insertWith (+) p 1 (tilePlayers t) }
 
 removePlayer :: PlayerId -> Tile -> Tile
 removePlayer p t = t { tilePlayers = Map.insertWith (+) p (-1) (tilePlayers t) }
 
+isStartTile :: Tile -> Bool
+isStartTile t =
+  case tileNumber t of
+    TileNum _ -> False
+    _         -> True
 
 
 
@@ -42,20 +53,36 @@ data TileSpot =
     Empty
   | Ghost
   | Player PlayerId
+    deriving (Generic,ToJSON)
 
 data City = City
   { citySpot    :: TileSpot
   , cityActions :: Action
-  }
+  } deriving (Generic, ToJSON)
 
 data Ruin = Ruin
   { ruinSpot   :: TileSpot
   , ruinType   :: TokenType
   , ruinTokens :: [Token]
   }
-
-
 declareFields ''Tile
+
+
+instance ToJSON Tile where
+  toJSON t = JS.object (if getField tileVisible t then vis else hidden)
+    where
+    hidden = [ "tileTerrain" .= ("Fog" :: Text) ]
+    vis = [ "tileTerrain" .= tileTerrain t
+          , "tileCities" .= getField tileCities t
+          , "tileRuins" .= getField tileRuins t
+          , "tilePlayers" .= tilePlayers t
+          ]
+
+instance ToJSON Ruin where
+  toJSON r = JS.object
+               [ "ruinSpot" .= ruinSpot r
+               , "ruinTokens" .= length (ruinTokens r)
+               ]
 
 defTile' :: TileName -> Terrain -> [City] -> [Ruin] -> Tile
 defTile' name ter cs rs = Tile

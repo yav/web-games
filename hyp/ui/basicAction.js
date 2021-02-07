@@ -42,12 +42,7 @@ const uiAction = (act) => {
 
 }
 
-
-
-const uiBasicAction = function() {
-
-
-const badge = function(n) {
+const badge = (n) => {
   const dom       = div('badge')
   const size      = 0.4 * iconSize
   setDim(dom,size,size)
@@ -55,6 +50,12 @@ const badge = function(n) {
   dom.textContent = n
   return dom
 }
+
+
+
+
+const uiBasicAction = function() {
+
 
 const actionIcon = (n,action,help) => {
   const dom     = div('icon ' + action)

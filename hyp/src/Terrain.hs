@@ -1,6 +1,10 @@
 module Terrain where
 
+import GHC.Generics(Generic)
+import Data.Aeson(ToJSON)
+
 data Terrain = Plains | Forest | Swamp | Mountain
+  deriving (Generic,ToJSON)
 
 extraEntryCost :: Terrain -> Int
 extraEntryCost t =

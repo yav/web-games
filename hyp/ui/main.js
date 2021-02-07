@@ -9,7 +9,7 @@ function uiRedraw(state) {
   console.log('redraw')
   gui = {}
   const body = document.getElementById('main')
-  body.appendChild(uiBoard()) 
+  body.appendChild(uiBoard(state.game.gameBoard))
 
 /*
   const test = state.game.test

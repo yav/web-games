@@ -27,6 +27,7 @@ library
     Bag,
     PlayerState,
     Geometry,
+    Layout,
     AppTypes
 
   build-depends:
@@ -48,6 +49,8 @@ executable hyp
     base,
     containers,
     bytestring,
+    text,
+    tf-random,
     common-utils,
     common-interact,
     hyp
