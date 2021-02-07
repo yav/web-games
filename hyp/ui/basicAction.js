@@ -1,11 +1,13 @@
 
 const iconSize = 32
 
-const tooltip = (el,above,n) => {
+
+
+const tooltipEl = (el,above,n) => {
   const dom  = div('tooltip')
   const size = 0.4 * iconSize
   setSize(dom,'fontSize',0.8 * size)
-  dom.innerHTML = n
+  dom.appendChild(n)
   el.addEventListener('mouseenter',() => dom.style.display = 'inline-block')
   el.addEventListener('mouseleave',() => dom.style.display = 'none')
   el.appendChild(dom)
@@ -13,12 +15,17 @@ const tooltip = (el,above,n) => {
   setSize(dom,'top', above? -size * 0.9 : 1.1 * iconSize)
 }
 
+const tooltip = (el,above,n) => tooltipEl(el,above,span(n))
+
+
 const uiAction = (act) => {
   const dom = div('action')
   const cont = act.contents
   switch (act.tag) {
     case 'If': {
-      uiBasicAction(dom,cont[0])
+      const a = div('action')
+      uiBasicAction(a,cont[0])
+      dom.appendChild(a)
       dom.appendChild(span(' to '))
       const as = cont[1]
       for (let i = 0; i < as.length; ++i) {

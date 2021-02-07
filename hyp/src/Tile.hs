@@ -58,6 +58,7 @@ data TileSpot =
 data City = City
   { citySpot    :: TileSpot
   , cityActions :: Action
+  , cityCapital :: Bool
   } deriving (Generic, ToJSON)
 
 data Ruin = Ruin
@@ -84,6 +85,8 @@ instance ToJSON Ruin where
                , "ruinTokens" .= length (ruinTokens r)
                ]
 
+
+--------------------------------------------------------------------------------
 defTile' :: TileName -> Terrain -> [City] -> [Ruin] -> Tile
 defTile' name ter cs rs = Tile
   { tileNumber    = name
@@ -97,8 +100,11 @@ defTile' name ter cs rs = Tile
 defTile :: Int -> Terrain -> [City] -> [Ruin] -> Tile
 defTile n = defTile' (TileNum n)
 
+defCity' :: Bool -> Action -> City
+defCity' c as = City { citySpot = Empty, cityActions = as, cityCapital = c }
+
 defCity :: Action -> City
-defCity as = City { citySpot = Empty, cityActions = as }
+defCity = defCity' False
 
 defRuin :: TokenType -> Ruin
 defRuin t = Ruin { ruinSpot = Empty, ruinType = t, ruinTokens = [] }
@@ -262,7 +268,7 @@ peripheralTiles =
 startTiles :: [Tile]
 startTiles =
   [ defTile' Capital Plains
-      [ defCity $ Action [ Move 1, Develop Any 1 ] ]
+      [ defCity' True $ Action [ Move 1, Develop Any 1 ] ]
       []
 
   , defTile' (TNW Nothing) Plains

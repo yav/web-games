@@ -13,13 +13,14 @@ import Common.Field
 import Resource
 import Tile
 
+newtype Board = Board (Map Loc Tile)
+
 data Loc      = Loc { locX, locY :: Int }
   deriving (Eq,Ord,Generic,ToJSON)
 
 origin :: Loc
 origin = Loc 0 0
 
-newtype Board = Board (Map Loc Tile)
 
 data Dir = NE | E | SE | SW | W | NW
   deriving (Eq,Ord,Show,Enum,Bounded)

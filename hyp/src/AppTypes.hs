@@ -38,6 +38,8 @@ initialState :: TFGen -> Bool -> [PlayerId] -> State
 initialState rng useFog ps = State
   { gameTurnOrder = ps
   , _gamePlayers  = Map.fromList [ (p,emptyPlayerState) | p <- ps ]
-  , gameBoard = setupBoard rng useFog (map (const Nothing) ps)
+  , gameBoard = brd
   , test = deck3
   }
+  where
+  brd = setupBoard rng useFog (map (const Nothing) ps)
