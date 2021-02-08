@@ -115,29 +115,30 @@ defRuin t = Ruin { ruinSpot = Empty, ruinType = t, ruinTokens = [] }
 centralTiles :: [Tile]
 centralTiles =
   [ defTile 31 Forest
-      [ defCity $ Action [ DrawResource 1, Gem 1 ]
-      , defCity $ Action [ Develop Same 2, Gem 1 ]
+      [ defCity $ Action [ DrawResource, Gem ]
+      , defCity $ Action [ Develop (Same 2), Gem ]
       ]
       []
 
   , defTile 32 Plains
-      [ defCity $ If (LooseResource AnyNormal 1) [ Gem 2, Develop Same 2 ] ]
+      [ defCity $ If (LooseResource AnyNormal)
+                                        [ Gem `Times` 2, Develop (Same 2) ] ]
       [ defRuin Gold ]
 
   , defTile 33 Swamp
-      [ defCity $ Action [ DrawResource 1, Develop Same 4 ] ]
+      [ defCity $ Action [ DrawResource, Develop (Same 4) ] ]
       []
 
   , defTile 34 Mountain
-      [ defCity $ Action [ Gem 1, Develop Same 3 ] ]
+      [ defCity $ Action [ Gem, Develop (Same 3) ] ]
       [ defRuin Gold ]
 
   , defTile 35 Mountain
-      [ defCity $ If (RemoveWorker 1) [ Gem 3 ] ]
+      [ defCity $ If RemoveWorker [ Gem `Times` 3 ] ]
       []
 
   , defTile 36 Forest
-      [ defCity $ Action [ Gem 2 ] ]
+      [ defCity $ Action [ Gem `Times` 2 ] ]
       [ defRuin Gold, defRuin Gold ]
   ]
 
@@ -145,27 +146,27 @@ centralTiles =
 peripheralTiles :: [Tile]
 peripheralTiles =
   [ defTile 1 Plains
-      [ defCity $ Action [ Gem 1 ] ]
+      [ defCity $ Action [ Gem ] ]
       []
 
   , defTile 2 Plains
-      [ defCity $ Action [ Develop Same 2 ] ]
+      [ defCity $ Action [ Develop (Same 2) ] ]
       []
 
   , defTile 3 Plains
-      [ defCity $ Action [ DrawResource 1, Develop Same 2 ] ]
+      [ defCity $ Action [ DrawResource, Develop (Same 2) ] ]
       []
 
   , defTile 4 Plains
-      [ defCity $ Action [ Develop Same 3 ] ]
+      [ defCity $ Action [ Develop (Same 3) ] ]
       []
 
   , defTile 5 Plains
-      [ defCity $ Action [ Gem 1 ] ]
+      [ defCity $ Action [ Gem ] ]
       []
 
   , defTile 6 Plains
-      [ defCity $ Action [ DrawResource 1, Develop Same 2 ] ]
+      [ defCity $ Action [ DrawResource, Develop (Same 2) ] ]
       []
 
   , defTile 7 Plains
@@ -186,19 +187,19 @@ peripheralTiles =
 
 
   , defTile 11 Forest
-      [ defCity $ Action [ Gem 1 ] ]
+      [ defCity $ Action [ Gem ] ]
       []
 
   , defTile 12 Forest
-      [ defCity $ Action [ DrawResource 1, Develop Same 2 ] ]
+      [ defCity $ Action [ DrawResource, Develop (Same 2) ] ]
       []
 
   , defTile 13 Forest
-      [ defCity $ Action [ Develop Same 3 ] ]
+      [ defCity $ Action [ Develop (Same 3) ] ]
       []
 
   , defTile 14 Forest
-      [ defCity $ Action [ Develop Same 2 ] ]
+      [ defCity $ Action [ Develop (Same 2) ] ]
       [ defRuin Silver ]
 
   , defTile 15 Plains
@@ -218,7 +219,7 @@ peripheralTiles =
       [ defRuin Silver ]
 
   , defTile 19 Mountain
-      [ defCity $ Action [ Gem 1 ] ]
+      [ defCity $ Action [ Gem ] ]
       []
 
   , defTile 20 Mountain
@@ -234,23 +235,23 @@ peripheralTiles =
       [ defRuin Silver, defRuin Silver ]
 
   , defTile 23 Plains
-      [ defCity $ Action [ Develop Same 4  ] ]
+      [ defCity $ Action [ Develop (Same 4)  ] ]
       []
 
   , defTile 24 Plains
-      [ defCity $ Action [ Move 2 ] ]
+      [ defCity $ Action [ Move `Times` 2 ] ]
       []
 
   , defTile 25 Plains
-      [ defCity $ Action [ DrawResource 1, Move 1 ] ]
+      [ defCity $ Action [ DrawResource, Move ] ]
       []
 
   , defTile 26 Forest
-      [ defCity $ Action [ Gem 1 ] ]
+      [ defCity $ Action [ Gem ] ]
       []
 
   , defTile 27 Forest
-      [ defCity $ Action [ Develop Same 3 ] ]
+      [ defCity $ Action [ Develop (Same 3) ] ]
       [ defRuin Silver ]
 
   , defTile 28 Plains
@@ -262,7 +263,7 @@ peripheralTiles =
       [ defRuin Silver, defRuin Silver ]
 
   , defTile 30 Mountain
-      [ defCity $ Action [ Fly 1 ] ]
+      [ defCity $ Action [ Fly ] ]
       [ ]
   ]
 
@@ -270,7 +271,7 @@ peripheralTiles =
 startTiles :: [Tile]
 startTiles =
   [ defTile' Capital Plains
-      [ defCity $ Action [ Move 1, Develop Any 1 ] ]
+      [ defCity $ Action [ Move, Develop Any ] ]
       []
 
   , defTile' (TNW Nothing) Plains
@@ -278,7 +279,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE Nothing ) Plains
-      [ defCity $ Action [ Move 1 ] `Or` Action [ Develop Any 1 ] ]
+      [ defCity $ Action [ Move ] `Or` Action [ Develop Any ] ]
       []
 
 
@@ -287,16 +288,16 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE (Just Blue)) Plains
-      [ defCity $ Action [ Move 1 ] `Or` Action [ DrawResource  1] ]
+      [ defCity $ Action [ Move ] `Or` Action [ DrawResource ] ]
       []
 
 
   , defTile' (TNW (Just Purple)) Plains
-      [ defCity $ Action [ Develop Any 1 ] ]
+      [ defCity $ Action [ Develop Any ] ]
       []
 
   , defTile' (TNE (Just Purple)) Plains
-      [ defCity $ Action [ Move 1 ] ]
+      [ defCity $ Action [ Move ] ]
       []
 
 
@@ -305,7 +306,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE (Just Red)) Plains
-      [ defCity $ Action [ Move 1 ] `Or` Action [ Attack 1 ] ]
+      [ defCity $ Action [ Move ] `Or` Action [ Attack ] ]
       []
 
 
@@ -314,12 +315,12 @@ startTiles =
       [ defRuin Bronze, defRuin Bronze ]
 
   , defTile' (TNE (Just Orange)) Plains
-      [ defCity $ Action [ Move 1 ] `Or` Action [ Develop Same 2 ] ]
+      [ defCity $ Action [ Move ] `Or` Action [ Develop (Same 2) ] ]
       []
 
 
   , defTile' (TNW (Just Yellow)) Plains
-      [ defCity $ Action [ Move 1 ] `Or` Action [ Develop Any 1 ] ]
+      [ defCity $ Action [ Move ] `Or` Action [ Develop Any ] ]
       []
 
   , defTile' (TNE (Just Yellow)) Plains
@@ -332,7 +333,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE (Just Green)) Plains
-      [ defCity $ Action [Move 2] `Or` Action [Develop Any 1 ] ]
+      [ defCity $ Action [Move `Times` 2] `Or` Action [Develop Any ] ]
       []
   ]
 

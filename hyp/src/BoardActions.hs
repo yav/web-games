@@ -50,34 +50,34 @@ pbSetResource g n s r = Map.adjust (asSetResouce n s r) g
 playerBoard :: Map GroupName [BoardAction]
 playerBoard = Map.fromList
   [ def Green
-      [ [Exact Green, AnyNormal ]    ~> Action [ Move 2 ]
-      , [Exact Green, Exact Purple ] ~> Action [ Move 1, PlaceWorker 1 ]
+      [ [Exact Green, AnyNormal ]    ~> Action [ Move `Times` 2 ]
+      , [Exact Green, Exact Purple ] ~> Action [ Move, PlaceWorker ]
       ]
 
   , def Red
-      [ [ Exact Red, AnyNormal ]   ~> Or (Action [ Attack 1 ])
-                                         (Action [ Fortify 2 ])
-      , [ Exact Red, Exact Green ] ~> Action [ Attack 1, Move 1 ]
+      [ [ Exact Red, AnyNormal ]   ~> Or (Action [ Attack ])
+                                         (Action [ Fortify `Times` 2 ])
+      , [ Exact Red, Exact Green ] ~> Action [ Attack, Move ]
       ]
 
   , def Purple
-      [ [ Exact Purple, AnyNormal ] ~> Action [ PlaceWorker 1, Fortify 1 ]
-      , [ Exact Purple, Exact Red ] ~> Action [ PlaceWorker 1, Attack 1 ]
+      [ [ Exact Purple, AnyNormal ] ~> Action [ PlaceWorker, Fortify ]
+      , [ Exact Purple, Exact Red ] ~> Action [ PlaceWorker, Attack ]
       ]
 
   , def Orange
-      [ [ Exact Orange, AnyNormal ]  ~> Action [ Develop Different 2 ]
-      , [ Exact Orange, Exact Blue ] ~> Action [ Develop Same 2 ]
+      [ [ Exact Orange, AnyNormal ]  ~> Action [ Develop (Different 2) ]
+      , [ Exact Orange, Exact Blue ] ~> Action [ Develop (Same 2) ]
       ]
 
   , def Yellow
-      [ [ Exact Yellow, AnyNormal ]    ~> Action [ Gem 1 ]
-      , [ Exact Yellow, Exact Orange ] ~> Action [ Gem 1, Develop Any 1 ]
+      [ [ Exact Yellow, AnyNormal ]    ~> Action [ Gem ]
+      , [ Exact Yellow, Exact Orange ] ~> Action [ Gem, Develop Any ]
       ]
 
   , def Blue
-      [ [ Exact Blue, AnyNormal, AnyNormal ]    ~> Action [ GainTech 1 ]
-      , [ Exact Blue, Exact Yellow, AnyNormal ] ~> Action [ GainTech 1, Gem 1 ]
+      [ [ Exact Blue, AnyNormal, AnyNormal ]    ~> Action [ GainTech ]
+      , [ Exact Blue, Exact Yellow, AnyNormal ] ~> Action [ GainTech, Gem ]
       ]
   ]
   where

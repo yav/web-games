@@ -6,25 +6,28 @@ import GHC.Generics(Generic)
 import Resource
 
 data BasicAction =
-    Move Int | Fly Int
-  | PlaceWorker Int | CloneWorker Int | RemoveWorker Int
-  | Attack Int  | RangedAttack Int
-  | Fortify Int
-  | Develop DevelopConstratint Int
-  | Gem Int   -- may be -ve, but only +ve triggers cont. effect
-  | GainTech Int
-  | DrawResource Int
+    Move | Fly
+  | PlaceWorker | CloneWorker | RemoveWorker
+  | Attack      | RangedAttack
+  | Fortify
+  | Develop DevelopConstratint
+  | Gem
+  | GainTech
+  | DrawResource
+  | ReturnResource
   | SwapResource ResourceReq ResourceReq
 
-  | GainResource ResourceReq Int
-  | LooseResource ResourceReq Int
-  | ReturnResource Int
-  | Spy Int
+  | GainResource ResourceReq
+  | LooseResource ResourceReq
+  | LooseGem
+  | LooseDevelop
+  | Spy
 
   | Neighbours BasicAction
+  | Times BasicAction Int
     deriving (Generic,ToJSON)
 
-data DevelopConstratint = Same | Different | Any
+data DevelopConstratint = Same Int | Different Int | Any
     deriving (Generic,ToJSON)
 
 
