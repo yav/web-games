@@ -11,7 +11,6 @@ const uiSpot = (spot) => {
 
 
 const uiTech = (t) => {
-  console.log(t)
   const dom = div('tech')
   setSize(dom,'width', 10 * iconSize)
   setSize(dom,'margin', iconSize / 8)

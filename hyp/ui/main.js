@@ -9,15 +9,18 @@ function uiRedraw(state) {
   console.log('redraw')
   gui = {}
   const body = document.getElementById('main')
-  body.appendChild(uiBoard(state.game.gameBoard))
+  // body.appendChild(uiBoard(state.game.gameBoard))
 
-/*
   const test = state.game.test
   for(let i = 0; i < test.length; ++i) {
-    body.appendChild(uiTech(test[i]))
+    const ds = test[i]
+    for (let j = 0; j < ds.length; ++j) {
+      body.appendChild(uiTech(ds[j]))
+      body.appendChild(document.createElement('br'))
+    }
+    body.appendChild(document.createElement('br'))
     body.appendChild(document.createElement('br'))
   }
-*/
 }
 
 function uiQuestions(questions) {

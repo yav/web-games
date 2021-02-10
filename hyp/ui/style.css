@@ -12,7 +12,7 @@ body {
 .orange { background-color: #f60 }
 .yellow { background-color: #fc0 }
 .gray   { background-color: #ccc  }
-.AnyNormal {
+.wild   {
   background-image: conic-gradient(#c00,#909,#09f,#090,#fc0,#f60,#c00)
 }
 
@@ -28,7 +28,6 @@ body {
 
 .icon .badge {
   position: absolute;
-  left: 0px;
   top: 0px;
   text-align: center;
   background-color: rgba(0,0,0,0.5);
@@ -36,6 +35,14 @@ body {
   border-radius: 12.5%;
   font-weight: bold;
   z-index: 1;
+}
+
+.icon .badge.left {
+  left: 0px;
+}
+
+.icon .badge.right {
+  right: 0px;
 }
 
 .icon .badge.negative {
@@ -77,15 +84,15 @@ body {
   top: 0px;
 }
 
-.Move          { background-image: url('img/walking-boot.svg'); }
-.Fly           { background-image: url('img/liberty-wing.svg'); }
-.Attack        { background-image: url('img/plain-dagger.svg'); }
-.RangedAttack  { background-image: url('img/high-shot.svg'); }
-.Fortify       { background-image: url('img/shield.svg'); }
+.move          { background-image: url('img/walking-boot.svg'); }
+.fly           { background-image: url('img/liberty-wing.svg'); }
+.attack        { background-image: url('img/plain-dagger.svg'); }
+.rangedAttack  { background-image: url('img/high-shot.svg'); }
+.fortify       { background-image: url('img/shield.svg'); }
 .gem           { background-image: url('img/seven-pointed-star.svg'); }
 .draw          { background-image: url('img/swap-bag.svg'); }
 .return        { background-image: url('img/return.svg'); }
-.Deploy        { background-image: url('img/crested-helmet.svg'); }
+.deploy        { background-image: url('img/crested-helmet.svg'); }
 .clone         { background-image: url('img/clone.svg'); }
 .upgrade       { background-image: url('img/plain-arrow.svg'); }
 .upgrade-eq    { background-image: url('img/plain-arrow-equal.svg'); }
@@ -93,7 +100,7 @@ body {
 .gain-tech     { background-image: url('img/card-draw.svg'); }
 .swap          { background-image: url('img/cycle.svg'); }
 .spy           { background-image: url('img/eye-target.svg'); }
-.Neighbours    {
+.neighbours    {
   display: inline-block;
 }
 
