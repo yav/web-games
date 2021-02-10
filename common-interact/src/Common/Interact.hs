@@ -30,7 +30,7 @@ import Data.Aeson (ToJSON(..), FromJSON(..), (.=), (.:?))
 import qualified Data.Aeson as JS
 
 import Common.Basics
-import AppTypes(State,Finished,Input,Update,doUpdate)
+import AppTypes(State,Finished,Input,Update,doUpdate,View,playerView)
 
 
 
@@ -57,7 +57,7 @@ data GameInfo = GameInfo
 
 
 data OutMsg =
-    CurGameState InteractState
+    CurGameState CurState
   | AskQuestions [ChoiceHelp]
   | GameUpdate Update
     deriving Generic
@@ -116,9 +116,17 @@ handleMessage (p :-> req) =
 
 reload :: InteractState -> PlayerId -> WithPlayer OutMsg
 reload s p =
-  let forMe (q :-> _) _ = p == q
-      ps = s { iAsk = Map.filterWithKey forMe (iAsk s) }
-  in p :-> CurGameState ps
+  p :-> CurGameState
+        CurState { cGame = fmap (playerView p) (iGame s)
+                 , cQuestions =
+                      [ ChoiceHelp { chChoice = q
+                                   , chHelp = help
+                                   , chStateName = iName s
+                                   }
+                      | (p' :-> q,(help,_)) <- Map.toList (iAsk s)
+                      , p' == p ]
+                 }
+
 
 
 data InteractState =
@@ -231,23 +239,21 @@ save = Interact $ \k s os -> k () s { iShouldSave = True } os
 --------------------------------------------------------------------------------
 -- Input and output messages
 
+data CurState = CurState
+  { cGame       :: Either Finished View
+  , cQuestions  :: [ChoiceHelp]
+  }
 
 
 instance ToJSON OutMsg
 
-instance ToJSON InteractState where
-  toJSON g =
-    JS.object
-      [ case iGame g of
-          Right a -> "game" .= a
-          Left a  -> "finished" .= a
-      , "questions" .= toChoiceHelp g
-      ]
-    where
-    toChoiceHelp :: InteractState -> [ ChoiceHelp ]
-    toChoiceHelp s =
-      [ ChoiceHelp { chChoice = q, chHelp = help, chStateName = iName s }
-      | (_ :-> q,(help,_)) <- Map.toList (iAsk s) ]
+instance ToJSON CurState where
+  toJSON g = JS.object
+    [ case cGame g of
+        Right a -> "game" .= a
+        Left a  -> "finished" .= a
+    , "questions" .= cQuestions g
+    ]
 
 instance FromJSON PlayerRequest where
   parseJSON =

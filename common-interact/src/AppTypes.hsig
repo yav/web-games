@@ -1,17 +1,20 @@
 signature AppTypes where
 
+import Common.Basics(PlayerId)
 import Data.Aeson(ToJSON,FromJSON)
 
 data State
 data Finished
+data View
 
-instance ToJSON State
+instance ToJSON View
 instance ToJSON Finished
 
 data Update
 
 instance ToJSON Update
-doUpdate :: Update -> State -> Either Finished State
+doUpdate   :: Update -> State -> Either Finished State
+playerView :: PlayerId -> State -> View
 
 data Input
 instance ToJSON   Input

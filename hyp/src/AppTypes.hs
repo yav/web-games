@@ -30,9 +30,13 @@ data State = State
   } deriving (Generic,ToJSON)
 
 type Finished = State
+type View = State
 
 doUpdate :: Update -> State -> Either Finished State
 doUpdate _ = Right
+
+playerView :: PlayerId -> State -> View
+playerView _ = id -- XXX: hide other player's ruin tokenundefineds
 
 initialState :: TFGen -> Bool -> [PlayerId] -> State
 initialState rng useFog ps = State
