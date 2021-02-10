@@ -10,6 +10,30 @@ const uiSpot = (spot) => {
 }
 
 
+const uiActivation = (cost,benefit) => {
+  const dom = div('activation')
+
+  const costDom = div('part')
+  for (let i = 0; i < cost.length; ++i) {
+    costDom.appendChild(uiSpot(cost[i]))
+  }
+  dom.appendChild(costDom)
+
+  const bftPart = div('part')
+  switch (benefit.tag) {
+    case 'OneTime':
+      bftPart.appendChild(uiAction(benefit.contents))
+      break
+    case 'Continuous': {
+      const xxx = span(JSON.stringify(benefit.contents))
+      bftPart.appendChild(xxx)
+      break
+    }
+  }
+  dom.appendChild(bftPart)
+  return dom
+}
+
 const uiTech = (t) => {
   const dom = div('tech')
   setSize(dom,'width', 10 * iconSize)
@@ -24,28 +48,8 @@ const uiTech = (t) => {
   h.appendChild(vp)
   dom.appendChild(h)
 
-  const a = div('activation')
-  dom.appendChild(a)
-
-  const cost = t.techCost
-  const costDom = div('part')
-  for (let i = 0; i < cost.length; ++i) {
-    costDom.appendChild(uiSpot(cost[i]))
-  }
-  a.appendChild(costDom)
-
-  const bft = t.techBenefit
-  const bftPart = div('part')
-  switch (bft.tag) {
-    case 'OneTime':
-      bftPart.appendChild(uiAction(bft.contents))
-      break
-    case 'Continuous': {
-      const xxx = span(JSON.stringify(bft.contents))
-      bftPart.appendChild(xxx)
-      break
-    }
-  }
-  a.appendChild(bftPart)
+  dom.appendChild(uiActivation(t.techCost,t.techBenefit))
   return dom
 }
+
+

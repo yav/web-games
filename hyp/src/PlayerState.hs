@@ -20,7 +20,7 @@ data PlayerState = PlayerState
   , _playerDiscarded :: Bag
   , _playerGems      :: Int
   , _playerDevel     :: Map Resource Int
-  , _playerActions   :: Map GroupName [BoardAction]
+  , _playerBoard     :: Map GroupName [BoardAction]
   , _playerTech      :: Map Int Tech
   } deriving (Generic,ToJSON)
 
@@ -33,7 +33,7 @@ emptyPlayerState = PlayerState
   , _playerDiscarded = bagEmpty
   , _playerGems      = 0
   , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll ]
-  , _playerActions   = playerBoard
+  , _playerBoard     = emptyPlayerBoard
   , _playerTech      = Map.empty
   }
 

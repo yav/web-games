@@ -9,7 +9,16 @@ function uiRedraw(state) {
   console.log('redraw')
   gui = {}
   const body = document.getElementById('main')
-  // body.appendChild(uiBoard(state.game.gameBoard))
+
+  console.log(state)
+
+  const players = state.game._gamePlayers
+  for (p in players) {
+    body.appendChild(uiPlayer(p, players[p]))
+  }
+
+/*
+  body.appendChild(uiBoard(state.game.gameBoard))
 
   const test = state.game.test
   for(let i = 0; i < test.length; ++i) {
@@ -21,6 +30,7 @@ function uiRedraw(state) {
     body.appendChild(document.createElement('br'))
     body.appendChild(document.createElement('br'))
   }
+*/
 }
 
 function uiQuestions(questions) {

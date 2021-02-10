@@ -47,8 +47,8 @@ pbSetResource g n s r = Map.adjust (asSetResouce n s r) g
 
 --------------------------------------------------------------------------------
 
-playerBoard :: Map GroupName [BoardAction]
-playerBoard = Map.fromList
+emptyPlayerBoard :: Map GroupName [BoardAction]
+emptyPlayerBoard = Map.fromList
   [ def Green
       [ [Exact Green, AnyNormal ]    ~> Action [ Move `Times` 2 ]
       , [Exact Green, Exact Purple ] ~> Action [ Move, PlaceWorker ]

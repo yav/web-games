@@ -224,3 +224,13 @@ body {
 .player-orange { fill: #f60 }
 .player-yellow { fill: #fc0 }
 
+.player {
+  display: inline-block;
+  background-color: white;
+  color: black;
+  border: 0.2em solid black;
+}
+
+.action-group {
+  padding: 1em;
+}
