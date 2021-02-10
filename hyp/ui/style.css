@@ -59,7 +59,7 @@ body {
   text-align: left;
   white-space: nowrap;
   display: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .icon .tooltip ul {
@@ -143,10 +143,13 @@ body {
 .activation {
   display: flex;
   justify-content: space-between;
+  margin: 0.2em;
+  z-index: 0;
+  background-color: #eee;
+  border-radius: 0.2em;
 }
 
 .part {
-  z-index: 2;
   display: inline-block;
   position: relative;
   white-space: nowrap;
@@ -232,5 +235,5 @@ body {
 }
 
 .action-group {
-  padding: 1em;
+  margin:  1em;
 }
