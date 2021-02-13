@@ -4,6 +4,8 @@ import Data.Maybe(isNothing)
 import GHC.Generics(Generic)
 import Data.Aeson(ToJSON,ToJSONKey(..),genericToJSONKey,defaultJSONKeyOptions)
 
+import Common.Field
+
 data Resource = Blue | Yellow | Orange | Purple | Red | Green | Gray
   deriving (Eq,Ord,Enum,Bounded,Generic,ToJSON)
 
@@ -33,28 +35,23 @@ resourceAmount r
 
 data ResourceSpot = ResourceSpot
   { spotRequires  :: ResourceReq
-  , spotResource  :: Maybe Resource
+  , _spotResource  :: Maybe Resource
   } deriving (Generic,ToJSON)
 
+declareFields ''ResourceSpot
+
 emptySpot :: ResourceReq -> ResourceSpot
-emptySpot r = ResourceSpot { spotRequires = r, spotResource = Nothing }
+emptySpot r = ResourceSpot { spotRequires = r, _spotResource = Nothing }
 
 
 type ResourceCost = [ ResourceSpot ]
 
 costFreeSpots :: ResourceCost -> [(Int,ResourceReq)]
 costFreeSpots c = [ (n,spotRequires s) | (n,s) <- zip [ 0 .. ] c
-                                       , isNothing (spotResource s) ]
+                                       , isNothing (getField spotResource s) ]
 
 costFullSpots :: ResourceCost -> [(Int,Resource)]
 costFullSpots c = [ (n,r) | (n,s)  <- zip [ 0 .. ] c
-                          , Just r <- [ spotResource s ] ]
-
-costSetResource :: Int -> Maybe Resource -> ResourceCost -> ResourceCost
-costSetResource n r c =
-  case splitAt n c of
-    (as,b:bs) -> as ++ b { spotResource = r } : bs
-    _ -> c
-
+                          , Just r <- [ getField spotResource s ] ]
 
 

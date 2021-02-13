@@ -4,6 +4,8 @@ import Data.Text(Text)
 import GHC.Generics(Generic)
 import Data.Aeson(ToJSON)
 
+import Common.Field
+
 import Resource
 import Action
 
@@ -11,17 +13,16 @@ import Action
 data Tech = Tech
   { techName      :: Text
   , techVP        :: Int
-  , techCost      :: ResourceCost
+  , _techCost     :: ResourceCost
   , techBenefit   :: TechBenefit
   } deriving (Generic,ToJSON)
 
-techFreeSpots :: Tech -> [(Int,ResourceReq)]
-techFreeSpots = costFreeSpots . techCost
+data TechBenefit =
+    OneTime Action
+  | Continuous ContinuousAciton
+    deriving (Generic,ToJSON)
 
-techSetResource :: Int -> Maybe Resource -> Tech -> Tech
-techSetResource n r t = t { techCost = costSetResource n r (techCost t) }
-
-
+declareFields ''Tech
 
 --------------------------------------------------------------------------------
 defTech ::
@@ -33,14 +34,10 @@ defTech ::
 defTech vp name cost benefit =
   Tech { techName     = name
        , techVP       = vp
-       , techCost     = map emptySpot cost
+       , _techCost    = map emptySpot cost
        , techBenefit  = benefit
        }
 
-data TechBenefit =
-    OneTime Action
-  | Continuous ContinuousAciton
-    deriving (Generic,ToJSON)
 
 deck1 :: [Tech]
 deck1 =

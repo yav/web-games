@@ -19,7 +19,7 @@ function uiRedraw(state) {
 
 /*
   body.appendChild(uiBoard(state.game.gameBoard))
-
+*/
   const test = state.game.test
   for(let i = 0; i < test.length; ++i) {
     const ds = test[i]
@@ -30,7 +30,7 @@ function uiRedraw(state) {
     body.appendChild(document.createElement('br'))
     body.appendChild(document.createElement('br'))
   }
-*/
+
 }
 
 function uiQuestions(questions) {

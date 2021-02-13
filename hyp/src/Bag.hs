@@ -32,6 +32,9 @@ bagIsEmpty (Bag b) = Map.null b
 bagToList :: Bag -> [(Resource,Int)]
 bagToList (Bag mp) = Map.toList mp
 
+bagFromList :: [Resource] -> Bag
+bagFromList = foldr bagAdd bagEmpty
+
 bagDraw :: Bag -> TFGen -> Maybe (Resource, (Bag, TFGen))
 bagDraw b rng
   | bagIsEmpty b = Nothing

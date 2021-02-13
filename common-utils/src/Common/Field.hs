@@ -36,6 +36,16 @@ mapAtMaybe a = Field
                        Just b  -> Map.insert a b
   }
 
+listAt :: Int -> Field [a] a
+listAt n = Field
+  { getField = \xs -> case drop n xs of
+                        a : _ -> a
+                        _     -> error "listAt: index out of bounds"
+  , setField = \v xs -> case splitAt n xs of
+                          (as,_:bs) -> as ++ v : bs
+                          _         -> xs
+  }
+
 
 declareFields :: Name -> Q [Dec]
 declareFields tyName =

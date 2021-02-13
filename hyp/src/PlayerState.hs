@@ -13,6 +13,7 @@ import Bag
 import BoardActions
 import Tech
 
+type TechId = Int
 
 data PlayerState = PlayerState
   { _playerBag       :: Bag
@@ -21,18 +22,33 @@ data PlayerState = PlayerState
   , _playerGems      :: Int
   , _playerDevel     :: Map Resource Int
   , _playerBoard     :: Map GroupName [BoardAction]
-  , _playerTech      :: Map Int Tech
+  , _playerTech      :: Map TechId Tech
   } deriving (Generic,ToJSON)
+
+data CubeLoc = OnBoard Resource Int Int -- ^ group, row, spot
+             | OnTech TechId Int -- ^ tech, spot
 
 declareFields ''PlayerState
 
+costSpot :: CubeLoc -> Field PlayerState ResourceSpot
+costSpot loc =
+  case loc of
+    OnBoard r n i -> playerBoard .> mapAt r .> listAt n .> baCost .> listAt i
+    OnTech t i    -> playerTech  .> mapAt t .> techCost .> listAt i
+
+
+
 emptyPlayerState :: PlayerState
-emptyPlayerState = PlayerState
-  { _playerBag       = bagEmpty
+emptyPlayerState =
+  setField (costSpot (OnBoard Red 0 1) .> spotResource) (Just Green) $
+  setField (costSpot (OnBoard Purple 0 0) .> spotResource) (Just Purple)
+   PlayerState
+  { _playerBag       = bagAdd Orange
+                     $ bagFromList [ r | r <- enumAll, r /= Gray ]
   , _playerAvailable = bagEmpty
   , _playerDiscarded = bagEmpty
   , _playerGems      = 0
-  , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll ]
+  , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll, r /= Gray ]
   , _playerBoard     = emptyPlayerBoard
   , _playerTech      = Map.empty
   }

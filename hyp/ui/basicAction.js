@@ -77,6 +77,7 @@ const addBadgeRight = (n,el) => {
 
 
 
+
 const uiBasicAction = function() {
 
 
@@ -106,23 +107,23 @@ const resourceName = (r) => {
   }
 }
 
-const cube = (color,withCube) => {
+const cube = (color) => {
   let cl = ''
   switch (color.tag) {
     case 'Exact': cl = r.contents; break
     case 'AnyNormal': cl = 'wild'; break
   }
-
-  const dom    = div('pic ' + cl)
-  const size   = iconSize * 0.75
+  const dom = div('icon')
+  const size = 0.75 * iconSize
   setDim(dom,size,size)
-  if (withCube) (dom.appendChild(img('img/cube.svg')))
+  setSize(dom,'margin', (iconSize - size) /2)
+  dom.classList.add(cl)
   return dom
 }
 
 const gainResource = (r) => {
   const dom = actionIcon('',resourceName(r))
-  dom.appendChild(cube(r,false))
+  dom.appendChild(cube(r))
   return dom
 }
 
@@ -153,7 +154,7 @@ const f = function(t) {
     , CloneWorker: () => res = actionIcon('clone','Reinforcments')
     , GainResource:(r) => {
         res = actionIcon('','Gain resource')
-        res.appendChild(cube(r,false))
+        res.appendChild(cube(r))
       }
     , DrawResource:() => res = actionIcon('draw','Draw Resource')
     , Spy:() => res = actionIcon('spy','Copy ability')
@@ -169,8 +170,8 @@ const f = function(t) {
       }
 
     , LooseResource: (r) => {
-        res = actionIcon('','Loos resource')
-        res.appendChild(cube(r,false))
+        res = actionIcon('','Loose resource')
+        res.appendChild(cube(r))
         addBadgeRight('x',res)
       }
 

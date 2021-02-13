@@ -1,11 +1,37 @@
+const innerIcon = () => {
+  const dom = div('icon')
+  const size = 0.75 * iconSize
+  setDim(dom,size,size)
+  setSize(dom,'margin', (iconSize - size) /2)
+  return dom
+}
+
+const uiCube = (color) => {
+  const r = div('icon')
+  const size = 0.75 * iconSize
+  setDim(r,size,size)
+  setSize(r,'margin', (iconSize - size) /2)
+
+  const c = svg('img/cube.svg#cube')
+  setDim(c,size,size)
+  c.classList.add('inner')
+  c.classList.add(color)
+  r.appendChild(c)
+
+  tooltip(r,false,color + ' cube')
+  return r
+}
+
+
 const uiSpot = (spot) => {
   const dom = div('spot')
-  // XXX: cube
   setDim(dom,iconSize,iconSize)
   const req = spot.spotRequires
-  const cl = req.tag === 'Exact' ? req.contents : req.tag
+  const cl = req.tag === 'Exact' ? req.contents : 'wild'
   dom.classList.add(cl)
   setSize(dom,'margin',iconSize/8)
+  const res = spot._spotResource
+  if (res) dom.appendChild(uiCube(res))
   return dom
 }
 
@@ -48,7 +74,7 @@ const uiTech = (t) => {
   h.appendChild(vp)
   dom.appendChild(h)
 
-  dom.appendChild(uiActivation(t.techCost,t.techBenefit))
+  dom.appendChild(uiActivation(t._techCost,t.techBenefit))
   return dom
 }
 
