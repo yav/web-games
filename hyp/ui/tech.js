@@ -22,7 +22,6 @@ const uiCube = (color) => {
   return r
 }
 
-
 const uiSpot = (spot) => {
   const dom = div('spot')
   setDim(dom,iconSize,iconSize)
@@ -35,8 +34,10 @@ const uiSpot = (spot) => {
   return dom
 }
 
+const uiActivation = (alt) => {
+  const cost = alt._techCost
+  const benefit = alt.techBenefit
 
-const uiActivation = (cost,benefit) => {
   const dom = div('activation')
 
   const costDom = div('part')
@@ -68,13 +69,21 @@ const uiTech = (t) => {
   const h = div('heading')
   const name = div('part name')
   name.textContent = t.techName
-  const vp = div('part vp')
-  vp.textContent = t.techVP
   h.appendChild(name)
-  h.appendChild(vp)
+
+  const vp = t.techVP
+  if (vp > 0) {
+    const vpDom = div('part vp')
+    vpDom.textContent = vp
+    h.appendChild(vpDom)
+    tooltip(vpDom,true,'Endgame VP')
+  }
   dom.appendChild(h)
 
-  dom.appendChild(uiActivation(t._techCost,t.techBenefit))
+  const alts = t._techAlts
+  for (let i = 0; i < alts.length; ++i) {
+    dom.appendChild(uiActivation(alts[i]))
+  }
   return dom
 }
 

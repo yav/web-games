@@ -5,27 +5,18 @@ const uiPlayer = (p, s) => {
   dom.appendChild(uiBag("Available",s._playerAvailable))
   dom.appendChild(uiBag("Discarded",s._playerDiscarded))
   dom.appendChild(uiUpgrade(s._playerDevel))
-  dom.appendChild(uiPlayerActions(s._playerBoard))
+  dom.appendChild(uiPlayerTech(s._playerTech))
   return dom
 }
 
-const uiPlayerActions = (a) => {
+const uiPlayerTech = (a) => {
   const dom = div('player-actions')
   for (g in a) {
-    dom.appendChild(uiPlayerBoardGroup(a,a[g]))
+    dom.appendChild(uiTech(a[g]))
   }
   return dom
 }
 
-const uiPlayerBoardGroup = (name,group) => {
-  const dom = div('action-group')
-  for (let i = 0; i < group.length; ++i) {
-    const a = group[i]
-    const hack = { tag: 'OneTime', contents: a.baBenefit }
-    dom.appendChild(uiActivation(a._baCost,hack))
-  }
-  return dom
-}
 
 const uiBag = (name,bag) => {
   const dom = div('bag')

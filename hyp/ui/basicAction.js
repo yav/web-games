@@ -103,27 +103,41 @@ const neighbours = () => {
 const resourceName = (r) => {
   switch (r.tag) {
     case 'Exact': return r.contents
-    case 'AnyNormal': return 'non-gray'
+    case 'AnyNormal': return 'wild'
   }
 }
 
 const cube = (color) => {
-  let cl = ''
-  switch (color.tag) {
-    case 'Exact': cl = r.contents; break
-    case 'AnyNormal': cl = 'wild'; break
-  }
   const dom = div('icon')
   const size = 0.75 * iconSize
   setDim(dom,size,size)
   setSize(dom,'margin', (iconSize - size) /2)
-  dom.classList.add(cl)
+  dom.classList.add(resourceName(color))
   return dom
 }
 
 const gainResource = (r) => {
   const dom = actionIcon('',resourceName(r))
   dom.appendChild(cube(r))
+  return dom
+}
+
+const swapResource = (a,b) => {
+  const dom = div('icon')
+  setSize(dom,'width',2 * iconSize)
+  setSize(dom,'margin',iconSize/8)
+  const x = cube(a)
+  const y = cube(b)
+  const z = svg('img/upgrade.svg#upgrade')
+  setDim(z,0.5 * iconSize, 0.5 * iconSize)
+  z.style.fill = '#fff'
+  z.style.transform = 'rotate(90deg)'
+  setSize(z,'left', 0.75 * iconSize)
+  setSize(z,'top',  0.25 * iconSize)
+  dom.appendChild(x)
+  dom.appendChild(y)
+  dom.appendChild(z)
+  tooltip(dom,false,'Change a resource')
   return dom
 }
 
@@ -157,9 +171,11 @@ const f = function(t) {
         res.appendChild(cube(r))
       }
     , DrawResource:() => res = actionIcon('draw','Draw Resource')
+    , ReturnResource:() => res = actionIcon('return','Return to bag')
     , Spy:() => res = actionIcon('spy','Copy ability')
     , GainTech:() => res = actionIcon('gain-tech','Gain Technology')
 
+    , SwapResource: (a,b) => res = swapResource(a,b)
     , LooseGem:() => {
         res = actionIcon('gem','Loose gem')
         addBadgeRight('x',res)
@@ -172,6 +188,11 @@ const f = function(t) {
     , LooseResource: (r) => {
         res = actionIcon('','Loose resource')
         res.appendChild(cube(r))
+        addBadgeRight('x',res)
+      }
+
+    , LooseDevelop: () => {
+        res = actionIcon('upgrade', 'Loose 1 upgrade step')
         addBadgeRight('x',res)
       }
 

@@ -10,21 +10,6 @@ import Resource
 import Action
 
 
-data Tech = Tech
-  { techName      :: Text
-  , techVP        :: Int
-  , _techCost     :: ResourceCost
-  , techBenefit   :: TechBenefit
-  } deriving (Generic,ToJSON)
-
-data TechBenefit =
-    OneTime Action
-  | Continuous ContinuousAciton
-    deriving (Generic,ToJSON)
-
-declareFields ''Tech
-
---------------------------------------------------------------------------------
 defTech ::
   Int           {-^ VP -} ->
   Text          {-^ Name -} ->
@@ -34,8 +19,10 @@ defTech ::
 defTech vp name cost benefit =
   Tech { techName     = name
        , techVP       = vp
-       , _techCost    = map emptySpot cost
-       , techBenefit  = benefit
+       , _techAlts    = [ TechAlt { _techCost = map emptySpot cost
+                                  , techBenefit = benefit
+                                  }
+                        ]
        }
 
 
