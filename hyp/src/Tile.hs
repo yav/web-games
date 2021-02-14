@@ -279,7 +279,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE Nothing ) Plains
-      [ defCity $ Action [ Move ] `Or` Action [ Develop Any ] ]
+      [ defCity $ Move `Or` Develop Any ]
       []
 
 
@@ -288,7 +288,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE (Just Blue)) Plains
-      [ defCity $ Action [ Move ] `Or` Action [ DrawResource ] ]
+      [ defCity $ Move `Or` DrawResource ]
       []
 
 
@@ -306,7 +306,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE (Just Red)) Plains
-      [ defCity $ Action [ Move ] `Or` Action [ Attack ] ]
+      [ defCity $ Move `Or` Attack ]
       []
 
 
@@ -315,12 +315,12 @@ startTiles =
       [ defRuin Bronze, defRuin Bronze ]
 
   , defTile' (TNE (Just Orange)) Plains
-      [ defCity $ Action [ Move ] `Or` Action [ Develop (Same 2) ] ]
+      [ defCity $ Move `Or` Develop (Same 2) ]
       []
 
 
   , defTile' (TNW (Just Yellow)) Plains
-      [ defCity $ Action [ Move ] `Or` Action [ Develop Any ] ]
+      [ defCity $ Move `Or` Develop Any ]
       []
 
   , defTile' (TNE (Just Yellow)) Plains
@@ -333,7 +333,7 @@ startTiles =
       [ defRuin Bronze ]
 
   , defTile' (TNE (Just Green)) Plains
-      [ defCity $ Action [Move `Times` 2] `Or` Action [Develop Any ] ]
+      [ defCity $ (Move `Times` 2) `Or` Develop Any ]
       []
   ]
 

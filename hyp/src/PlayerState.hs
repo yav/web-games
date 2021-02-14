@@ -16,9 +16,9 @@ import BoardActions
 type TechId = Int
 
 data PlayerState = PlayerState
-  { _playerBag       :: Bag
-  , _playerAvailable :: Bag
-  , _playerDiscarded :: Bag
+  { _playerBag       :: Bag Resource
+  , _playerAvailable :: Bag Resource
+  , _playerDiscarded :: Bag Resource
   , _playerGems      :: Int
   , _playerDevel     :: Map Resource Int
   , _playerTech      :: Map TechId Tech

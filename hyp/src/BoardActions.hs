@@ -14,8 +14,7 @@ emptyPlayerBoard =
       ]
 
   , def "Millitary"
-      [ [ Exact Red, AnyNormal ]   ~> Or (Action [ Attack ])
-                                         (Action [ Fortify `Times` 2 ])
+      [ [ Exact Red, AnyNormal ]   ~> (Attack `Or` (Fortify `Times` 2))
       , [ Exact Red, Exact Green ] ~> Action [ Attack, Move ]
       ]
 

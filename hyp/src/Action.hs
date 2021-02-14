@@ -37,7 +37,7 @@ data DevelopConstratint = Same Int | Different Int | Any
 data Action =
     If BasicAction [BasicAction]
   | Action [BasicAction]
-  | Or Action Action
+  | Or BasicAction BasicAction
     deriving (Generic,ToJSON)
 
 data Event =

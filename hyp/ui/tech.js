@@ -23,7 +23,7 @@ const uiCube = (color) => {
 }
 
 const uiSpot = (spot) => {
-  const dom = div('spot')
+  const dom = div('question spot')
   setDim(dom,iconSize,iconSize)
   const req = spot.spotRequires
   const cl = req.tag === 'Exact' ? req.contents : 'wild'

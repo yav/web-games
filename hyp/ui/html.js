@@ -7,6 +7,7 @@ function div(classes) {
   return dom
 }
 
+
 function span(x) {
   const dom = document.createElement('span')
   dom.textContent = x

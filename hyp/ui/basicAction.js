@@ -17,6 +17,21 @@ const tooltipEl = (el,above,n) => {
 
 const tooltip = (el,above,n) => tooltipEl(el,above,span(n))
 
+const uiHelp = (title,ps) => {
+  const dom     = div('help')
+  const h       = div('heading')
+  h.textContent = title
+  dom.appendChild(h)
+
+  for (let i = 0; i < ps.length; ++i) {
+    const p = document.createElement('p')
+    p.textContent = ps[i]
+    dom.appendChild(p)
+  }
+
+  return dom
+}
+
 
 const uiAction = (act) => {
   const dom = div('action')
@@ -40,9 +55,9 @@ const uiAction = (act) => {
       return dom
     }
     case 'Or': {
-      dom.appendChild(uiAction(cont[0]))
+      dom.appendChild(uiBasicAction(cont[0]))
       dom.appendChild(span(' or '))
-      dom.appendChild(uiAction(cont[1]))
+      dom.appendChild(uiBasicAction(cont[1]))
       return dom
     }
   }

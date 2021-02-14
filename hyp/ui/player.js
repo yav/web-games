@@ -43,7 +43,7 @@ const uiUpgrade = (bag) => {
 
   for (const color in bag) {
     const n = bag[color]
-    const r = div('icon')
+    const r = div('question icon')
     const size = 0.75 * iconSize
     setDim(r,size,size)
     setSize(r,'margin', (iconSize - size) /2)
@@ -54,12 +54,15 @@ const uiUpgrade = (bag) => {
     c.classList.add(color)
     r.appendChild(c)
 
-    tooltip(r,false, 'Gain ' + color + ' cube at 4, 2 at 6')
-
     addBadge(n,r)
     dom.appendChild(r)
   }
 
-  tooltip(dom,true,'Upgrades')
+  const help = uiHelp( 'Upgrades'
+                     , [ 'Reduce to 0 to add a cube of the corresponding' +
+                         ' color to the bag.'
+                       , 'At level 4/5 add 1 cube'
+                       , 'At level 6 add 2 cubes.'])
+  tooltipEl(dom,false,help)
   return dom
 }

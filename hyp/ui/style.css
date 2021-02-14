@@ -72,6 +72,10 @@ svg.gray     { fill: #ccc }
   z-index: 2;
 }
 
+.help .heading {
+  font-weight: bold;
+}
+
 .icon .tooltip ul {
   padding-left: 1em;
 }
@@ -123,7 +127,7 @@ svg.gray     { fill: #ccc }
 }
 
 .tech .heading .vp {
-  background-color: gold;
+  background-color: white;
   color: black;
   font-size: smaller;
   margin: 0.2em;
@@ -234,4 +238,18 @@ svg.gray     { fill: #ccc }
   min-width:  1em;
   position: relative;
   margin: 0.2em;
+}
+
+
+.question {
+  outline: 0.08em dashed yellow;
+  cursor: pointer;
+}
+
+.question:hover {
+  outline-width: 0.12em;
+}
+
+.tech .question {
+  outline-color: black;
 }

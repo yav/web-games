@@ -28,6 +28,7 @@ library
     PlayerState,
     Geometry,
     Layout,
+    Turn,
     AppTypes
 
   build-depends:
