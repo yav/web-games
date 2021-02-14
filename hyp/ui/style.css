@@ -38,7 +38,7 @@ svg.gray     { fill: #ccc }
 
 .badge {
   position: absolute;
-  top: 0px;
+  top: 0;
   text-align: center;
   background-color: rgba(0,0,0,0.5);
   color: white;
@@ -48,11 +48,11 @@ svg.gray     { fill: #ccc }
 }
 
 .badge.left {
-  left: 0px;
+  left: 0;
 }
 
 .badge.right {
-  right: 0px;
+  right: 0;
 }
 
 .badge.negative {
@@ -242,14 +242,22 @@ svg.gray     { fill: #ccc }
 
 
 .question {
-  outline: 0.08em dashed yellow;
-  cursor: pointer;
+  outline: 0.075em dashed;
+  outline-offset: 0.1em;
 }
 
 .question:hover {
-  outline-width: 0.12em;
+  outline-width: 0.1em;
+  outline-style: solid;
+  cursor: pointer;
 }
 
-.tech .question {
-  outline-color: black;
+.bag  .question { outline-color: white; }
+.tech .question { outline-color: black; }
+.turn .question { outline-color: black; }
+
+.turn {
+  display: inline-block;
+  background-color: white;
+  color: black;
 }

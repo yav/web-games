@@ -12,7 +12,10 @@ function uiRedraw(state) {
 
   console.log(state)
 
-  const players = state.game._gamePlayers
+  const game = state.game
+  body.appendChild(uiTurn(game._gameTurn))
+
+  const players = game._gamePlayers
   for (p in players) {
     body.appendChild(uiPlayer(p, players[p]))
   }
@@ -20,7 +23,7 @@ function uiRedraw(state) {
 /*
   body.appendChild(uiBoard(state.game.gameBoard))
 */
-  const test = state.game.test
+  const test = game.test
   for(let i = 0; i < test.length; ++i) {
     const ds = test[i]
     for (let j = 0; j < ds.length; ++j) {

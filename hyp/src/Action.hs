@@ -1,7 +1,7 @@
 module Action where
 
 import Data.Text(Text)
-import Data.Aeson(ToJSON)
+import Data.Aeson(ToJSON,ToJSONKey)
 import GHC.Generics(Generic)
 
 import Common.Field
@@ -28,10 +28,10 @@ data BasicAction =
 
   | Neighbours BasicAction
   | Times BasicAction Int
-    deriving (Generic,ToJSON)
+    deriving (Generic,ToJSON,ToJSONKey,Eq,Ord)
 
 data DevelopConstratint = Same Int | Different Int | Any
-    deriving (Generic,ToJSON)
+    deriving (Generic,ToJSON,Eq,Ord)
 
 
 data Action =

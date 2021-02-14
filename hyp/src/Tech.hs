@@ -1,10 +1,6 @@
 module Tech where
 
 import Data.Text(Text)
-import GHC.Generics(Generic)
-import Data.Aeson(ToJSON)
-
-import Common.Field
 
 import Resource
 import Action

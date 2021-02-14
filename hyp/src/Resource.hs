@@ -13,7 +13,7 @@ instance ToJSONKey Resource where
   toJSONKey = genericToJSONKey defaultJSONKeyOptions
 
 data ResourceReq = Exact Resource | AnyNormal
-  deriving (Generic,ToJSON)
+  deriving (Eq,Ord,Generic,ToJSON)
 
 isNormal :: Resource -> Bool
 isNormal r =

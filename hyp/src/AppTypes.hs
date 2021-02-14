@@ -1,10 +1,10 @@
-module AppTypes where
+module AppTypes (module AppTypes, Input) where
 
 import Data.Map(Map)
 import qualified Data.Map as Map
 import GHC.Generics
 
-import Data.Aeson(FromJSON,ToJSON(..))
+import Data.Aeson(ToJSON(..))
 import System.Random.TF(TFGen)
 
 import Common.Basics
@@ -13,15 +13,15 @@ import Tech
 import Geometry
 import Layout
 import PlayerState
+import Turn
 
-data Input = XXXInput
-  deriving (Eq,Ord,Show,Generic,FromJSON,ToJSON)
 
 data Update = XXXUpdate
   deriving (Generic,ToJSON)
 
 data State = State
   { _gamePlayers  :: Map PlayerId PlayerState
+  , _gameTurn     :: Turn
   , gameTurnOrder :: [PlayerId]
   , gameBoard :: Board
   , test :: [[Tech]]
@@ -44,6 +44,7 @@ initialState rng useFog ps = State
   , _gamePlayers  = Map.fromList [ (p,emptyPlayerState) | p <- ps ]
   , gameBoard = brd
   , test = [deck1,deck2,deck3,deck4]
+  , _gameTurn = newTurn (head ps)
   }
   where
   brd = setupBoard rng useFog [ (Just p, Nothing) | p <- ps ]

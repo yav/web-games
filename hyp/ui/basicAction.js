@@ -163,7 +163,7 @@ const f = function(t) {
 
     { Times: (act,n) => {
         res = f(act)
-        addBadge(n,res)
+        if (n !== 1) addBadge(n,res)
       }
 
     , Neighbours: (act) => {
