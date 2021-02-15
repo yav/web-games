@@ -11,8 +11,12 @@ const uiPlayer = (p, s) => {
 
 const uiPlayerTech = (a) => {
   const dom = div('player-actions')
+  const ts = []
   for (g in a) {
-    dom.appendChild(uiTech(a[g]))
+    ts[g] = uiTech(a[g])
+  }
+  for (let i = 0; i < ts.length; ++i) {
+    dom.appendChild(ts[i])
   }
   return dom
 }

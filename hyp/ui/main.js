@@ -23,16 +23,6 @@ function uiRedraw(state) {
 /*
   body.appendChild(uiBoard(state.game.gameBoard))
 */
-  const test = game.test
-  for(let i = 0; i < test.length; ++i) {
-    const ds = test[i]
-    for (let j = 0; j < ds.length; ++j) {
-      body.appendChild(uiTech(ds[j]))
-      body.appendChild(document.createElement('br'))
-    }
-    body.appendChild(document.createElement('br'))
-    body.appendChild(document.createElement('br'))
-  }
 
 }
 

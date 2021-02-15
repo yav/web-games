@@ -24,7 +24,6 @@ data State = State
   , _gameTurn     :: Turn
   , gameTurnOrder :: [PlayerId]
   , gameBoard :: Board
-  , test :: [[Tech]]
   -- map
   -- tech market
   } deriving (Generic,ToJSON)
@@ -43,7 +42,6 @@ initialState rng useFog ps = State
   { gameTurnOrder = ps
   , _gamePlayers  = Map.fromList [ (p,emptyPlayerState) | p <- ps ]
   , gameBoard = brd
-  , test = [deck1,deck2,deck3,deck4]
   , _gameTurn = newTurn (head ps)
   }
   where
