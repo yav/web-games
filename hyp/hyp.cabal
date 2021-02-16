@@ -33,7 +33,6 @@ library
 
   build-depends:
     base, containers, text,
-    tf-random,
     aeson,
     common-utils
 

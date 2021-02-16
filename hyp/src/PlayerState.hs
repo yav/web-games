@@ -51,7 +51,6 @@ freeSpots tid t =
 
 
 
-
 emptyPlayerState :: PlayerState
 emptyPlayerState =
   setField (costSpot (CubeLoc 0 0 1) .> spotResource) (Just Green) $

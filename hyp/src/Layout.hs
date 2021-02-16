@@ -1,8 +1,8 @@
 module Layout (setupBoard) where
 
-import System.Random.TF(TFGen)
-import Common.Utils(shuffle,enumAll)
+import Common.Utils(enumAll)
 import Common.Field
+import Common.RNG(RNG,shuffle)
 import Common.Basics(PlayerId)
 
 
@@ -11,7 +11,7 @@ import Geometry
 import Tile
 
 
-setupBoard :: TFGen -> Bool -> [(Maybe PlayerId,Maybe Resource)] -> Board
+setupBoard :: RNG -> Bool -> [(Maybe PlayerId,Maybe Resource)] -> Board
 setupBoard rng0 useFog rs = foldr placePlayer core' (startLocs `zip` rs')
   where
   n = length rs

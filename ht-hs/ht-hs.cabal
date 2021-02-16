@@ -30,7 +30,7 @@ library
   build-depends:
     common-utils,
     base >=4.13,
-    containers, text, tf-random, aeson
+    containers, text, aeson
   default-language:    Haskell2010
   ghc-options:         -Wall
 

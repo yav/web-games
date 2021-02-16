@@ -8,10 +8,10 @@ import Data.List(foldl')
 import Data.Map(Map)
 import qualified Data.Map as Map
 import System.Console.GetOpt
-import System.Random.TF(newTFGen)
 import qualified Data.Aeson as JS
 
 import Common.Basics
+import Common.RNG
 import Common.Server
 import Common.CallJS
 import Common.Interact
@@ -22,7 +22,7 @@ import Action
 main :: IO ()
 main =
   newServer options \opts ->
-    do seed <- newTFGen
+    do seed <- newRNG
        let ps = pcolor (makePlayers (players opts))
        pure
          ( jsColors ps

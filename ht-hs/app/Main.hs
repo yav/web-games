@@ -6,11 +6,9 @@ import qualified Data.Text as Text
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 
-import System.Random.TF(mkSeedUnix,seedTFGen)
-import Data.Word(Word64)
-
 import Common.CallJS
 import Common.Server
+import Common.RNG
 
 import Actions(nextAction)
 import Basics
@@ -32,7 +30,7 @@ main =
            [(s,"")] -> begin s
            _ -> fail "Failed to load save"
     else
-      do seed <- mkSeedUnix
+      do seed <- newRNGSeed
          let moves = []
              args = board opts : players opts
          begin Save { .. }
@@ -69,7 +67,7 @@ options =
 
 
 data Save = Save
-  { seed  :: (Word64, Word64, Word64, Word64)
+  { seed  :: Seed
   , args  :: [String]
   , moves :: [WithPlayer Choice]
   } deriving (Read,Show)
@@ -80,7 +78,7 @@ begin Save { .. } =
     b : ps ->
       case Map.lookup (Text.pack b) boards of
         Just board ->
-          do let rng = seedTFGen seed
+          do let rng = seedRNG seed
                  mkP = PlayerId . Text.pack
                  players = Set.fromList (map mkP ps)
                  str = $(jsHandlers [ ''EventElement,

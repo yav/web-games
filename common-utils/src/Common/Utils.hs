@@ -4,11 +4,6 @@ import Data.Map(Map)
 import qualified Data.Map as Map
 import Data.Text(Text)
 import qualified Data.Text as Text
-import Control.Monad.ST
-import System.Random.TF
-import System.Random.TF.Instances
-import qualified Data.Vector as Vector
-import qualified Data.Vector.Mutable as MVector
 import Data.Aeson (ToJSON(toJSON),(.=))
 import qualified Data.Aeson as JS
 import qualified Data.Aeson.Types as JS
@@ -19,36 +14,6 @@ showText = Text.pack . show
 
 enumAll :: (Bounded a,Enum a) => [a]
 enumAll = [ minBound .. maxBound ]
-
--- | Assumes non-empty input
-pickWeighted :: [(a,Int)] -> TFGen -> (a, TFGen)
-pickWeighted xs rng = (head $ drop i $ concatMap expand xs, rng1)
-  where
-  (i,rng1) = randomR (0,tot-1) rng
-  tot = sum (map snd xs)
-  expand (a,n) = replicate n a
-
-shuffle :: [a] -> TFGen -> ([a],TFGen)
-shuffle xs g0
-  | null xs = ([],g0)
-  | otherwise =
-    runST do v <- Vector.unsafeThaw (Vector.fromList xs)
-             mutShuffle v g0 (MVector.length v - 1)
-  where
-  mutShuffle v g i
-    | i > 0 =
-      case randomR (0,i) g of
-        (j,g1) -> do swap v i j
-                     mutShuffle v g1 (i-1)
-
-    | otherwise = do v1 <- Vector.unsafeFreeze v
-                     pure (Vector.toList v1,g)
-
-  swap v a b =
-    do x <- MVector.read v a
-       y <- MVector.read v b
-       MVector.write v a y
-       MVector.write v b x
 
 jsTag :: Text -> JS.Pair
 jsTag t = "tag" JS..= t

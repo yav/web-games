@@ -27,10 +27,10 @@ import GHC.Generics
 
 import qualified Data.Aeson as JS
 import Data.Aeson ((.=),ToJSON(..))
-import System.Random.TF(TFGen)
 
 import Common.Utils
 import Common.Basics
+import Common.RNG
 import Common.Field
 
 import Basics
@@ -223,7 +223,7 @@ playerAfter playerId state =
 
 
 
-initialGame :: TFGen -> Board -> Set PlayerId -> Game
+initialGame :: RNG -> Board -> Set PlayerId -> Game
 initialGame rng0 board playerIds =
   Game
     { _gamePlayers   = playerState
