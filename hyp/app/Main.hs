@@ -18,6 +18,7 @@ import Common.Interact
 
 import AppTypes
 import Action
+import Play
 
 main :: IO ()
 main =
@@ -31,7 +32,7 @@ main =
          , startGame GameInfo
                  { gPlayers = Map.keysSet ps
                  , gState   = initialState seed (useFog opts) (Map.keys ps)
-                 , gInit    = pure ()
+                 , gInit    = takeTurn
                  , gSave    = \_m -> ""
                  }
                  []

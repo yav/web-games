@@ -23,7 +23,7 @@ const uiCube = (color) => {
 }
 
 const uiSpot = (spot) => {
-  const dom = div('question spot')
+  const dom = div('spot')
   setDim(dom,iconSize,iconSize)
   const req = spot.spotRequires
   const cl = req.tag === 'Exact' ? req.contents : 'wild'
@@ -41,8 +41,10 @@ const uiActivation = (alt) => {
   const dom = div('activation')
 
   const costDom = div('part')
+  const spot = []
   for (let i = 0; i < cost.length; ++i) {
-    costDom.appendChild(uiSpot(cost[i]))
+    spot[i] = uiSpot(cost[i])
+    costDom.appendChild(spot[i])
   }
   dom.appendChild(costDom)
 
@@ -58,7 +60,7 @@ const uiActivation = (alt) => {
     }
   }
   dom.appendChild(bftPart)
-  return dom
+  return { dom: dom, spot: spot }
 }
 
 const uiTech = (t) => {
@@ -81,10 +83,12 @@ const uiTech = (t) => {
   dom.appendChild(h)
 
   const alts = t._techAlts
+  const as = []
   for (let i = 0; i < alts.length; ++i) {
-    dom.appendChild(uiActivation(alts[i]))
+    as[i] = uiActivation(alts[i])
+    dom.appendChild(as[i].dom)
   }
-  return dom
+  return { dom: dom, alt: as }
 }
 
 

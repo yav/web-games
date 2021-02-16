@@ -1,12 +1,19 @@
 
 const uiPlayer = (p, s) => {
   const dom = div('player')
-  dom.appendChild(uiBag("Bag",s._playerBag))
-  dom.appendChild(uiBag("Available",s._playerAvailable))
-  dom.appendChild(uiBag("Discarded",s._playerDiscarded))
-  dom.appendChild(uiUpgrade(s._playerDevel))
-  dom.appendChild(uiPlayerTech(s._playerTech))
-  return dom
+  const ui = { bag:       uiBag("Bag",s._playerBag)
+             , available: uiBag("Available",s._playerAvailable)
+             , discarded: uiBag("Discarded",s._playerDiscarded)
+             , updgrade:  uiUpgrade(s._playerDevel)
+             , techs:     uiPlayerTech(s._playerTech)
+             , dom: dom
+             }
+  dom.appendChild(ui.bag.dom)
+  dom.appendChild(ui.available.dom)
+  dom.appendChild(ui.discarded.dom)
+  dom.appendChild(ui.updgrade.dom)
+  dom.appendChild(ui.techs.dom)
+  return ui
 }
 
 const uiPlayerTech = (a) => {
@@ -16,9 +23,9 @@ const uiPlayerTech = (a) => {
     ts[g] = uiTech(a[g])
   }
   for (let i = 0; i < ts.length; ++i) {
-    dom.appendChild(ts[i])
+    dom.appendChild(ts[i].dom)
   }
-  return dom
+  return { dom: dom, tech: ts }
 }
 
 
@@ -35,7 +42,7 @@ const uiBag = (name,bag) => {
   }
   tooltip(dom,true,name)
 
-  return dom
+  return { dom: dom }
 }
 
 
@@ -47,7 +54,7 @@ const uiUpgrade = (bag) => {
 
   for (const color in bag) {
     const n = bag[color]
-    const r = div('question icon')
+    const r = div('icon')
     const size = 0.75 * iconSize
     setDim(r,size,size)
     setSize(r,'margin', (iconSize - size) /2)
@@ -68,5 +75,5 @@ const uiUpgrade = (bag) => {
                        , 'At level 4/5 add 1 cube'
                        , 'At level 6 add 2 cubes.'])
   tooltipEl(dom,false,help)
-  return dom
+  return { dom: dom }
 }

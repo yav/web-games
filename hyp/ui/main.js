@@ -1,33 +1,34 @@
-function toSize(n) {
+let gui = {}
+
+const toSize = (n) => {
   const scale = 1
   return scale * n
 }
 
-let gui = {}
 
 function uiRedraw(state) {
   console.log('redraw')
   gui = {}
-  const body = document.getElementById('main')
+  gui.questions = []
 
-  console.log(state)
+  const body = document.getElementById('main')
 
   const game = state.game
   body.appendChild(uiTurn(game._gameTurn))
 
   const players = game._gamePlayers
+  const ps = {}
+  gui.player = ps
   for (p in players) {
-    body.appendChild(uiPlayer(p, players[p]))
+    ps[p] = uiPlayer(p, players[p])
+    body.appendChild(ps[p].dom)
   }
 
 /*
   body.appendChild(uiBoard(state.game.gameBoard))
 */
 
-}
-
-function uiQuestions(questions) {
-  console.log('questions')
+  uiQuestions(state.questions)
 }
 
 function uiUpdate() {

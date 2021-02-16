@@ -1,8 +1,7 @@
-function sendJSON(ws,obj) {
-  ws.send(JSON.stringify(obj))
-}
+let sendJSON = null
+let playerId = null
 
-function srvConnect() {
+const srvConnect = () => {
   const obj = new URL(window.location)
   const info = obj.searchParams
   const url = 'ws://' + obj.host + '/ws'
@@ -20,7 +19,8 @@ function srvConnect() {
     playerId = info.get('player') // stored in global
     console.log("We are player: " + playerId)
     ws.send(playerId)
-    sendJSON(ws,{ tag: 'reload' })
+    sendJSON = (obj) => ws.send(JSON.stringify(obj))
+    sendJSON({ tag: 'reload' })
   }
 
   ws.onmessage = function(e) {

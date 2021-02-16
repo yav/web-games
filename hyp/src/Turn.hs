@@ -9,6 +9,7 @@ import Common.Field
 import Bag
 
 import Action
+import PlayerState
 
 data Turn = Turn
   { turnPlayer   :: PlayerId
@@ -18,8 +19,10 @@ data Turn = Turn
   } deriving (Generic,ToJSON)
 
 
-data Input = XXXInput
-  deriving (Eq,Ord,Show,Generic,FromJSON,ToJSON)
+data Input = AskCubeLoc CubeLoc
+           | XXXMore
+  deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+
 
 declareFields ''Turn
 

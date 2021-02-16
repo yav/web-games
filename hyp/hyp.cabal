@@ -45,6 +45,8 @@ library
 executable hyp
   hs-source-dirs: app
   main-is: Main.hs
+  other-modules:
+    Play
   build-depends:
     base,
     containers,

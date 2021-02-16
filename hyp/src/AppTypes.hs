@@ -2,6 +2,7 @@ module AppTypes (module AppTypes, Input) where
 
 import Data.Map(Map)
 import qualified Data.Map as Map
+import Data.List(mapAccumL)
 import GHC.Generics
 
 import Data.Aeson(ToJSON)
@@ -24,7 +25,6 @@ data State = State
   , _gameTurn     :: Turn
   , gameTurnOrder :: [PlayerId]
   , gameBoard     :: Board
-  , _gameRNG      :: RNG
   -- map
   -- tech market
 
@@ -44,13 +44,16 @@ playerView _ = id -- XXX: hide other player's ruin tokenundefineds
 initialState :: RNG -> Bool -> [PlayerId] -> State
 initialState rng useFog ps = State
   { gameTurnOrder = ps
-  , _gamePlayers  = Map.fromList [ (p,emptyPlayerState) | p <- ps ]
+  , _gamePlayers  = Map.fromList pstates
   , gameBoard = brd
   , _gameTurn = newTurn (head ps)
-  , _gameRNG = rng1
   }
   where
-  (rng1,boardRng) = splitRNG rng
+  mkP r p = let (r1,r2) = splitRNG r
+            in (r1, (p, emptyPlayerState r2))
+  (boardRng,pstates) = mapAccumL mkP rng ps
   brd = setupBoard boardRng useFog [ (Just p, Nothing) | p <- ps ]
 
+playerState :: PlayerId -> Field State PlayerState
+playerState p = gamePlayers .> mapAt p
 
