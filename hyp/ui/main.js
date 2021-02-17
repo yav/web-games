@@ -31,6 +31,13 @@ function uiRedraw(state) {
   uiQuestions(state.questions)
 }
 
-function uiUpdate() {
-  console.log('update')
-}
+const uiUpdate = hsUpdate (
+  { PlaceCube: (pid,loc,r) => {
+      gui.player[pid]
+         .techs.tech[loc.cubeTech]
+         .alt[loc.cubeAlt]
+         .spot[loc.cubeSpot]
+         .add(r)
+    }
+  , RemoveFromReady: (pid,r) => { gui.player[pid].available.remove(r) }
+  })

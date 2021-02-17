@@ -30,8 +30,22 @@ const uiSpot = (spot) => {
   dom.classList.add(cl)
   setSize(dom,'margin',iconSize/8)
   const res = spot._spotResource
-  if (res) dom.appendChild(uiCube(res))
-  return dom
+  let resDom = null
+  if (res) {
+    resDom = uiCube(res)
+    dom.appendChild(resDom)
+  }
+  return {
+    dom: dom,
+    add: (r) => {
+      if (resDom) resDom.remove()
+      resDom = uiCube(r)
+      dom.appendChild(resDom)
+    },
+    remove: () => {
+      if (resDom) resDom.remove()
+    }
+  }
 }
 
 const uiActivation = (alt) => {
@@ -44,7 +58,7 @@ const uiActivation = (alt) => {
   const spot = []
   for (let i = 0; i < cost.length; ++i) {
     spot[i] = uiSpot(cost[i])
-    costDom.appendChild(spot[i])
+    costDom.appendChild(spot[i].dom)
   }
   dom.appendChild(costDom)
 

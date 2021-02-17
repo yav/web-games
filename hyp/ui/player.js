@@ -33,16 +33,37 @@ const uiBag = (name,bag) => {
   const dom = div('bag')
   setSize(dom,'height',iconSize)
 
+  const cubes = {}
+
+  const setR = (r,n) => {
+    if (n > 0) {
+      const c = uiCube(r)
+      addBadge(n,c)
+      dom.appendChild(c)
+      cubes[r] = { dom: c, number: n }
+    } else cubes[r] = undefined
+  }
+
   for (const r in bag) {
     const n = bag[r]
     if (n < 1) continue
-    const c = uiCube(r)
-    if (n > 0) addBadge(n,c)
-    dom.appendChild(c)
+    setR(r,n)
   }
   tooltip(dom,true,name)
 
-  return { dom: dom }
+  return {
+      dom: dom
+    , remove: (r) => {
+        let info = cubes[r]
+        if (info) info.dom.remove()
+        setR(info? (info.number - 1) : 0, r)
+      }
+    , add: (r) => {
+        let info = cubes[r]
+        if (info) info.dom.remove()
+        setR(info? (info.number + 1) : 1, r)
+      }
+  }
 }
 
 

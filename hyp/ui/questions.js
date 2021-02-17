@@ -25,7 +25,7 @@ const uiQuestion = (q) => {
   hsInput({
     AskCubeLoc: (x) => {
       const dom = gui.player[playerId]
-                     .techs.tech[x.cubeTech].alt[x.cubeAlt].spot[x.cubeSpot]
+                     .techs.tech[x.cubeTech].alt[x.cubeAlt].spot[x.cubeSpot].dom
       existingQuestion(dom,q)
     }
   })(q.chChoice)
