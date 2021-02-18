@@ -13,9 +13,10 @@ const tooltipEl = (el,above,n) => {
   el.appendChild(dom)
   setSize(dom,'left',0)
   setSize(dom,'top', above? -size * 0.9 : 1.1 * iconSize)
+  return dom
 }
 
-const tooltip = (el,above,n) => tooltipEl(el,above,span(n))
+const tooltip = (el,above,n) => { return tooltipEl(el,above,span(n)) }
 
 const uiHelp = (title,ps) => {
   const dom     = div('help')
@@ -77,10 +78,11 @@ const badge = (n) => {
 
 
 const addBadge = (n,el) => {
-  if (n == 1) return
+  if (n == 1) return null
   const b = badge(n)
   b.classList.add('left')
   el.appendChild(b)
+  return b
 }
 
 

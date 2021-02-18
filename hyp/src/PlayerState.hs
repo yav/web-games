@@ -2,6 +2,7 @@ module PlayerState where
 
 import Data.Map(Map)
 import qualified Data.Map as Map
+import Data.Maybe(maybeToList)
 import GHC.Generics(Generic)
 import Data.Aeson(ToJSON,FromJSON)
 
@@ -41,11 +42,8 @@ declareFields ''PlayerState
 
 emptyPlayerState :: RNG -> PlayerState
 emptyPlayerState rng =
-  drawCubes 3 $
-  setField (costSpot (CubeLoc 0 0 1) .> spotResource) (Just Green) $
-  setField (costSpot (CubeLoc 1 0 0) .> spotResource) (Just Purple) $
   foldl (flip playerGainTech) s0 $ emptyPlayerBoard ++
-                                   deck1 ++ deck2 ++ deck3 ++ deck4
+                                   reverse (deck1 ++ deck2 ++ deck3 ++ deck4)
   where
   s0 =
    PlayerState
@@ -69,15 +67,10 @@ costSpot (CubeLoc t r i) =
   playerTech  .> mapAt t .> techAlts .> listAt r .> techCost .> listAt i
 
 
-
-drawCubes :: Int -> PlayerState -> PlayerState
-drawCubes n p = updField playerAvailable (\a -> foldr bagAdd a cs)
-              $ setField playerBag b
-              $ setField playerRNG r
-                p
-  where
-  (cs,b,r) = bagDrawUpTo n (getField playerBag p) (getField playerRNG p)
-
+cubeToDraw :: PlayerState -> Maybe (Resource,PlayerState)
+cubeToDraw p =
+  do (r,rng) <- bagPick (getField playerBag p) (getField playerRNG p)
+     pure (r, setField playerRNG rng p)
 
 
 
@@ -93,6 +86,14 @@ freeSpots tid t =
   hasCubes  = not . null . costFullSpots . getField techCost . snd
 
 
+fullSpots :: (TechBenefit -> Bool) -> TechId -> Tech -> [(CubeLoc,Resource)]
+fullSpots ok tid t =
+  [ (CubeLoc { cubeTech = tid, cubeAlt = a, cubeSpot = s }, r)
+  | (a,alt)  <- zip [0..] (getField techAlts t)
+  , ok (techBenefit alt)
+  , (s,spot) <- zip [0..] (getField techCost alt)
+  , r        <- maybeToList (getField spotResource spot)
+  ]
 
 placeSpots :: PlayerState -> [CubeLoc]
 placeSpots ps = [ spot

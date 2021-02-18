@@ -1,5 +1,6 @@
 module Turn where
 
+import Data.Text(Text)
 import Data.Map(Map)
 import GHC.Generics(Generic)
 import Data.Aeson(FromJSON,ToJSON)
@@ -8,6 +9,7 @@ import Common.Basics
 import Common.Field
 import Bag
 
+import Resource
 import Action
 import PlayerState
 
@@ -20,7 +22,8 @@ data Turn = Turn
 
 
 data Input = AskCubeLoc CubeLoc
-           | XXXMore
+           | AskReady Resource
+           | AskButton Text
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 

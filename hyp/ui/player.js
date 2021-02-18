@@ -36,12 +36,26 @@ const uiBag = (name,bag) => {
   const cubes = {}
 
   const setR = (r,n) => {
-    if (n > 0) {
-      const c = uiCube(r)
-      addBadge(n,c)
-      dom.appendChild(c)
-      cubes[r] = { dom: c, number: n }
-    } else cubes[r] = undefined
+    let cur = cubes[r]
+    if (n === 0) {
+      if (cur) cur.dom.remove()
+      cubes[r] = undefined
+      return
+    }
+
+    if (!cur) {
+      cur = { dom: uiCube(r), badge: null, number: n }
+      dom.appendChild(cur.dom)
+    }
+    else cur.number = n
+
+    if (n === 1) {
+      if (cur.badge) { cur.badge.remove(); cur.badge = null }
+    } else {
+      if (!cur.badge) cur.badge = addBadge(n,cur.dom)
+      else cur.badge.textContent = n
+    }
+    cubes[r] = cur
   }
 
   for (const r in bag) {
@@ -52,17 +66,10 @@ const uiBag = (name,bag) => {
   tooltip(dom,true,name)
 
   return {
-      dom: dom
-    , remove: (r) => {
-        let info = cubes[r]
-        if (info) info.dom.remove()
-        setR(info? (info.number - 1) : 0, r)
-      }
-    , add: (r) => {
-        let info = cubes[r]
-        if (info) info.dom.remove()
-        setR(info? (info.number + 1) : 1, r)
-      }
+    dom: dom,
+    remove: (r)   => { setR(r, cubes[r].number - 1) },
+    add:    (r)   => { setR(r, cubes[r] ? cubes[r].number + 1 : 1) },
+    ask:    (r,q) => { existingQuestion(cubes[r].dom,q) }
   }
 }
 

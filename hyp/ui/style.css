@@ -261,3 +261,10 @@ svg.gray     { fill: #ccc }
   background-color: white;
   color: black;
 }
+
+.button {
+  background-color: #f90;
+  border-radius: 0.2em;
+  margin: 0.2em;
+  position: relative;
+}

@@ -32,7 +32,7 @@ main =
          , startGame GameInfo
                  { gPlayers = Map.keysSet ps
                  , gState   = initialState seed (useFog opts) (Map.keys ps)
-                 , gInit    = takeTurn
+                 , gInit    = setup
                  , gSave    = \_m -> ""
                  }
                  []

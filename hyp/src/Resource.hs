@@ -2,12 +2,13 @@ module Resource where
 
 import Data.Maybe(isNothing)
 import GHC.Generics(Generic)
-import Data.Aeson(ToJSON,ToJSONKey(..),genericToJSONKey,defaultJSONKeyOptions)
+import Data.Aeson(FromJSON,ToJSON,ToJSONKey(..),
+                    genericToJSONKey,defaultJSONKeyOptions)
 
 import Common.Field
 
 data Resource = Blue | Yellow | Orange | Purple | Red | Green | Gray
-  deriving (Eq,Ord,Enum,Bounded,Generic,ToJSON)
+  deriving (Eq,Ord,Show,Enum,Bounded,Generic,FromJSON,ToJSON)
 
 instance ToJSONKey Resource where
   toJSONKey = genericToJSONKey defaultJSONKeyOptions

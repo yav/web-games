@@ -14,7 +14,8 @@ function uiRedraw(state) {
   const body = document.getElementById('main')
 
   const game = state.game
-  body.appendChild(uiTurn(game._gameTurn))
+  gui.turn = uiTurn(game._gameTurn)
+  body.appendChild(gui.turn.dom)
 
   const players = game._gamePlayers
   const ps = {}
@@ -39,5 +40,17 @@ const uiUpdate = hsUpdate (
          .spot[loc.cubeSpot]
          .add(r)
     }
-  , RemoveFromReady: (pid,r) => { gui.player[pid].available.remove(r) }
+  , RemoveCube: (pid,loc) => {
+      gui.player[pid]
+         .techs.tech[loc.cubeTech]
+         .alt[loc.cubeAlt]
+         .spot[loc.cubeSpot]
+         .remove()
+    }
+  , RemoveFromReady:  (pid,r) => { gui.player[pid].available.remove(r) }
+  , AddToReady:       (pid,r) => { gui.player[pid].available.add(r) }
+  , RemoveFromBag:    (pid,r) => { gui.player[pid].bag.remove(r) }
+  , AddToBag:         (pid,r) => { gui.player[pid].bag.add(r) }
+  , RemoveFromDiscard:(pid,r) => { gui.player[pid].discarded.remove(r) }
+  , AddToDiscard:     (pid,r) => { gui.player[pid].discarded.add(r) }
   })

@@ -13,6 +13,8 @@ module Common.Interact
   , choose
   , view
   , update
+  , localUpdate
+  , localUpdate_
   , getState
   , save
   ) where
@@ -231,6 +233,19 @@ update o = Interact $
   \s os -> case iGame s of
              Left _  -> (s,os)
              Right a -> k () s { iGame = doUpdate o a } (o : os)
+
+-- | Updates that are not visible to the players
+localUpdate :: (State -> (a,State)) -> Interact a
+localUpdate f = Interact $
+  \k ->
+  \s os -> case iGame s of
+             Left _  -> (s,os)
+             Right a -> case f a of
+                          (x,b) -> k x s { iGame = Right b } os
+
+-- | Updates that are not visible to the players
+localUpdate_ :: (State -> State) -> Interact ()
+localUpdate_ f = localUpdate \s -> ((),f s)
 
 save :: Interact ()
 save = Interact $ \k s os -> k () s { iShouldSave = True } os
