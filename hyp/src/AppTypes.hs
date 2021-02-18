@@ -17,11 +17,14 @@ import Geometry
 import Layout
 import PlayerState
 import Turn
+import Action
 
 
 data Update =
     PlaceCube PlayerId CubeLoc Resource
   | RemoveCube PlayerId CubeLoc
+  | SetTurn Turn
+
   | RemoveFromReady   PlayerId Resource
   | AddToReady        PlayerId Resource
   | RemoveFromBag     PlayerId Resource
@@ -108,5 +111,9 @@ doUpdate upd =
     AddToDiscard playerId r ->
       Right . updField (playerState playerId .> playerDiscarded)
                        (bagAdd r)
+
+    SetTurn t ->
+      Right . setField gameTurn t
+
 
 

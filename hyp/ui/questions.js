@@ -50,7 +50,10 @@ const uiQuestion = (q) => {
       gui.player[playerId].available.ask(r,q)
     },
     AskButton: (txt) => {
-      gui.turn.askButton(txt,q)
+      const btn = div('button')
+      btn.textContent = txt
+      newQuestion(btn,q)
+      gui.menu.appendChild(btn)
     }
   })(q.chChoice)
 

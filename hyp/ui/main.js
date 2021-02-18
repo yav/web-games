@@ -14,6 +14,8 @@ function uiRedraw(state) {
   const body = document.getElementById('main')
 
   const game = state.game
+  gui.menu = div('menu')
+  body.appendChild(gui.menu)
   gui.turn = uiTurn(game._gameTurn)
   body.appendChild(gui.turn.dom)
 
@@ -53,4 +55,5 @@ const uiUpdate = hsUpdate (
   , AddToBag:         (pid,r) => { gui.player[pid].bag.add(r) }
   , RemoveFromDiscard:(pid,r) => { gui.player[pid].discarded.remove(r) }
   , AddToDiscard:     (pid,r) => { gui.player[pid].discarded.add(r) }
+  , SetTurn:          (t)     => { gui.turn.redraw(t) }
   })

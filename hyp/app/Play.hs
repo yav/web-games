@@ -3,6 +3,7 @@ module Play where
 import Data.Text(Text)
 import Control.Monad(forM_,replicateM_)
 import qualified Data.Map as Map
+import Data.Maybe(isJust)
 
 import Common.Basics
 import Common.Field
@@ -14,6 +15,8 @@ import AppTypes
 import Action
 import PlayerState
 import Resource
+
+import Debug.Trace
 
 setup :: Interact ()
 setup =
@@ -29,9 +32,6 @@ takeTurn =
                 actPlaceCube state
      askInputs opts
 
-endTurn :: Interact ()
-endTurn = takeTurn
-
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
 
 actPlaceCube :: Opts
@@ -41,7 +41,8 @@ actPlaceCube state =
     , do r <- askResouce spot
          update (RemoveFromReady playerId r)
          update (PlaceCube playerId spot r)
-         endTurn
+         checkGainBenefit playerId spot
+         takeTurn
     ) | spot <- placeSpots player
   ]
   where
@@ -66,6 +67,7 @@ actEndTurn state =
     , "End Turn"
     , do discardReady
          drawNew
+         -- XXX: next player, etc.
          takeTurn
     )
   ]
@@ -115,3 +117,14 @@ doDrawCube playerId =
             update (RemoveFromBag playerId r)
             update (AddToReady playerId r)
             pure True
+
+checkGainBenefit :: PlayerId -> CubeLoc -> Interact ()
+checkGainBenefit playerId lastCube =
+  do state <- getState
+     let player = getField (playerState playerId) state
+         alt = getField (techAltFor lastCube) player
+     case techBenefit alt of
+       OneTime a
+         | all (isJust . getField spotResource) (getField techCost alt) ->
+            update (SetTurn (turnAddAction a (getField gameTurn state)))
+       _ -> traceM "NOPE" >> pure ()

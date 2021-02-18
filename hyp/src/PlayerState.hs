@@ -62,6 +62,10 @@ playerGainTech :: Tech -> PlayerState -> PlayerState
 playerGainTech t = updField playerTech add
   where add mp = Map.insert (Map.size mp) t mp
 
+techAltFor :: CubeLoc -> Field PlayerState TechAlt
+techAltFor loc =
+  playerTech .> mapAt (cubeTech loc) .> techAlts .> listAt (cubeAlt loc)
+
 costSpot :: CubeLoc -> Field PlayerState ResourceSpot
 costSpot (CubeLoc t r i) =
   playerTech  .> mapAt t .> techAlts .> listAt r .> techCost .> listAt i
