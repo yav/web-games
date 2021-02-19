@@ -31,6 +31,9 @@ data Update =
   | AddToBag          PlayerId Resource
   | AddToDiscard      PlayerId Resource
   | RemoveFromDiscard PlayerId Resource
+
+  | Upgrade           PlayerId Resource Int
+  | ResetUpgrade      PlayerId Resource
   deriving (Generic,ToJSON)
 
 
@@ -115,5 +118,9 @@ doUpdate upd =
     SetTurn t ->
       Right . setField gameTurn t
 
+    Upgrade playerId r n ->
+      Right . updField (playerState playerId .> playerDevel .> mapAt r) (+n)
 
+    ResetUpgrade playerId r ->
+      Right . setField (playerState playerId .> playerDevel .> mapAt r) 0
 

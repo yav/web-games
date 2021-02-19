@@ -77,8 +77,8 @@ const badge = (n) => {
 
 
 
-const addBadge = (n,el) => {
-  if (n == 1) return null
+const addBadge = (n,el,always) => {
+  if (!always && n == 1) return null
   const b = badge(n)
   b.classList.add('left')
   el.appendChild(b)

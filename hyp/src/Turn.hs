@@ -25,6 +25,7 @@ data Input = AskCubeLoc CubeLoc
            | AskReady Resource
            | AskButton Text
            | AskReadyAction  BasicAction
+           | AskUpgrade Resource
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 

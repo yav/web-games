@@ -4,14 +4,14 @@ const uiPlayer = (p, s) => {
   const ui = { bag:       uiBag("Bag",s._playerBag)
              , available: uiBag("Available",s._playerAvailable)
              , discarded: uiBag("Discarded",s._playerDiscarded)
-             , updgrade:  uiUpgrade(s._playerDevel)
+             , upgrade:  uiUpgrade(s._playerDevel)
              , techs:     uiPlayerTech(s._playerTech)
              , dom: dom
              }
   dom.appendChild(ui.bag.dom)
   dom.appendChild(ui.available.dom)
   dom.appendChild(ui.discarded.dom)
-  dom.appendChild(ui.updgrade.dom)
+  dom.appendChild(ui.upgrade.dom)
   dom.appendChild(ui.techs.dom)
   return ui
 }
@@ -80,6 +80,8 @@ const uiUpgrade = (bag) => {
   const dom = div('bag')
   setSize(dom,'height',iconSize)
 
+  const number = {}
+
   for (const color in bag) {
     const n = bag[color]
     const r = div('icon')
@@ -93,7 +95,8 @@ const uiUpgrade = (bag) => {
     c.classList.add(color)
     r.appendChild(c)
 
-    addBadge(n,r)
+    const ba = addBadge(n,r,true)
+    number[color] = { dom: r, ba: ba, number: n }
     dom.appendChild(r)
   }
 
@@ -103,5 +106,19 @@ const uiUpgrade = (bag) => {
                        , 'At level 4/5 add 1 cube'
                        , 'At level 6 add 2 cubes.'])
   tooltipEl(dom,false,help)
-  return { dom: dom }
+  return {
+    dom: dom,
+    reset: (c) => {
+      const ui = number[c]
+      ui.number = 0
+      ui.ba.textContent = ui.number
+    },
+    change: (c,n) => {
+      const ui = number[c]
+      ui.number = ui.number + n
+      if (ui.number < 0) ui.number = 0
+      ui.ba.textContent = ui.number
+    },
+    ask: (c,q) => { existingQuestion(number[c].dom,q) }
+  }
 }

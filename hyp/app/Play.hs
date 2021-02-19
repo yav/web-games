@@ -31,10 +31,25 @@ takeTurn =
   do state <- getState
      let opts = actEndTurn state ++
                 actPlaceCube state ++
-                actReadyAction state
+                actReadyAction state ++
+                actTest state
      askInputs opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
+
+
+actTest :: Opts
+actTest state =
+  [ ( playerId :-> AskUpgrade Yellow
+    , "Just testing"
+    , do if getField (playerDevel .> mapAt Yellow) player == 6
+            then update (ResetUpgrade playerId Yellow)
+            else update (Upgrade playerId Yellow 1)
+         takeTurn
+    )
+  ]
+  where
+  (playerId,player) = currentPlayer state
 
 actPlaceCube :: Opts
 actPlaceCube state =

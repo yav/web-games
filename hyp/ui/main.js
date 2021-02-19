@@ -56,4 +56,6 @@ const uiUpdate = hsUpdate (
   , RemoveFromDiscard:(pid,r) => { gui.player[pid].discarded.remove(r) }
   , AddToDiscard:     (pid,r) => { gui.player[pid].discarded.add(r) }
   , SetTurn:          (t)     => { gui.turn.redraw(t) }
+  , Upgrade:          (pid,r,n) => { gui.player[pid].upgrade.change(r,n) }
+  , ResetUpgrade:     (pid,r) => { gui.player[pid].upgrade.reset(r) }
   })
