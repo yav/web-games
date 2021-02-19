@@ -1,7 +1,7 @@
 module Action where
 
 import Data.Text(Text)
-import Data.Aeson(ToJSON,ToJSONKey)
+import Data.Aeson(FromJSON,ToJSON,ToJSONKey)
 import GHC.Generics(Generic)
 
 import Common.Field
@@ -28,10 +28,10 @@ data BasicAction =
 
   | Neighbours BasicAction
   | Times BasicAction Int
-    deriving (Generic,ToJSON,ToJSONKey,Eq,Ord)
+    deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON,ToJSONKey)
 
 data DevelopConstratint = Same Int | Different Int | Any
-    deriving (Generic,ToJSON,Eq,Ord)
+    deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 
 data Action =
@@ -76,4 +76,25 @@ data TechBenefit =
 declareFields ''Tech
 declareFields ''TechAlt
 
+contModifyAction :: ContinuousAciton -> Action -> Action
+contModifyAction cont act =
+  case (cont,act) of
+    (On ev a, Action as) ->
+      let has r = if any (is r) as then Action (a:as) else act
+      in case ev of
+           GainAttack  -> has (== Attack)
+           GainMove    -> has (== Move)
+           GainWorker  -> has (== PlaceWorker)
+           GainGem     -> has (== Gem)
+           GainDevelop -> has develop
+           StartTurn   -> act
+    _ -> act
+  where
+  develop d = case d of
+                Develop {} -> True
+                _          -> False
+  is p ba =
+    case ba of
+      Times b n | n > 0 -> is p b
+      _ -> p ba
 

@@ -24,6 +24,7 @@ data Turn = Turn
 data Input = AskCubeLoc CubeLoc
            | AskReady Resource
            | AskButton Text
+           | AskReadyAction  BasicAction
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 

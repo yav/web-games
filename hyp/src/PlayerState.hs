@@ -2,7 +2,7 @@ module PlayerState where
 
 import Data.Map(Map)
 import qualified Data.Map as Map
-import Data.Maybe(maybeToList)
+import Data.Maybe(maybeToList,isJust)
 import GHC.Generics(Generic)
 import Data.Aeson(ToJSON,FromJSON)
 
@@ -47,8 +47,7 @@ emptyPlayerState rng =
   where
   s0 =
    PlayerState
-      { _playerBag       = bagAdd Orange
-                         $ bagFromList [ r | r <- enumAll, r /= Gray ]
+      { _playerBag       = bagEmpty
       , _playerAvailable = bagEmpty
       , _playerDiscarded = bagEmpty
       , _playerGems      = 0
@@ -108,6 +107,13 @@ placeSpots ps = [ spot
   where
   available = map fst (bagToList (getField playerAvailable ps))
 
-
+continuousBenefits :: PlayerState -> [ContinuousAciton]
+continuousBenefits player =
+  [ c
+  | tech <- Map.elems (getField playerTech player)
+  , alt  <- getField techAlts tech
+  , Continuous c <- [ techBenefit alt ]
+  , and [ isJust (getField spotResource spot) | spot <- getField techCost alt ]
+  ]
 
 

@@ -54,7 +54,8 @@ const uiQuestion = (q) => {
       btn.textContent = txt
       newQuestion(btn,q)
       gui.menu.appendChild(btn)
-    }
+    },
+    AskReadyAction: (r) => { gui.turn.askBasic(r,q) }
   })(q.chChoice)
 
 }

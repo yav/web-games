@@ -6,6 +6,7 @@ import qualified Data.Map as Map
 import Data.Maybe(isJust)
 
 import Common.Basics
+import Common.Utils(enumAll)
 import Common.Field
 import Common.Interact
 
@@ -16,20 +17,21 @@ import Action
 import PlayerState
 import Resource
 
-import Debug.Trace
 
 setup :: Interact ()
 setup =
   do state <- getState
      forM_ (gameTurnOrder state) \p ->
-       replicateM_ 3 (doDrawCube p)
+       do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll ] -- XXX: test
+          replicateM_ 3 (doDrawCube p)
      takeTurn
 
 takeTurn :: Interact ()
 takeTurn =
   do state <- getState
      let opts = actEndTurn state ++
-                actPlaceCube state
+                actPlaceCube state ++
+                actReadyAction state
      askInputs opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
@@ -85,6 +87,26 @@ actEndTurn state =
           else doReset playerId
 
 
+actReadyAction :: Opts
+actReadyAction state =
+  [ ( playerId :-> AskReadyAction b
+    , "Use acton"
+    , performBasicAction b n
+    )
+  | (b,n) <- bagToList (getField (gameTurn .> turnReady) state)
+  , n > 0
+  ]
+  where
+  (playerId,_) = currentPlayer state
+
+performBasicAction :: BasicAction -> Int -> Interact ()
+performBasicAction b n =
+  -- XXX
+  do turn <- getField gameTurn <$> getState
+     update (SetTurn (updField turnReady (bagRemove b) turn))
+     takeTurn
+
+--------------------------------------------------------------------------------
 
 
 doReset :: PlayerId -> Interact ()
@@ -106,6 +128,9 @@ doReset playerId =
      replicateM_ 3 (doDrawCube playerId)
 
 
+doGainCube :: PlayerId -> Resource -> Interact ()
+doGainCube pid r = update (AddToBag pid r)
+
 doDrawCube :: PlayerId -> Interact Bool
 doDrawCube playerId =
   do state <- getState
@@ -126,5 +151,6 @@ checkGainBenefit playerId lastCube =
      case techBenefit alt of
        OneTime a
          | all (isJust . getField spotResource) (getField techCost alt) ->
-            update (SetTurn (turnAddAction a (getField gameTurn state)))
-       _ -> traceM "NOPE" >> pure ()
+           do let a' = foldr contModifyAction a (continuousBenefits player)
+              update (SetTurn (turnAddAction a' (getField gameTurn state)))
+       _ -> pure ()
