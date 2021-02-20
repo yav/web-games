@@ -68,8 +68,7 @@ const uiActivation = (alt) => {
       bftPart.appendChild(uiAction(benefit.contents))
       break
     case 'Continuous': {
-      const xxx = span(JSON.stringify(benefit.contents))
-      bftPart.appendChild(xxx)
+      bftPart.appendChild(uiContAction(benefit.contents))
       break
     }
   }
@@ -79,7 +78,7 @@ const uiActivation = (alt) => {
 
 const uiTech = (t) => {
   const dom = div('tech')
-  setSize(dom,'width', 10 * iconSize)
+  setSize(dom,'width', 8.5 * iconSize)
   setSize(dom,'margin', iconSize / 8)
 
   const h = div('heading')

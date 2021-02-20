@@ -1,47 +1,49 @@
-
-const iconSize = 32
-
-
-
-const tooltipEl = (el,above,n) => {
-  const dom  = div('tooltip')
-  const size = 0.4 * iconSize
-  setSize(dom,'fontSize',0.8 * size)
-  dom.appendChild(n)
-  el.addEventListener('mouseenter',() => dom.style.display = 'inline-block')
-  el.addEventListener('mouseleave',() => dom.style.display = 'none')
-  el.appendChild(dom)
-  setSize(dom,'left',0)
-  setSize(dom,'top', above? -size * 0.9 : 1.1 * iconSize)
-  return dom
-}
-
-const tooltip = (el,above,n) => { return tooltipEl(el,above,span(n)) }
-
-const uiHelp = (title,ps) => {
-  const dom     = div('help')
-  const h       = div('heading')
-  h.textContent = title
-  dom.appendChild(h)
-
-  for (let i = 0; i < ps.length; ++i) {
-    const p = document.createElement('p')
-    p.textContent = ps[i]
-    dom.appendChild(p)
+const uiContAction = (act) => {
+  const dom = div('action')
+  switch (act.tag) {
+    case 'On': {
+      const cont = act.contents
+      dom.appendChild(span('on '))
+      dom.appendChild(uiEvent(cont[0]))
+      dom.appendChild(span(':'))
+      dom.appendChild(uiBasicAction(cont[1]))
+      break
+    }
+    case 'UseMoveAsFly': {
+      dom.appendChild(span('use '))
+      dom.appendChild(uiBasicAction({tag:'Move'}))
+      dom.appendChild(span(' as '))
+      dom.appendChild(uiBasicAction({tag:'Fly'}))
+      break
+    }
+    case 'UseWorkerAsClone': {
+      dom.appendChild(span('use '))
+      dom.appendChild(uiBasicAction({tag:'PlaceWorker'}))
+      dom.appendChild(span(' as '))
+      dom.appendChild(uiBasicAction({tag:'CloneWorker'}))
+      break
+    }
   }
-
   return dom
 }
 
+const uiEvent = (ev) => {
+  switch(ev) {
+    case 'GainAttack': return actionIcon('attack','Gain attack')
+    case 'GainMove': return actionIcon('move','Gian move')
+    case 'GainWorker': return actionIcon('deploy','Deploy')
+    case 'GainGem': return actionIcon('gem','Gain gem')
+    case 'GainDevelop': return actionIcon('upgrade','Gain upgrade')
+    case 'StartTurn': return actionIcon('ev-turn','Start turn')
+  }
+}
 
 const uiAction = (act) => {
   const dom = div('action')
   const cont = act.contents
   switch (act.tag) {
     case 'If': {
-      const a = div('action')
-      a.appendChild(uiBasicAction(cont[0]))
-      dom.appendChild(a)
+      dom.appendChild(uiBasicAction(cont[0]))
       dom.appendChild(span(' to '))
       const as = cont[1]
       for (let i = 0; i < as.length; ++i) {
@@ -92,12 +94,6 @@ const addBadgeRight = (n,el) => {
   el.appendChild(b)
 }
 
-
-
-
-const uiBasicAction = function() {
-
-
 const actionIcon = (action,help) => {
   const dom     = div('icon ' + action)
   const style   = dom.style
@@ -106,6 +102,12 @@ const actionIcon = (action,help) => {
   tooltip(dom,false,help)
   return dom
 }
+
+
+const uiBasicAction = function() {
+
+
+
 
 const neighbours = () => {
   const dom = div('icon neighbours')

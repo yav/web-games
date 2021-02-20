@@ -34,6 +34,7 @@ svg.gray     { fill: #ccc }
   background-color: black;
   border-radius: 12.5%;
   text-align: center;
+  vertical-align: middle;
 }
 
 .badge {
@@ -96,6 +97,7 @@ svg.gray     { fill: #ccc }
 .gain-tech     { background-image: url('img/card-draw.svg'); }
 .swap          { background-image: url('img/cycle.svg'); }
 .spy           { background-image: url('img/eye-target.svg'); }
+.ev-turn       { background-image: url('img/clockwise-rotation.svg'); }
 .neighbours    {
   display: inline-block;
 }
@@ -115,7 +117,7 @@ svg.gray     { fill: #ccc }
 
 .tech {
   background-color: white;
-  display: inline-block;
+  display: block;
 }
 
 .tech .heading {
@@ -229,7 +231,6 @@ svg.gray     { fill: #ccc }
   color: black;
   border: 0.2em solid black;
 }
-
 
 .bag {
   vertical-align: middle;

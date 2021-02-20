@@ -1,9 +1,42 @@
 let gui = {}
+const iconSize = 32
 
 const toSize = (n) => {
   const scale = 1
   return scale * n
 }
+
+const tooltipEl = (el,above,n) => {
+  const dom  = div('tooltip')
+  const size = 0.4 * iconSize
+  setSize(dom,'fontSize',0.8 * size)
+  dom.appendChild(n)
+  el.addEventListener('mouseenter',() => dom.style.display = 'inline-block')
+  el.addEventListener('mouseleave',() => dom.style.display = 'none')
+  el.appendChild(dom)
+  setSize(dom,'left',0)
+  setSize(dom,'top', above? -size * 0.9 : 1.1 * iconSize)
+  return dom
+}
+
+const tooltip = (el,above,n) => { return tooltipEl(el,above,span(n)) }
+
+const uiHelp = (title,ps) => {
+  const dom     = div('help')
+  const h       = div('heading')
+  h.textContent = title
+  dom.appendChild(h)
+
+  for (let i = 0; i < ps.length; ++i) {
+    const p = document.createElement('p')
+    p.textContent = ps[i]
+    dom.appendChild(p)
+  }
+
+  return dom
+}
+
+
 
 
 function uiRedraw(state) {
