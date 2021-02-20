@@ -1,11 +1,12 @@
-const hexSize   = 5 * iconSize
-const boardSize = 7 * hexSize
+const hexSize   = 4 * iconSize
+// const boardSize = 7 * hexSize
+let originX = 0
+let originY = 0
 
 const uiHexLoc = (loc) => {
   const hexSpace = hexSize / 30
-  const origin   = boardSize / 2 - hexSize / 2
-  return { x: origin + (loc.locX + loc.locY/2) * (hexSize + hexSpace)
-         , y: origin + (-0.75 * loc.locY) * (hexSize + hexSpace)
+  return { x: originX + (loc.locX + loc.locY/2) * (hexSize + hexSpace)
+         , y: originY + (-0.75 * loc.locY) * (hexSize + hexSpace)
          }
 }
 
@@ -31,9 +32,12 @@ const uiSoldier = (n,p) => {
 
 
 
-const uiCity = (cityId, city) => {
+const uiCity = (el,pos,cityId, city) => {
   const dom = div('icon')
   setDim(dom,iconSize,iconSize)
+  setSize(dom,'left',pos.x)
+  setSize(dom,'top',pos.y)
+  el.appendChild(dom)
 
   const capital = city.cityCapital
   if (capital) {
@@ -47,8 +51,8 @@ const uiCity = (cityId, city) => {
   const h = div('part')
   const help = uiAction(city.cityActions)
   h.appendChild(help)
-  setSize(h,'left',0)
-  setSize(h,'top',iconSize)
+  setSize(h,'left',pos.x)
+  setSize(h,'top',pos.y + iconSize)
   let pinned = false
   dom.addEventListener('mouseenter',() => h.style.display = 'inline-block')
   dom.addEventListener('mouseleave',() => {
@@ -59,16 +63,18 @@ const uiCity = (cityId, city) => {
     pinned = !pinned
   })
   h.style.display = 'none'
-  dom.appendChild(h)
-  return dom
+  el.appendChild(h)
 }
 
-const uiRuin = (ruinId, ruin) => {
+const uiRuin = (el, pos, ruinId, ruin) => {
   const dom = div('icon')
+  setDim(dom,iconSize,iconSize)
+  setSize(dom,'left',pos.x)
+  setSize(dom,'top',pos.y)
+  el.appendChild(dom)
   dom.classList.add('ruins')
   setDim(dom,iconSize,iconSize)
   tooltip(dom,false,'Ruins')
-  return dom
 }
 
 
@@ -76,14 +82,30 @@ const uiRuin = (ruinId, ruin) => {
 
 const uiBoard = (b) => {
   const dom = div('board')
-  for (let i = 0; i < b.length; ++i)
-    dom.appendChild(uiHex(b[i]))
-  setDim(dom,boardSize,boardSize)
+  let minX = 10 * iconSize
+  let minY = 10 * iconSize
+  let maxX = 0
+  let maxY = 0
+  for (let i = 0; i < b.length; ++i) {
+    const pos = uiHexLoc(b[i][0])
+    if (pos.x < minX) minX = pos.x
+    if (pos.x > maxX) maxX = pos.x
+    if (pos.y < minY) minY = pos.y
+    if (pos.y > maxY) maxY = pos.y
+  }
+  const w = maxX - minX + hexSize
+  const h = maxY - minY + hexSize
+  setDim(dom,w,h)
+  originX = (w-hexSize)/2
+  originY = (h-hexSize)/2
+  for (let i = 0; i < b.length; ++i) {
+    uiHex(dom,b[i])
+  }
   return dom
 }
 
 
-const uiHex = (info) => {
+const uiHex = (container,info) => {
   const loc = info[0]
   const h   = info[1]
 
@@ -96,15 +118,16 @@ const uiHex = (info) => {
   const bg = div('bg')
   bg.classList.add(h.tileTerrain)
   dom.appendChild(bg)
+  container.appendChild(dom)
 
 
   const k  = hexSize / 4
   const ko = (k-iconSize) / 2
   const order = [ 2, 7, 5, 4, 1, 6, 3, 8, 9, 0 ]
-  const start = Math.abs((loc.locX + loc.locY)) % 4
+  const start = 0 // Math.abs((loc.locX + loc.locY)) % 4
 
   let thing = 0
-  const position = (el) => {
+  const position = () => {
     const i = order[(start + thing) % order.length]
     let x = 0
     let y = 0
@@ -116,26 +139,19 @@ const uiHex = (info) => {
       x = ko + ((i - 1) % 4) * k
       y = ko + (Math.floor ((i - 1) / 4) + 1) * k
     }
-    setSize(el,'left', x)
-    setSize(el,'top',  y)
+    return { x: pos.x + x, y: pos.y + y }
   }
 
   for (cityId in h.tileCities) {
-    const el = uiCity(cityId, h.tileCities[cityId])
-    position(el)
-    dom.appendChild(el)
+    uiCity(container,position(),cityId, h.tileCities[cityId])
     ++thing
   }
 
   for (ruinId in h.tileRuins) {
-    const el = uiRuin(ruinId, h.tileRuins[ruinId])
-    position(el)
-    dom.appendChild(el)
+    uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
     ++thing
   }
 
-
-
-  return dom
+  return pos
 }
 

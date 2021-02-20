@@ -1,5 +1,5 @@
 let gui = {}
-const iconSize = 32
+const iconSize = 28
 
 const toSize = (n) => {
   const scale = 1
@@ -44,13 +44,11 @@ function uiRedraw(state) {
   gui = {}
   gui.questions = []
 
+  const game = state.game
   const body = document.getElementById('main')
 
-  const game = state.game
-  gui.menu = div('menu')
-  body.appendChild(gui.menu)
-  gui.turn = uiTurn(game._gameTurn)
-  body.appendChild(gui.turn.dom)
+  body.appendChild(uiBoard(state.game.gameBoard))
+
 
   const players = game._gamePlayers
   const ps = {}
@@ -60,9 +58,13 @@ function uiRedraw(state) {
     body.appendChild(ps[p].dom)
   }
 
-/*
-  body.appendChild(uiBoard(state.game.gameBoard))
-*/
+
+  gui.menu = div('menu')
+  body.appendChild(gui.menu)
+  gui.turn = uiTurn(game._gameTurn)
+  body.appendChild(gui.turn.dom)
+
+
 
   uiQuestions(state.questions)
 }

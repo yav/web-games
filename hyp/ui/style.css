@@ -1,6 +1,9 @@
 body {
-  background-color: #999;
   font-family: arial;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  background-color: #036;
 }
 
 
@@ -70,7 +73,7 @@ svg.gray     { fill: #ccc }
   text-align: left;
   white-space: nowrap;
   display: none;
-  z-index: 2;
+  z-index: 3;
 }
 
 .help .heading {
@@ -156,12 +159,16 @@ svg.gray     { fill: #ccc }
 .action {
   display: inline-block;
   vertical-align: middle;
+  z-index: 2;
 }
 
 
 /* --- board ---------------------------------------------------------------- */
 .board {
-  background-color: #666;
+  padding:0;
+  display: inline-block;
+  position: relative;
+  margin: 1em;
 }
 
 .hex {
@@ -169,6 +176,7 @@ svg.gray     { fill: #ccc }
   position: absolute;
   background-color: rgba(0,0,0,0);
   pointer-events: none;
+  z-index: 0;
 }
 
 .hex .bg {
@@ -200,21 +208,27 @@ svg.gray     { fill: #ccc }
   top: 0;
 }
 
-.hex .icon {
+.board .icon {
   pointer-events: auto;
   position: absolute;
+  z-index: 1;
+}
+
+.board .action {
+  z-index: 2;
 }
 
 
-.hex .icon .action .icon {
+.board .action .icon {
   position: relative;
 }
 
-.hex .icon .part {
+.board .part {
   background-color: white;
   border-radius: 0.3em;
   border: 1px solid black;
   position: absolute;
+  z-index:3;
 }
 
 
