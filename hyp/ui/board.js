@@ -96,8 +96,8 @@ const uiBoard = (b) => {
   const w = maxX - minX + hexSize
   const h = maxY - minY + hexSize
   setDim(dom,w,h)
-  originX = (w-hexSize)/2
-  originY = (h-hexSize)/2
+  originX = -minX;
+  originY = -minY;
   for (let i = 0; i < b.length; ++i) {
     uiHex(dom,b[i])
   }

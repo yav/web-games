@@ -1,7 +1,6 @@
 module Turn where
 
 import Data.Text(Text)
-import Data.Map(Map)
 import GHC.Generics(Generic)
 import Data.Aeson(FromJSON,ToJSON)
 
@@ -54,6 +53,12 @@ turnAddBasicAction act =
     _           -> updField turnReady (bagChange 1 act)
 
 
+turnRemoveGems :: Turn -> (Int,Turn)
+turnRemoveGems t = (pos+neg, setField turnReady b2 t)
+  where
+  b0       = getField turnReady t
+  (pos,b1) = bagRemoveAll Gem b0
+  (neg,b2) = bagRemoveAll LooseGem b1
 
 
 

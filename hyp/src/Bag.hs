@@ -1,5 +1,6 @@
 module Bag where
 
+import Data.Maybe(fromMaybe)
 import Data.Map(Map)
 import qualified Data.Map as Map
 import GHC.Generics(Generic)
@@ -36,5 +37,8 @@ bagPick b rng
   | otherwise    = let (r,rng1) = pickWeighted (bagToList b) rng
                    in Just (r, rng1)
 
-
+bagRemoveAll :: Ord a => a -> Bag a -> (Int, Bag a)
+bagRemoveAll r (Bag b) = (fromMaybe 0 mb, Bag b1)
+  where
+  (mb, b1) = Map.updateLookupWithKey (\_ _ -> Nothing) r b
 

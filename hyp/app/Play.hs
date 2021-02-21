@@ -1,7 +1,7 @@
 module Play where
 
 import Data.Text(Text)
-import Control.Monad(forM_,replicateM_)
+import Control.Monad(forM_,replicateM_,when)
 import qualified Data.Map as Map
 import Data.Maybe(isJust)
 
@@ -167,6 +167,16 @@ checkGainBenefit playerId lastCube =
      case techBenefit alt of
        OneTime a
          | all (isJust . getField spotResource) (getField techCost alt) ->
-           do let a' = foldr contModifyAction a (continuousBenefits player)
-              update (SetTurn (turnAddAction a' (getField gameTurn state)))
+           doGainBenefit playerId a
        _ -> pure ()
+
+doGainBenefit :: PlayerId -> Action -> Interact ()
+doGainBenefit playerId a =
+  do state <- getState
+     let player = getField (playerState playerId) state
+         a'     = foldr contModifyAction a (continuousBenefits player)
+         (n,t1) = turnRemoveGems $ turnAddAction a' $ getField gameTurn state
+     when (n /= 0) $ update (ChangeGems playerId n)
+     update (SetTurn t1)
+
+

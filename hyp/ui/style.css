@@ -170,6 +170,7 @@ svg.gray     { fill: #ccc }
   position: relative;
   margin: 1em;
   background: #000;
+  border-radius: 0.5em;
 }
 
 .hex {
@@ -240,11 +241,18 @@ svg.gray     { fill: #ccc }
 .player-orange { fill: #f60 }
 .player-yellow { fill: #fc0 }
 
+/* ------------------------------------------------------------------- */
+
 .player {
   display: inline-block;
   background-color: white;
   color: black;
-  border: 0.2em solid black;
+  border: 0.2em solid #963;
+}
+
+.player .stats {
+  background-color: #000;
+  color: #fff;
 }
 
 .bag {
@@ -256,6 +264,9 @@ svg.gray     { fill: #ccc }
   margin: 0.2em;
 }
 
+
+
+/* ----------------------------------------------------------------------- */
 
 .question {
   outline: 0.075em dashed;
@@ -282,5 +293,6 @@ svg.gray     { fill: #ccc }
   background-color: #f90;
   border-radius: 0.2em;
   margin: 0.2em;
-  position: relative;
+  position: absolute;
+  left: 0; top: 0;
 }

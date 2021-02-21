@@ -40,7 +40,6 @@ const uiHelp = (title,ps) => {
 
 
 function uiRedraw(state) {
-  console.log('redraw')
   gui = {}
   gui.questions = []
 
@@ -85,6 +84,7 @@ const uiUpdate = hsUpdate (
          .remove()
     }
   , ChangeBag: (pid,nm,r,n) => { gui.player[pid].bag[nm].change(r,n) }
+  , ChangeGems: (pid,n) => { gui.player[pid].stats.changeGems(n) }
   , SetTurn:          (t)       => { gui.turn.redraw(t) }
   , Upgrade:          (pid,r,n) => { gui.player[pid].upgrade.change(r,n) }
   , ResetUpgrade:     (pid,r)   => { gui.player[pid].upgrade.reset(r) }

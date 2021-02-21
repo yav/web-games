@@ -7,16 +7,35 @@ const uiPlayer = (p, s) => {
     bag[b] = uiBag(b,s._playerBag[b])
   }
   const ui = { bag: bag
+             , stats:    uiPlayerStats(s)
              , upgrade:  uiUpgrade(s._playerDevel)
              , techs:    uiPlayerTech(s._playerTech)
              , dom: dom
              }
+  dom.appendChild(ui.stats.dom)
   dom.appendChild(ui.bag['BagSource'].dom)
   dom.appendChild(ui.bag['BagReady'].dom)
   dom.appendChild(ui.bag['BagDiscard'].dom)
   dom.appendChild(ui.upgrade.dom)
   dom.appendChild(ui.techs.dom)
   return ui
+}
+
+const uiPlayerStats = (p) => {
+  const dom = div('stats')
+
+  let gems = p._playerGems
+  const gemDom = actionIcon('gem','Gems')
+  const gemBadge = addBadge(gems,gemDom,true)
+  dom.appendChild(gemDom)
+
+  return {
+    dom: dom,
+    changeGems: (n) => {
+      gems += n
+      gemBadge.textContent = gems
+    }
+  }
 }
 
 const uiPlayerTech = (a) => {
@@ -40,7 +59,6 @@ const uiBag = (name,bag) => {
   const cubes = {}
 
   const setR = (r,n) => {
-    console.log(r,n)
     let cur = cubes[r]
     if (n === 0) {
       if (cur) cur.dom.remove()

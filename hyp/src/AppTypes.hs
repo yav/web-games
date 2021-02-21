@@ -25,6 +25,7 @@ data Update =
   | SetTurn Turn
 
   | ChangeBag PlayerId BagName Resource Int
+  | ChangeGems PlayerId Int
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
@@ -91,6 +92,9 @@ doUpdate upd =
     ChangeBag playerId nm r n ->
       Right . updField (playerState playerId .> playerBag .> mapAt nm)
                        (bagChange n r)
+
+    ChangeGems playerId n ->
+      Right . updField (playerState playerId .> playerGems) (+n)
 
     SetTurn t ->
       Right . setField gameTurn t
