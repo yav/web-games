@@ -1,16 +1,19 @@
 
 const uiPlayer = (p, s) => {
   const dom = div('player')
-  const ui = { bag:       uiBag("Bag",s._playerBag)
-             , available: uiBag("Available",s._playerAvailable)
-             , discarded: uiBag("Discarded",s._playerDiscarded)
+  const bag = {}
+
+  for (b in s._playerBag) {
+    bag[b] = uiBag(b,s._playerBag[b])
+  }
+  const ui = { bag: bag
              , upgrade:  uiUpgrade(s._playerDevel)
-             , techs:     uiPlayerTech(s._playerTech)
+             , techs:    uiPlayerTech(s._playerTech)
              , dom: dom
              }
-  dom.appendChild(ui.bag.dom)
-  dom.appendChild(ui.available.dom)
-  dom.appendChild(ui.discarded.dom)
+  dom.appendChild(ui.bag['BagSource'].dom)
+  dom.appendChild(ui.bag['BagReady'].dom)
+  dom.appendChild(ui.bag['BagDiscard'].dom)
   dom.appendChild(ui.upgrade.dom)
   dom.appendChild(ui.techs.dom)
   return ui
@@ -29,6 +32,7 @@ const uiPlayerTech = (a) => {
 }
 
 
+
 const uiBag = (name,bag) => {
   const dom = div('bag')
   setSize(dom,'height',iconSize)
@@ -36,6 +40,7 @@ const uiBag = (name,bag) => {
   const cubes = {}
 
   const setR = (r,n) => {
+    console.log(r,n)
     let cur = cubes[r]
     if (n === 0) {
       if (cur) cur.dom.remove()
@@ -67,8 +72,10 @@ const uiBag = (name,bag) => {
 
   return {
     dom: dom,
-    remove: (r)   => { setR(r, cubes[r].number - 1) },
-    add:    (r)   => { setR(r, cubes[r] ? cubes[r].number + 1 : 1) },
+    change: (r,n) => {
+      const x = cubes[r] ? cubes[r].number : 0
+      setR(r, x+n)
+    },
     ask:    (r,q) => { existingQuestion(cubes[r].dom,q) }
   }
 }

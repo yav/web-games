@@ -56,7 +56,7 @@ actPlaceCube state =
   [ ( playerId :-> AskCubeLoc spot
     , "Place a cube"
     , do r <- askResouce spot
-         update (RemoveFromReady playerId r)
+         update (ChangeBag playerId BagReady r (-1))
          update (PlaceCube playerId spot r)
          checkGainBenefit playerId spot
          takeTurn
@@ -75,7 +75,7 @@ actPlaceCube state =
                                 [ (AskReady r, "Place on wild") | r <- opts ]
                      pure r
          where
-         avail = getField playerAvailable player
+         avail = getField (playerBag .> mapAt BagReady) player
          opts  = filter (/= Gray) (map fst (bagToList avail))
 
 actEndTurn :: Opts
@@ -91,10 +91,10 @@ actEndTurn state =
   where
   (playerId,player) = currentPlayer state
   discardReady =
-    forM_ (bagToList (getField playerAvailable player)) \(r,n) ->
+    forM_ (bagToList (getField (playerBag .> mapAt BagReady) player)) \(r,n) ->
       replicateM_ n
-      do update (RemoveFromReady playerId r)
-         update (AddToDiscard playerId r)
+      do update (ChangeBag playerId BagReady   r (-1))
+         update (ChangeBag playerId BagDiscard r 1)
   drawNew =
     do have <- doDrawCube playerId
        if have
@@ -118,7 +118,7 @@ performBasicAction :: BasicAction -> Int -> Interact ()
 performBasicAction b n =
   -- XXX
   do turn <- getField gameTurn <$> getState
-     update (SetTurn (updField turnReady (bagRemove b) turn))
+     update (SetTurn (updField turnReady (bagChange (-1) b) turn))
      takeTurn
 
 --------------------------------------------------------------------------------
@@ -127,24 +127,25 @@ performBasicAction b n =
 doReset :: PlayerId -> Interact ()
 doReset playerId =
   do player <- getField (playerState playerId) <$> getState
-     forM_ (bagToList (getField playerDiscarded player)) \(r,n) ->
+     let discarded = bagToList (getField (playerBag .> mapAt BagDiscard) player)
+     forM_ discarded \(r,n) ->
         replicateM_ n
-        do update (RemoveFromDiscard playerId r)
-           update (AddToBag playerId r)
+        do update (ChangeBag playerId BagDiscard r (-1))
+           update (ChangeBag playerId BagSource r 1)
      let ok b = case b of
                   Continuous {} -> False
                   OneTime {}          -> True
      forM_ (Map.toList (getField playerTech player)) \(tid,t) ->
        forM_ (fullSpots ok tid t) \(spot,r) ->
          do update (RemoveCube playerId spot)
-            update (AddToBag playerId r)
+            update (ChangeBag playerId BagSource r 1)
      -- XXX: ask for cont.
 
      replicateM_ 3 (doDrawCube playerId)
 
 
 doGainCube :: PlayerId -> Resource -> Interact ()
-doGainCube pid r = update (AddToBag pid r)
+doGainCube pid r = update (ChangeBag pid BagSource r 1)
 
 doDrawCube :: PlayerId -> Interact Bool
 doDrawCube playerId =
@@ -154,8 +155,8 @@ doDrawCube playerId =
        Nothing -> pure False
        Just (r,p1) ->
          do localUpdate_ (setField (playerState playerId) p1)
-            update (RemoveFromBag playerId r)
-            update (AddToReady playerId r)
+            update (ChangeBag playerId BagSource r (-1))
+            update (ChangeBag playerId BagReady  r ( 1))
             pure True
 
 checkGainBenefit :: PlayerId -> CubeLoc -> Interact ()

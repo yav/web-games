@@ -84,13 +84,8 @@ const uiUpdate = hsUpdate (
          .spot[loc.cubeSpot]
          .remove()
     }
-  , RemoveFromReady:  (pid,r) => { gui.player[pid].available.remove(r) }
-  , AddToReady:       (pid,r) => { gui.player[pid].available.add(r) }
-  , RemoveFromBag:    (pid,r) => { gui.player[pid].bag.remove(r) }
-  , AddToBag:         (pid,r) => { gui.player[pid].bag.add(r) }
-  , RemoveFromDiscard:(pid,r) => { gui.player[pid].discarded.remove(r) }
-  , AddToDiscard:     (pid,r) => { gui.player[pid].discarded.add(r) }
-  , SetTurn:          (t)     => { gui.turn.redraw(t) }
+  , ChangeBag: (pid,nm,r,n) => { gui.player[pid].bag[nm].change(r,n) }
+  , SetTurn:          (t)       => { gui.turn.redraw(t) }
   , Upgrade:          (pid,r,n) => { gui.player[pid].upgrade.change(r,n) }
-  , ResetUpgrade:     (pid,r) => { gui.player[pid].upgrade.reset(r) }
+  , ResetUpgrade:     (pid,r)   => { gui.player[pid].upgrade.reset(r) }
   })

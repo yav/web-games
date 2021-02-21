@@ -47,7 +47,7 @@ const uiQuestion = (q) => {
       existingQuestion(dom,q)
     },
     AskReady: (r) => {
-      gui.player[playerId].available.ask(r,q)
+      gui.player[playerId].bag.BagReady.ask(r,q)
     },
     AskButton: (txt) => {
       const btn = div('button')

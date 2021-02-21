@@ -4,7 +4,8 @@ import Data.Map(Map)
 import qualified Data.Map as Map
 import Data.Maybe(maybeToList,isJust)
 import GHC.Generics(Generic)
-import Data.Aeson(ToJSON,FromJSON)
+import Data.Aeson(ToJSON,FromJSON,
+                    ToJSONKey(..),genericToJSONKey,defaultJSONKeyOptions)
 
 import Common.Utils(enumAll)
 import Common.Field
@@ -20,14 +21,15 @@ import Tech
 type TechId = Int
 
 data PlayerState = PlayerState
-  { _playerBag       :: Bag Resource
-  , _playerAvailable :: Bag Resource
-  , _playerDiscarded :: Bag Resource
+  { _playerBag       :: Map BagName (Bag Resource)
   , _playerGems      :: Int
   , _playerDevel     :: Map Resource Int
   , _playerTech      :: Map TechId Tech
   , _playerRNG       :: RNG
   } deriving (Generic,ToJSON)
+
+data BagName = BagSource | BagReady | BagDiscard
+  deriving (Eq,Ord,Enum,Bounded,Generic,ToJSON)
 
 data CubeLoc = CubeLoc
   { cubeTech :: TechId
@@ -35,9 +37,10 @@ data CubeLoc = CubeLoc
   , cubeSpot :: Int
   } deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
+instance ToJSONKey BagName where
+  toJSONKey = genericToJSONKey defaultJSONKeyOptions
+
 declareFields ''PlayerState
-
-
 
 
 emptyPlayerState :: RNG -> PlayerState
@@ -47,9 +50,7 @@ emptyPlayerState rng =
   where
   s0 =
    PlayerState
-      { _playerBag       = bagEmpty
-      , _playerAvailable = bagEmpty
-      , _playerDiscarded = bagEmpty
+      { _playerBag       = Map.fromList [ (b,bagEmpty) | b <- enumAll ]
       , _playerGems      = 0
       , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll, r /= Gray ]
       , _playerTech      = Map.empty
@@ -72,7 +73,8 @@ costSpot (CubeLoc t r i) =
 
 cubeToDraw :: PlayerState -> Maybe (Resource,PlayerState)
 cubeToDraw p =
-  do (r,rng) <- bagPick (getField playerBag p) (getField playerRNG p)
+  do (r,rng) <- bagPick (getField (playerBag .> mapAt BagSource) p)
+                        (getField playerRNG p)
      pure (r, setField playerRNG rng p)
 
 
@@ -105,7 +107,7 @@ placeSpots ps = [ spot
                 , any (matches requires) available
                 ]
   where
-  available = map fst (bagToList (getField playerAvailable ps))
+  available = map fst (bagToList (getField (playerBag .> mapAt BagReady) ps))
 
 continuousBenefits :: PlayerState -> [ContinuousAciton]
 continuousBenefits player =

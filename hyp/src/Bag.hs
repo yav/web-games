@@ -14,15 +14,12 @@ newtype Bag a = Bag (Map a Int)
 bagEmpty :: Bag a
 bagEmpty = Bag Map.empty
 
-bagAdd :: Ord a => a -> Bag a -> Bag a
-bagAdd r (Bag b) = Bag (Map.insertWith (+) r 1 b)
-
-bagRemove :: Ord a => a -> Bag a -> Bag a
-bagRemove r (Bag b) =
+bagChange :: Ord a => Int -> a -> Bag a -> Bag a
+bagChange x r (Bag b) =
   Bag
-  case Map.lookup r b of
-    Just n | n > 1 -> Map.adjust (subtract 1) r b
-    _              -> Map.delete r b
+  let cur = Map.findWithDefault 0 r b
+      new = cur + x
+  in if new > 0 then Map.insert r new b else Map.delete r b
 
 bagIsEmpty :: Bag a -> Bool
 bagIsEmpty (Bag b) = Map.null b
@@ -31,7 +28,7 @@ bagToList :: Bag a -> [(a,Int)]
 bagToList (Bag mp) = Map.toList mp
 
 bagFromList :: Ord a => [a] -> Bag a
-bagFromList = foldr bagAdd bagEmpty
+bagFromList = foldr (bagChange 1) bagEmpty
 
 bagPick :: Ord a => Bag a -> RNG -> Maybe (a, RNG)
 bagPick b rng

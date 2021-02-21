@@ -17,7 +17,6 @@ import Geometry
 import Layout
 import PlayerState
 import Turn
-import Action
 
 
 data Update =
@@ -25,16 +24,12 @@ data Update =
   | RemoveCube PlayerId CubeLoc
   | SetTurn Turn
 
-  | RemoveFromReady   PlayerId Resource
-  | AddToReady        PlayerId Resource
-  | RemoveFromBag     PlayerId Resource
-  | AddToBag          PlayerId Resource
-  | AddToDiscard      PlayerId Resource
-  | RemoveFromDiscard PlayerId Resource
+  | ChangeBag PlayerId BagName Resource Int
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
   deriving (Generic,ToJSON)
+
 
 
 data State = State
@@ -93,27 +88,9 @@ doUpdate upd =
       Right . setField (playerState playerId .> costSpot loc .> spotResource)
                        Nothing
 
-    RemoveFromReady playerId r ->
-      Right . updField (playerState playerId .> playerAvailable)
-                       (bagRemove r)
-    AddToReady playerId r ->
-      Right . updField (playerState playerId .> playerAvailable)
-                       (bagAdd r)
-
-    RemoveFromBag playerId r ->
-      Right . updField (playerState playerId .> playerBag)
-                       (bagRemove r)
-    AddToBag playerId r ->
-      Right . updField (playerState playerId .> playerBag)
-                       (bagAdd r)
-
-
-    RemoveFromDiscard playerId r ->
-      Right . updField (playerState playerId .> playerDiscarded)
-                       (bagRemove r)
-    AddToDiscard playerId r ->
-      Right . updField (playerState playerId .> playerDiscarded)
-                       (bagAdd r)
+    ChangeBag playerId nm r n ->
+      Right . updField (playerState playerId .> playerBag .> mapAt nm)
+                       (bagChange n r)
 
     SetTurn t ->
       Right . setField gameTurn t

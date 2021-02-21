@@ -51,7 +51,7 @@ turnAddBasicAction :: BasicAction -> Turn -> Turn
 turnAddBasicAction act =
   case act of
     a `Times` n -> \t -> foldr turnAddBasicAction t (replicate n a)
-    _           -> updField turnReady (bagAdd act)
+    _           -> updField turnReady (bagChange 1 act)
 
 
 
