@@ -169,12 +169,13 @@ svg.gray     { fill: #ccc }
   display: inline-block;
   position: relative;
   margin: 1em;
+  background: #000;
 }
 
 .hex {
   display: inline-block;
   position: absolute;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(1,0,0,0);
   pointer-events: none;
   z-index: 0;
 }
@@ -186,7 +187,7 @@ svg.gray     { fill: #ccc }
   left: 0;
   top: 0;
   background-size: cover;
-  opacity: 75%;
+  opacity: 85%;
   clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%);
   pointer-events: auto;
 }
