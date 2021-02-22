@@ -287,6 +287,19 @@ svg.gray     { fill: #ccc }
   display: inline-block;
   background-color: white;
   color: black;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.turn .if {
+  background-color: #ccc;
+  margin-left: 0.3em;
+}
+
+.turn .or {
+  background-color: #ccc;
+  margin-left: 0.3em;
 }
 
 .button {
@@ -294,5 +307,6 @@ svg.gray     { fill: #ccc }
   border-radius: 0.2em;
   margin: 0.2em;
   position: absolute;
-  left: 0; top: 0;
+  left: 0;
+  top: 3em;
 }

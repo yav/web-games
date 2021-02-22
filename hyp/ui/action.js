@@ -43,25 +43,30 @@ const uiAction = (act) => {
   const cont = act.contents
   switch (act.tag) {
     case 'If': {
-      dom.appendChild(uiBasicAction(cont[0]))
+      dom.classList.add('if')
+      const left = uiBasicAction(cont[0])
+      dom.appendChild(left)
       dom.appendChild(span(' to '))
       const as = cont[1]
       for (let i = 0; i < as.length; ++i) {
         dom.appendChild(uiBasicAction(as[i]))
       }
-      return dom
+      return { dom: dom, left: left  }
     }
     case 'Action': {
       for (let i = 0; i < cont.length; ++i) {
         dom.appendChild(uiBasicAction(cont[i]))
       }
-      return dom
+      return { dom: dom }
     }
     case 'Or': {
-      dom.appendChild(uiBasicAction(cont[0]))
+      dom.classList.add('or')
+      const left  = uiBasicAction(cont[0])
+      const right = uiBasicAction(cont[1])
+      dom.appendChild(left)
       dom.appendChild(span(' or '))
-      dom.appendChild(uiBasicAction(cont[1]))
-      return dom
+      dom.appendChild(right)
+      return { dom: dom, left: left, right: right }
     }
   }
 

@@ -98,3 +98,32 @@ contModifyAction cont act =
       Times b n | n > 0 -> is p b
       _ -> p ba
 
+autoExecute :: BasicAction -> Bool
+autoExecute ba =
+  case ba of
+
+    Gem               -> True
+    LooseResource {}  -> True
+    LooseGem          -> True
+    LooseDevelop      -> True
+    RemoveWorker      -> True
+    Neighbours {}     -> True
+
+    Move              -> False
+    Fly               -> False
+    PlaceWorker       -> False
+    CloneWorker       -> False
+    Attack            -> False
+    RangedAttack      -> False
+    Fortify           -> False
+    Develop {}        -> False
+    GainTech          -> False
+    DrawResource      -> False
+    ReturnResource    -> False
+    SwapResource {}   -> False
+    GainResource {}   -> False
+    Spy               -> False
+
+    Times x _         -> autoExecute x
+
+

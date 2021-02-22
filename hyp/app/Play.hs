@@ -1,7 +1,7 @@
 module Play where
 
 import Data.Text(Text)
-import Control.Monad(forM_,replicateM_,when)
+import Control.Monad(forM_,replicateM_)
 import qualified Data.Map as Map
 import Data.Maybe(isJust)
 
@@ -16,6 +16,8 @@ import AppTypes
 import Action
 import PlayerState
 import Resource
+
+import BasicAction
 
 
 setup :: Interact ()
@@ -106,20 +108,56 @@ actReadyAction :: Opts
 actReadyAction state =
   [ ( playerId :-> AskReadyAction b
     , "Use acton"
-    , performBasicAction b n
+    , performBasicAction playerId b
     )
-  | (b,n) <- bagToList (getField (gameTurn .> turnReady) state)
-  , n > 0
+  | b <- map fst (bagToList (getField turnReady turn))
+      -- XXX: not all actions are activated though the action menu
+      -- (e.g., attack by clicking on the map, same for move, fly)
+
+  ] ++
+  [ ( playerId :-> AskIfAction n
+    , "Use action"
+    , performIfAction playerId n
+    )
+  | n <- zipWith const [ 0.. ] (getField turnIfs turn)
+  ] ++
+  [ ( playerId :-> AskOrActionLeft n
+    , "Use action"
+    , performOrAction playerId (Left n)
+    ) | n <- ors
+  ] ++
+  [ ( playerId :-> AskOrActionRight n
+    , "Use action"
+    , performOrAction playerId (Right n)
+    ) | n <- ors
   ]
   where
   (playerId,_) = currentPlayer state
+  turn         = getField gameTurn state
+  ors          = zipWith const [ 0.. ] (getField turnOrs turn)
 
-performBasicAction :: BasicAction -> Int -> Interact ()
-performBasicAction b n =
-  -- XXX
-  do turn <- getField gameTurn <$> getState
-     update (SetTurn (updField turnReady (bagChange (-1) b) turn))
+
+
+performBasicAction :: PlayerId -> BasicAction -> Interact ()
+performBasicAction playerId b =
+  do doBasicAction playerId b
      takeTurn
+
+performIfAction :: PlayerId -> Int -> Interact ()
+performIfAction playerId n =
+  do (x,xs,turn) <- turnGetIf n . getField gameTurn <$> getState
+     update (SetTurn turn)
+     doGainBenefit playerId (Action [x])
+     doGainBenefit playerId (Action xs)
+     takeTurn
+
+performOrAction :: PlayerId -> Either Int Int -> Interact ()
+performOrAction playerId which =
+  do (x,turn) <- turnGetOr which . getField gameTurn <$> getState
+     update (SetTurn turn)
+     doGainBenefit playerId (Action [x])
+     takeTurn
+
 
 --------------------------------------------------------------------------------
 
@@ -175,8 +213,8 @@ doGainBenefit playerId a =
   do state <- getState
      let player = getField (playerState playerId) state
          a'     = foldr contModifyAction a (continuousBenefits player)
-         (n,t1) = turnRemoveGems $ turnAddAction a' $ getField gameTurn state
-     when (n /= 0) $ update (ChangeGems playerId n)
+         (now,t1) = turnAutoExecute $ turnAddAction a' $ getField gameTurn state
      update (SetTurn t1)
-
+     mapM_ (doBasicAction playerId) now
+                        -- here we assume the order does not matter
 

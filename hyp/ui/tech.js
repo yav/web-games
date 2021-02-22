@@ -65,7 +65,7 @@ const uiActivation = (alt) => {
   const bftPart = div('part')
   switch (benefit.tag) {
     case 'OneTime':
-      bftPart.appendChild(uiAction(benefit.contents))
+      bftPart.appendChild(uiAction(benefit.contents).dom)
       break
     case 'Continuous': {
       bftPart.appendChild(uiContAction(benefit.contents))

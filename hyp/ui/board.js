@@ -49,7 +49,7 @@ const uiCity = (el,pos,cityId, city) => {
   else dom.classList.add('city')
 
   const h = div('part')
-  const help = uiAction(city.cityActions)
+  const help = uiAction(city.cityActions).dom
   h.appendChild(help)
   setSize(h,'left',pos.x)
   setSize(h,'top',pos.y + iconSize)

@@ -28,6 +28,9 @@ bagIsEmpty (Bag b) = Map.null b
 bagToList :: Bag a -> [(a,Int)]
 bagToList (Bag mp) = Map.toList mp
 
+bagFromNumList :: Ord a => [(a,Int)] -> Bag a
+bagFromNumList xs = Bag (Map.fromListWith (+) xs)
+
 bagFromList :: Ord a => [a] -> Bag a
 bagFromList = foldr (bagChange 1) bagEmpty
 

@@ -55,8 +55,11 @@ const uiQuestion = (q) => {
       newQuestion(btn,q)
       gui.menu.appendChild(btn)
     },
+    AskUpgrade: (c) => { gui.player[playerId].upgrade.ask(c,q) },
     AskReadyAction: (r) => { gui.turn.askBasic(r,q) },
-    AskUpgrade: (c) => { gui.player[playerId].upgrade.ask(c,q) }
+    AskIfAction: (n) => { gui.turn.askIf(n,q) },
+    AskOrActionLeft: (n) => { gui.turn.askOrLeft(n,q) },
+    AskOrActionRight: (n) => { gui.turn.askOrRight(n,q) },
   })(q.chChoice)
 
 }
