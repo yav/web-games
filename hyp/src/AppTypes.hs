@@ -14,6 +14,7 @@ import Common.RNG
 import Bag
 import Resource
 import Geometry
+import Tile
 import Layout
 import PlayerState
 import Turn
@@ -29,6 +30,13 @@ data Update =
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
+
+  | ChangeUnit PlayerId UnitType Loc Int
+
+  | SetCity Loc CityId TileSpot
+  | SetRuin Loc RuinId TileSpot
+
+
   deriving (Generic,ToJSON)
 
 
@@ -37,7 +45,8 @@ data State = State
   { _gamePlayers  :: Map PlayerId PlayerState
   , _gameTurn     :: Turn
   , gameTurnOrder :: [PlayerId]
-  , gameBoard     :: Board
+  , _gameEndOn    :: Maybe PlayerId
+  , _gameBoard     :: Board
   -- map
   -- tech market
 
@@ -52,8 +61,9 @@ type View = State
 initialState :: RNG -> Bool -> [PlayerId] -> State
 initialState rng useFog ps = State
   { gameTurnOrder = ps
+  , _gameEndOn = Nothing
   , _gamePlayers  = Map.fromList pstates
-  , gameBoard = brd
+  , _gameBoard = brd
   , _gameTurn = newTurn (head ps)
   }
   where
@@ -104,4 +114,19 @@ doUpdate upd =
 
     ResetUpgrade playerId r ->
       Right . setField (playerState playerId .> playerDevel .> mapAt r) 0
+
+    ChangeUnit playerId ty loc n ->
+      Right . updField (gameBoard .> tileAt loc .> playerUnits playerId)
+                       (bagChange n ty)
+
+
+    SetCity loc cityId val ->
+      Right . setField (gameBoard .> tileAt loc
+                                  .> tileCities .> mapAt cityId .> citySpot)
+                       val
+
+    SetRuin loc ruinId val ->
+      Right . setField (gameBoard .> tileAt loc
+                                  .> tileRuins .> mapAt ruinId .> ruinSpot)
+                       val
 

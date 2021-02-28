@@ -21,14 +21,14 @@ data Turn = Turn
   } deriving (Generic,ToJSON)
 
 
-data Input = AskCubeLoc CubeLoc
-           | AskReady Resource
-           | AskButton Text
-           | AskReadyAction  BasicAction
-           | AskIfAction Int
-           | AskOrActionLeft Int
-           | AskOrActionRight Int
-           | AskUpgrade Resource
+data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
+           | AskReady Resource                  -- ^ Resource in ready area
+           | AskButton Text                     -- ^ A button
+           | AskReadyAction  BasicAction        -- ^ Activate a produced action
+           | AskIfAction Int                    -- ^ Activate cond. action
+           | AskOrActionLeft Int                -- ^ Choose left of alt. act
+           | AskOrActionRight Int               -- ^ Choose right of alt. act
+           | AskUpgrade Resource                -- ^ Choose upgrade track
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 
@@ -36,12 +36,14 @@ declareFields ''Turn
 
 newTurn :: PlayerId -> Turn
 newTurn p =
-   turnAddAction (Action [Move]) -- XXX
-   Turn { turnPlayer  = p
-        , _turnReady  = bagEmpty
-        , _turnIfs    = []
-        , _turnOrs    = []
-        }
+  Turn { turnPlayer  = p
+       , _turnReady  = bagEmpty
+       , _turnIfs    = []
+       , _turnOrs    = []
+       }
+
+turnRemoveReady :: BasicAction -> Turn -> Turn
+turnRemoveReady act = updField turnReady (bagChange (-1) act)
 
 turnAddAction :: Action -> Turn -> Turn
 turnAddAction act =

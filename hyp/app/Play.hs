@@ -28,30 +28,37 @@ setup =
           replicateM_ 3 (doDrawCube p)
      takeTurn
 
+
+startTurn :: Interact ()
+startTurn =
+  do -- XXX: start of turn actions + remove fortify
+     takeTurn
+
+endGame :: Interact ()
+endGame = pure ()
+
+endTurn :: Interact ()
+endTurn =
+  do state <- getState
+     let curP = turnPlayer (getField gameTurn state)
+         newP = case dropWhile (/= curP) (gameTurnOrder state) of
+                  a : _ -> a
+                  _     -> head (gameTurnOrder state)
+     case getField gameEndOn state of
+       Just p | p == newP -> endGame
+       _ -> update (SetTurn (newTurn newP))
+     startTurn
+
 takeTurn :: Interact ()
 takeTurn =
   do state <- getState
-     let opts = actEndTurn state ++
+     let opts = actEndTurn   state ++
                 actPlaceCube state ++
-                actReadyAction state ++
-                actTest state
+                actUseAction state
      askInputs opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
 
-
-actTest :: Opts
-actTest state =
-  [ ( playerId :-> AskUpgrade Yellow
-    , "Just testing"
-    , do if getField (playerDevel .> mapAt Yellow) player == 6
-            then update (ResetUpgrade playerId Yellow)
-            else update (Upgrade playerId Yellow 1)
-         takeTurn
-    )
-  ]
-  where
-  (playerId,player) = currentPlayer state
 
 actPlaceCube :: Opts
 actPlaceCube state =
@@ -80,23 +87,25 @@ actPlaceCube state =
          avail = getField (playerBag .> mapAt BagReady) player
          opts  = filter (/= Gray) (map fst (bagToList avail))
 
+
 actEndTurn :: Opts
 actEndTurn state =
   [ ( playerId :-> AskButton "End Turn"
     , "End Turn"
     , do discardReady
          drawNew
-         -- XXX: next player, etc.
-         takeTurn
+         endTurn
     )
   ]
   where
   (playerId,player) = currentPlayer state
+
   discardReady =
     forM_ (bagToList (getField (playerBag .> mapAt BagReady) player)) \(r,n) ->
       replicateM_ n
       do update (ChangeBag playerId BagReady   r (-1))
          update (ChangeBag playerId BagDiscard r 1)
+
   drawNew =
     do have <- doDrawCube playerId
        if have
@@ -104,8 +113,8 @@ actEndTurn state =
           else doReset playerId
 
 
-actReadyAction :: Opts
-actReadyAction state =
+actUseAction :: Opts
+actUseAction state =
   [ ( playerId :-> AskReadyAction b
     , "Use acton"
     , performBasicAction playerId b
@@ -120,6 +129,7 @@ actReadyAction state =
     , performIfAction playerId n
     )
   | n <- zipWith const [ 0.. ] (getField turnIfs turn)
+  -- XXX: Only enabled
   ] ++
   [ ( playerId :-> AskOrActionLeft n
     , "Use action"
@@ -132,9 +142,9 @@ actReadyAction state =
     ) | n <- ors
   ]
   where
-  (playerId,_) = currentPlayer state
-  turn         = getField gameTurn state
-  ors          = zipWith const [ 0.. ] (getField turnOrs turn)
+  (playerId,player) = currentPlayer state
+  turn              = getField gameTurn state
+  ors               = zipWith const [ 0.. ] (getField turnOrs turn)
 
 
 
@@ -165,19 +175,25 @@ performOrAction playerId which =
 doReset :: PlayerId -> Interact ()
 doReset playerId =
   do player <- getField (playerState playerId) <$> getState
+
+     -- discards to bag
      let discarded = bagToList (getField (playerBag .> mapAt BagDiscard) player)
      forM_ discarded \(r,n) ->
         replicateM_ n
         do update (ChangeBag playerId BagDiscard r (-1))
            update (ChangeBag playerId BagSource r 1)
+
+     -- from non-continus cards
      let ok b = case b of
                   Continuous {} -> False
-                  OneTime {}          -> True
+                  OneTime {}    -> True
      forM_ (Map.toList (getField playerTech player)) \(tid,t) ->
        forM_ (fullSpots ok tid t) \(spot,r) ->
          do update (RemoveCube playerId spot)
             update (ChangeBag playerId BagSource r 1)
+
      -- XXX: ask for cont.
+     -- XXX: reactivate map
 
      replicateM_ 3 (doDrawCube playerId)
 

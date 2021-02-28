@@ -6,7 +6,8 @@ import qualified Data.Map as Map
 import GHC.Generics(Generic)
 
 import qualified Data.Aeson as JS
-import Data.Aeson (ToJSON(..), (.=))
+import Data.Aeson (ToJSON(..), FromJSON, (.=), ToJSONKey,
+                                 genericToJSONKey, defaultJSONKeyOptions)
 
 import Common.Basics
 import Common.Field
@@ -15,6 +16,7 @@ import Terrain
 import Action
 import RuinToken
 import Resource
+import Bag
 
 
 data TileName =
@@ -24,41 +26,56 @@ data TileName =
   | TNW (Maybe Resource)
     deriving (Eq,Ord)
 
+type CityId = Int
+type RuinId = Int
 
 data Tile = Tile
   { tileNumber    :: TileName
   , tileTerrain   :: Terrain
-  , _tileCities   :: Map Int City
-  , _tileRuins    :: Map Int Ruin
+  , _tileCities   :: Map CityId City
+  , _tileRuins    :: Map RuinId Ruin
   , _tileVisible  :: Bool
-  , tilePlayers   :: Map PlayerId Int   -- how many units a player has
+  , tilePlayers   :: Map PlayerId (Bag UnitType)
   }
+
+data UnitType = FreeUnit | LockedUnit | Frotification
+  deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+
+instance ToJSONKey UnitType where
+  toJSONKey = genericToJSONKey defaultJSONKeyOptions
 
 data TileSpot =
     Empty
   | Ghost
-  | Player PlayerId
+  | Occupied PlayerId
     deriving (Generic,ToJSON)
 
 data City = City
-  { citySpot    :: TileSpot
+  { _citySpot    :: TileSpot
   , cityActions :: Action
   , cityCapital :: Maybe PlayerId
   } deriving (Generic, ToJSON)
 
 data Ruin = Ruin
-  { ruinSpot   :: TileSpot
+  { _ruinSpot   :: TileSpot
   , ruinType   :: TokenType
   , ruinTokens :: [Token]
   }
 declareFields ''Tile
+declareFields ''City
+declareFields ''Ruin
 
 
-addPlayer :: PlayerId -> Tile -> Tile
-addPlayer p t = t { tilePlayers = Map.insertWith (+) p 1 (tilePlayers t) }
+playerUnits :: PlayerId -> Field Tile (Bag UnitType)
+playerUnits p = Field
+  { getField = Map.findWithDefault bagEmpty p . tilePlayers
+  , setField = \b t -> t { tilePlayers =
+                            if bagIsEmpty b
+                              then Map.delete p (tilePlayers t)
+                              else Map.insert p b (tilePlayers t)
+                         }
+  }
 
-removePlayer :: PlayerId -> Tile -> Tile
-removePlayer p t = t { tilePlayers = Map.insertWith (+) p (-1) (tilePlayers t) }
 
 setCapital :: Maybe PlayerId -> Tile -> Tile
 setCapital p = updField tileCities (fmap citySetCapital)
@@ -86,7 +103,7 @@ instance ToJSON Tile where
 
 instance ToJSON Ruin where
   toJSON r = JS.object
-               [ "ruinSpot" .= ruinSpot r
+               [ "ruinSpot" .= getField ruinSpot r
                , "ruinTokens" .= length (ruinTokens r)
                ]
 
@@ -106,10 +123,13 @@ defTile :: Int -> Terrain -> [City] -> [Ruin] -> Tile
 defTile n = defTile' (TileNum n)
 
 defCity :: Action -> City
-defCity as = City { citySpot = Empty, cityActions = as, cityCapital = Nothing  }
+defCity as = City { _citySpot   = Empty
+                  , cityActions = as
+                  , cityCapital = Nothing
+                  }
 
 defRuin :: TokenType -> Ruin
-defRuin t = Ruin { ruinSpot = Empty, ruinType = t, ruinTokens = [] }
+defRuin t = Ruin { _ruinSpot = Empty, ruinType = t, ruinTokens = [] }
 
 
 centralTiles :: [Tile]
