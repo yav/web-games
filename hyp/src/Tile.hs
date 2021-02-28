@@ -38,7 +38,7 @@ data Tile = Tile
   , tilePlayers   :: Map PlayerId (Bag UnitType)
   }
 
-data UnitType = FreeUnit | LockedUnit | Frotification
+data UnitType = FreeUnit | LockedUnit | Fortification
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 instance ToJSONKey UnitType where
@@ -75,6 +75,20 @@ playerUnits p = Field
                               else Map.insert p b (tilePlayers t)
                          }
   }
+
+countWorkersOnTile :: PlayerId -> Tile -> Int
+countWorkersOnTile pid t = free + fromMap citySpot tileCities +
+                                  fromMap ruinSpot tileRuins
+  where
+  free = sum $ map snd $ bagToList $ getField (playerUnits pid) t
+
+  fromMap g f =
+    sum $ map (countTileSpot . getField g) $ Map.elems $ getField f t
+
+  countTileSpot s =
+    case s of
+      Occupied x | x == pid -> 1
+      _ -> 0
 
 
 setCapital :: Maybe PlayerId -> Tile -> Tile

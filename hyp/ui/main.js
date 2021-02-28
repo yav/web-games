@@ -46,7 +46,7 @@ function uiRedraw(state) {
   const game = state.game
   const body = document.getElementById('main')
 
-  body.appendChild(uiBoard(state.game.gameBoard))
+  body.appendChild(uiBoard(state.game._gameBoard))
 
 
   const players = game._gamePlayers

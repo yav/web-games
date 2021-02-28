@@ -10,26 +10,34 @@ const uiHexLoc = (loc) => {
          }
 }
 
-const uiSoldier = (n,p) => {
+
+const uiSoldier = (el,pos,p,n,locked) => {
   const dom = div('icon')
   setDim(dom,iconSize,iconSize)
+  setSize(dom,'left',pos.x)
+  setSize(dom,'top',pos.y)
+  el.appendChild(dom)
 
-  const pic = svg('img/crested-helmet.svg#helmet')
+  const pic = svg('img/player.svg#helmet')
   pic.classList.add('player-' + playerColors[p])
   setDim(pic,iconSize,iconSize)
   dom.appendChild(pic)
 
   if (n != 1) {
     const b = badge(n)
-    if (n < 0) b.classList.add('negative')
     dom.appendChild(b)
   }
 
+  // XXX: locked
+  // XXX: interaction
+
   tooltip(dom,false, n + ' ' + p + ' troop' + (n > 1? 's' : ''))
-  return dom
 }
 
 
+const uiFort = (el,pos,p,num) => {
+  // XXX
+}
 
 
 const uiCity = (el,pos,cityId, city) => {
@@ -106,6 +114,7 @@ const uiBoard = (b) => {
 
 
 const uiHex = (container,info) => {
+
   const loc = info[0]
   const h   = info[1]
 
@@ -150,6 +159,25 @@ const uiHex = (container,info) => {
   for (ruinId in h.tileRuins) {
     uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
     ++thing
+  }
+
+  for (playerId in h.tilePlayers) {
+    const player = h.tilePlayers[playerId]
+    const fort = player.Fortification
+
+    if (fort > 0) {
+      uiFort(container,position(),playerId,fort)
+      ++thing
+    }
+
+    const free = player.FreeUnit || 0
+    const lock = player.LockedUnit || 0
+    const tot  = free + lock
+    console.log(free,lock)
+    if (tot > 0) {
+      uiSoldier(container,position(),playerId,tot, free === 0)
+      ++thing
+    }
   }
 
   return pos

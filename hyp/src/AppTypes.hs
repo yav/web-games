@@ -2,6 +2,7 @@ module AppTypes (module AppTypes, Input) where
 
 import Data.Map(Map)
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import Data.List(mapAccumL)
 import GHC.Generics
 
@@ -27,6 +28,9 @@ data Update =
 
   | ChangeBag PlayerId BagName Resource Int
   | ChangeGems PlayerId Int
+  | ChangeGhosts PlayerId Int
+  | ChangeWorkers PlayerId Int
+  | Capture PlayerId PlayerId   -- captured is 2nd
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
@@ -105,6 +109,16 @@ doUpdate upd =
 
     ChangeGems playerId n ->
       Right . updField (playerState playerId .> playerGems) (+n)
+
+    ChangeGhosts playerId n ->
+      Right . updField (playerState playerId .> playerGhosts) (+n)
+
+    ChangeWorkers playerId n ->
+      Right . updField (playerState playerId .> playerWorkers) (+n)
+
+    Capture playerId capturedId ->
+      Right . updField (playerState playerId .> playerCaptured)
+                       (Set.insert capturedId)
 
     SetTurn t ->
       Right . setField gameTurn t

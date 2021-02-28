@@ -1,5 +1,7 @@
 module PlayerState where
 
+import Data.Set(Set)
+import qualified Data.Set as Set
 import Data.Map(Map)
 import qualified Data.Map as Map
 import Data.Maybe(maybeToList,isJust)
@@ -7,6 +9,7 @@ import GHC.Generics(Generic)
 import Data.Aeson(ToJSON,FromJSON,
                     ToJSONKey(..),genericToJSONKey,defaultJSONKeyOptions)
 
+import Common.Basics
 import Common.Utils(enumAll)
 import Common.Field
 import Common.RNG
@@ -23,6 +26,9 @@ type TechId = Int
 data PlayerState = PlayerState
   { _playerBag       :: Map BagName (Bag Resource)
   , _playerGems      :: Int
+  , _playerGhosts    :: Int
+  , _playerWorkers   :: Int
+  , _playerCaptured  :: Set PlayerId
   , _playerDevel     :: Map Resource Int
   , _playerTech      :: Map TechId Tech
   , _playerRNG       :: RNG
@@ -52,6 +58,9 @@ emptyPlayerState rng =
    PlayerState
       { _playerBag       = Map.fromList [ (b,bagEmpty) | b <- enumAll ]
       , _playerGems      = 0
+      , _playerGhosts    = 0
+      , _playerCaptured  = Set.empty
+      , _playerWorkers   = 10
       , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll, r /= Gray ]
       , _playerTech      = Map.empty
       , _playerRNG       = rng

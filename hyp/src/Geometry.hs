@@ -14,10 +14,15 @@ import Common.Field
 import Resource
 import Tile
 
-newtype Board = Board (Map Loc Tile)
+data Board = Board
+  { _boardMap     :: Map Loc Tile
+  , _boardCapital :: Map PlayerId Loc
+  }
 
 data Loc      = Loc { locX, locY :: Int }
   deriving (Eq,Ord,Generic,ToJSON)
+
+declareFields ''Board
 
 origin :: Loc
 origin = Loc 0 0
@@ -40,14 +45,10 @@ toCart dir n =
     NW -> (-n,n)
 
 tileAt :: Loc -> Field Board Tile
-tileAt loc = brd .> mapAt loc
-  where
-  brd = Field { getField = \(Board b) -> b
-              , setField = \m _ -> Board m
-              }
+tileAt loc = boardMap .> mapAt loc
 
 onBoard :: Loc -> Board -> Bool
-onBoard l (Board b) = l `Map.member` b
+onBoard l b = l `Map.member` getField boardMap b
 
 neighbour :: Dir -> Loc -> Loc
 neighbour d (Loc x y) = Loc (x + dx) (y + dy)
@@ -60,16 +61,22 @@ neighbours l b = [ loc
                  , onBoard loc b
                  ]
 
+countWorkers :: PlayerId -> Board -> Int
+countWorkers pid =
+  sum . map (countWorkersOnTile pid) . Map.elems . getField boardMap
 
 --------------------------------------------------------------------------------
 emptyBoard :: Board
-emptyBoard = Board Map.empty
+emptyBoard = Board { _boardMap = Map.empty
+                   , _boardCapital = Map.empty
+                   }
 
 placeTile :: Loc -> Tile -> Board -> Board
-placeTile l t (Board b) = Board (Map.insert l t b)
+placeTile l t = updField boardMap (Map.insert l t)
 
 placeStart :: Maybe PlayerId -> Loc -> Dir -> Maybe Resource -> Board -> Board
-placeStart pl l d r = placeTile (neighbour (rot 1 d) l) b
+placeStart pl l d r = setCap
+                    . placeTile (neighbour (rot 1 d) l) b
                     . placeTile (neighbour d l) a
                     . placeTile l (setCapital pl p)
   where
@@ -80,10 +87,12 @@ placeStart pl l d r = placeTile (neighbour (rot 1 d) l) b
   a = findStart (TNE r)
   b = findStart (TNW r)
 
-
+  setCap = case pl of
+             Nothing  -> id
+             Just pid -> updField boardCapital (Map.insert pid l)
 
 
 --------------------------------------------------------------------------------
 
 instance ToJSON Board where
-  toJSON (Board b) = toJSON (Map.toList b)
+  toJSON = toJSON . Map.toList . getField boardMap

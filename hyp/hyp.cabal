@@ -47,7 +47,8 @@ executable hyp
   main-is: Main.hs
   other-modules:
     Play,
-    BasicAction
+    BasicAction,
+    Common
   build-depends:
     base,
     containers,

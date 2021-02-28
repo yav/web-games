@@ -16,8 +16,10 @@ import AppTypes
 import Action
 import PlayerState
 import Resource
+import Geometry
 
 import BasicAction
+import Common
 
 
 setup :: Interact ()
@@ -26,12 +28,16 @@ setup =
      forM_ (gameTurnOrder state) \p ->
        do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll ] -- XXX: test
           replicateM_ 3 (doDrawCube p)
-     takeTurn
+     startTurn
 
 
 startTurn :: Interact ()
 startTurn =
-  do -- XXX: start of turn actions + remove fortify
+  do -- XXX: start of turn actions + remove fortify + refill to 3 if needed
+     state <- getState
+     let playerId = turnPlayer (getField gameTurn state)
+     let n = countWorkers playerId (getField gameBoard state)
+     replicateM_ (3 - n) (doPlaceWorkerOnCapital playerId)
      takeTurn
 
 endGame :: Interact ()
@@ -142,10 +148,9 @@ actUseAction state =
     ) | n <- ors
   ]
   where
-  (playerId,player) = currentPlayer state
-  turn              = getField gameTurn state
-  ors               = zipWith const [ 0.. ] (getField turnOrs turn)
-
+  (playerId,_) = currentPlayer state
+  turn         = getField gameTurn state
+  ors          = zipWith const [ 0.. ] (getField turnOrs turn)
 
 
 performBasicAction :: PlayerId -> BasicAction -> Interact ()
