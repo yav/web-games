@@ -11,7 +11,7 @@ const uiHexLoc = (loc) => {
 }
 
 
-const uiSoldier = (el,pos,p,n,locked) => {
+const uiSoldier = (el,pos,p,info) => {
   const dom = div('icon')
   setDim(dom,iconSize,iconSize)
   setSize(dom,'left',pos.x)
@@ -19,24 +19,93 @@ const uiSoldier = (el,pos,p,n,locked) => {
   el.appendChild(dom)
 
   const pic = svg('img/player.svg#helmet')
-  pic.classList.add('player-' + playerColors[p])
+  pic.classList.add('inner')
+  pic.classList.add(playerColors[p])
   setDim(pic,iconSize,iconSize)
   dom.appendChild(pic)
 
-  if (n != 1) {
-    const b = badge(n)
-    dom.appendChild(b)
+  let fort = info.Fortification || 0
+  let free = info.FreeUnit || 0
+  let lock = info.LockedUnit || 0
+
+  const counterDom = badge('')
+  counterDom.classList.add('top')
+  counterDom.classList.add('left')
+
+  const fortDom = badge('')
+  fortDom.classList.add('bottom')
+  fortDom.classList.add('right')
+
+  const lockDom = badge('')
+  lockDom.innerHTML = '&#9876;'
+  lockDom.classList.add('top')
+  lockDom.classList.add('right')
+
+  const update = () => {
+    const tot = free + lock
+    if (tot) {
+      pic.style.display = 'inline-block'
+      dom.style.backgroundColor = 'rgba(0,0,0,0.65)'
+    } else {
+      pic.style.display = 'none'
+      dom.style.backgroundColor = 'rgba(0,0,0,0)'
+    }
+    counterDom.textContent = tot
+    counterDom.style.display = (tot <= 1) ? 'none' : 'inline-block'
+    fortDom.innerHTML =
+      fort + '<span class="fg-' + playerColors[p] + '">&#9820;</span>'
+    fortDom.style.display = (fort == 0) ? 'none' : 'inline-block'
+    lockDom.style.display = (lock == 0 || free > 0) ? 'none' : 'inline-block'
   }
 
-  // XXX: locked
-  // XXX: interaction
+  update()
+  dom.appendChild(counterDom)
+  dom.appendChild(fortDom)
+  dom.appendChild(lockDom)
 
-  tooltip(dom,false, n + ' ' + p + ' troop' + (n > 1? 's' : ''))
+  // XXX: methods
 }
 
 
-const uiFort = (el,pos,p,num) => {
-  // XXX
+const uiOccupantOf = (dom) => {
+
+  let occ
+
+  return (it) => {
+    if (occ) occ.remove()
+
+    switch(it.tag) {
+      case 'Empty': break
+      case 'Ghost': {
+        occ = badge('')
+        occ.style.backgroundColor = 'black'
+        setDim(occ,iconSize/2,iconSize/2)
+        occ.classList.add('top')
+        occ.classList.add('right')
+        occ.classList.add('ghost')
+        dom.appendChild(occ)
+        break
+      }
+      case 'Occupied': {
+        const player = it.contents
+        occ = badge('')
+        setDim(occ,iconSize/2,iconSize/2)
+        occ.classList.add('top')
+        occ.classList.add('right')
+        occ.style.backgroundColor = 'black'
+
+        const pic = svg('img/player.svg#helmet')
+        pic.classList.add('inner')
+        pic.classList.add(playerColors[player])
+        setDim(pic,iconSize/2,iconSize/2)
+        occ.appendChild(pic)
+
+        dom.appendChild(occ)
+        break
+      }
+    }
+  }
+
 }
 
 
@@ -50,7 +119,8 @@ const uiCity = (el,pos,cityId, city) => {
   const capital = city.cityCapital
   if (capital) {
     const pic = svg('img/capitol.svg#capitol')
-    pic.classList.add('player-' + playerColors[capital])
+    pic.classList.add('inner')
+    pic.classList.add(playerColors[capital])
     setDim(pic,iconSize,iconSize)
     dom.appendChild(pic)
   }
@@ -80,9 +150,22 @@ const uiRuin = (el, pos, ruinId, ruin) => {
   setSize(dom,'left',pos.x)
   setSize(dom,'top',pos.y)
   el.appendChild(dom)
+
   dom.classList.add('ruins')
   setDim(dom,iconSize,iconSize)
   tooltip(dom,false,'Ruins')
+
+  const setOcc = uiOccupantOf(dom)
+  setOcc(ruin.ruinSpot)
+
+  let tokens = ruin.ruinTokens
+  // XXX: tokens
+
+
+  return {
+    setOccupant: setOcc
+  }
+
 }
 
 
@@ -112,6 +195,22 @@ const uiBoard = (b) => {
   return dom
 }
 
+const uiHexAllocator = () => {
+  const allocated = {}
+
+  return {
+    newLoc: () => {
+      let i = 0
+      while(allocated[i]) ++i
+      allocated[i] = true
+      return i
+    },
+    freeLoc: (i) => {
+      delete allocated[i]
+    }
+  }
+}
+
 
 const uiHex = (container,info) => {
 
@@ -132,7 +231,7 @@ const uiHex = (container,info) => {
 
   const k  = hexSize / 4
   const ko = (k-iconSize) / 2
-  const order = [ 2, 7, 5, 4, 1, 6, 3, 8, 9, 0 ]
+  const order = [ 2, 7, 5, 4, 9, 0, 1, 6, 3, 8 ]
   const start = 0 // Math.abs((loc.locX + loc.locY)) % 4
 
   let thing = 0
@@ -157,27 +256,13 @@ const uiHex = (container,info) => {
   }
 
   for (ruinId in h.tileRuins) {
+    h.tileRuins[ruinId].ruinSpot = { tag: 'Occupied', contents: '3' }
     uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
     ++thing
   }
 
   for (playerId in h.tilePlayers) {
-    const player = h.tilePlayers[playerId]
-    const fort = player.Fortification
-
-    if (fort > 0) {
-      uiFort(container,position(),playerId,fort)
-      ++thing
-    }
-
-    const free = player.FreeUnit || 0
-    const lock = player.LockedUnit || 0
-    const tot  = free + lock
-    console.log(free,lock)
-    if (tot > 0) {
-      uiSoldier(container,position(),playerId,tot, free === 0)
-      ++thing
-    }
+    uiSoldier(container,position(),playerId,h.tilePlayers[playerId])
   }
 
   return pos

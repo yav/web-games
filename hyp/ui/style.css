@@ -7,7 +7,14 @@ body {
 }
 
 
-/* Resources */
+/* Resources and player colors */
+.fg-red         { color: #c00 !important }
+.fg-green       { color: #090 !important }
+.fg-purple      { color: #909 !important }
+.fg-blue        { color: #09f !important }
+.fg-orange      { color: #f60 !important }
+.fg-yellow      { color: #fc0 !important }
+
 .red         { background-color: #c00 !important }
 .green       { background-color: #090 !important }
 .purple      { background-color: #909 !important }
@@ -16,6 +23,7 @@ body {
 .yellow      { background-color: #fc0 !important }
 .gray        { background-color: #ccc !important }
 .inner       { background-color: transparent !important; }
+
 svg.red      { fill: #c00 }
 svg.green    { fill: #090 }
 svg.purple   { fill: #909 }
@@ -42,7 +50,6 @@ svg.gray     { fill: #ccc }
 
 .badge {
   position: absolute;
-  top: 0;
   text-align: center;
   background-color: rgba(0,0,0,0.5);
   color: white;
@@ -57,6 +64,14 @@ svg.gray     { fill: #ccc }
 
 .badge.right {
   right: 0;
+}
+
+.badge.top {
+  top: 0
+}
+
+.badge.bottom {
+  bottom: 0
 }
 
 .badge.negative {
@@ -100,6 +115,7 @@ svg.gray     { fill: #ccc }
 .gain-tech     { background-image: url('img/card-draw.svg'); }
 .swap          { background-image: url('img/cycle.svg'); }
 .spy           { background-image: url('img/eye-target.svg'); }
+.ghost         { background-image: url('img/haunting.svg'); }
 .ev-turn       { background-image: url('img/clockwise-rotation.svg'); }
 .neighbours    {
   display: inline-block;
@@ -233,13 +249,6 @@ svg.gray     { fill: #ccc }
   z-index:3;
 }
 
-
-.player-red    { fill: #c00 }
-.player-green  { fill: #090 }
-.player-purple { fill: #909 }
-.player-blue   { fill: #09f }
-.player-orange { fill: #f60 }
-.player-yellow { fill: #fc0 }
 
 /* ------------------------------------------------------------------- */
 

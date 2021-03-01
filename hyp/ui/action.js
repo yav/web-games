@@ -82,11 +82,10 @@ const badge = (n) => {
   return dom
 }
 
-
-
 const addBadge = (n,el,always) => {
   if (!always && n == 1) return null
   const b = badge(n)
+  b.classList.add('top')
   b.classList.add('left')
   el.appendChild(b)
   return b
@@ -95,9 +94,11 @@ const addBadge = (n,el,always) => {
 
 const addBadgeRight = (n,el) => {
   const b = badge(n)
+  b.classList.add('top')
   b.classList.add('right')
   el.appendChild(b)
 }
+
 
 const actionIcon = (action,help) => {
   const dom     = div('icon ' + action)
