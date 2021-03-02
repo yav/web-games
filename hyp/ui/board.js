@@ -256,7 +256,6 @@ const uiHex = (container,info) => {
   }
 
   for (ruinId in h.tileRuins) {
-    h.tileRuins[ruinId].ruinSpot = { tag: 'Occupied', contents: '3' }
     uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
     ++thing
   }

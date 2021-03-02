@@ -29,12 +29,46 @@ const uiPlayerStats = (p) => {
   const gemBadge = addBadge(gems,gemDom,true)
   dom.appendChild(gemDom)
 
+  let workers = p._playerWorkers
+  const workerDom = actionIcon('deploy','Remaining troops')
+  const workerBadge = addBadge(workers,workerDom,true)
+  dom.appendChild(workerDom)
+
+  let ghosts = p._playerGhosts
+  const ghostDom = actionIcon('ghost','Captured ghosts')
+  const ghostBadge = addBadge(ghosts,ghostDom,true)
+  dom.appendChild(ghostDom)
+
+  const addCaptured = (c) => {
+    const cDom = div('icon')
+    setDim(cDom,iconSize,iconSize)
+    const pic = svg('img/player.svg#helmet')
+    pic.classList.add('inner')
+    pic.classList.add(playerColors[c])
+    setDim(pic,iconSize,iconSize)
+    cDom.appendChild(pic)
+    tooltip(cDom,false,'Captured troop')
+    dom.appendChild(cDom)
+  }
+
+  for (let i = 0; i < p._playerCaptured.length; ++i)
+    addCaptured(p._playerCaptured[i])
+
   return {
     dom: dom,
     changeGems: (n) => {
       gems += n
       gemBadge.textContent = gems
-    }
+    },
+    changeGhosts: (n) => {
+      ghosts += n
+      ghostBagde.textContent = ghosts
+    },
+    changeWorkers: (n) => {
+      workers += n
+      workerBagde.textContent = workers
+    },
+    capture: addCaptured
   }
 }
 

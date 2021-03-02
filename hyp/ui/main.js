@@ -85,7 +85,14 @@ const uiUpdate = hsUpdate (
     }
   , ChangeBag: (pid,nm,r,n) => { gui.player[pid].bag[nm].change(r,n) }
   , ChangeGems: (pid,n) => { gui.player[pid].stats.changeGems(n) }
+  , ChangeGhosts: (pid,n) => { gui.player[pid].stats.changeGhosts(n) }
+  , ChangeWorkers: (pid,n) => { gui.player[pid].stats.changeWorkers(n) }
+  , Capture: (pid,capt) => { gui.player[pid].stats.capture(capt) }
   , SetTurn:          (t)       => { gui.turn.redraw(t) }
   , Upgrade:          (pid,r,n) => { gui.player[pid].upgrade.change(r,n) }
   , ResetUpgrade:     (pid,r)   => { gui.player[pid].upgrade.reset(r) }
+
+  , ChangeUnit(pid,ty,loc,n) => { /* XXX */ }
+  , SetCity(loc,cityId,spot) => { /* XXX */ }
+  , SetRuin(loc,ruinId,spot) => { /* XXX */ }
   })
