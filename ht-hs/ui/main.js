@@ -232,7 +232,10 @@ function uiQuestions(qs) {
     const ui = {}
 
     // Player
-    ui.ChSetPreference = function(shape) { gui.playerUI().askPreference(q) }
+    ui.ChSetPreference = function(shape) {
+      gui.playerUI().askWorker('available',shape,q)
+      // gui.playerUI().askPreference(q)
+    }
     ui.ChActiveWorker = function(shape) {
       gui.playerUI().askWorker('available',shape,q)
     }

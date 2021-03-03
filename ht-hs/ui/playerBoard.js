@@ -234,6 +234,8 @@ function drawPlayer(pid,opts) {
       gui.questionAnnot(it,json)
     }
 
+    return () => {}
+
     return function(shape) {
       const info = workerInfo['available'][shape]
       imgStyle.height = '2ex'
