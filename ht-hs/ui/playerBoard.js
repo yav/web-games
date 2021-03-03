@@ -74,22 +74,27 @@ function drawPlayer(pid,opts) {
           { Movement:  { x: [ 1.109, 1.309, 1.554, 1.747 ]
                        , y: 0.427
                        , shape: 'disc'
+                       , help: (i) => `Move ${[2,3,4,5][i]} workers`
                        }
           , Privilege: { x: [ 0.273, 0.440, 0.608, 0.775 ]
                        , y: 0.533
                        , shape: 'cube'
+                       , help: (i) => `Build in ${['white','orange','pink','black'][i]} locations`
                        }
           , Keys:      { x: [ 0.255, 0.440, 0.613, 0.805, 1.002 ]
                        , y: 0.10
                        , shape: 'rombus'
+                       , help: (i) => `${[1,2,2,3,4][i]} VP per office in largest network`
                        }
           , Actions:   { x: [ 1.555, 1.760, 1.963, 2.18, 2.38, 2.6 ]
                        , y: 0.15
                        , shape: 'rombus'
+                       , help: (i) => `Perform ${[2,3,3,4,4,5][i]} actions`
                        }
           , Hiring:    { x: [ 2.05, 2.26, 2.50, 2.7 ]
                        , y: 0.38
                        , shape: 'rombus'
+                       , help: (i) => `Hire ${[3,5,7,'all'][i]} workers`
                        }
           }
 
@@ -109,8 +114,7 @@ function drawPlayer(pid,opts) {
                        }
         const loc = { x: info.x[i] * height, y: y }
         const b = drawWorkerAt(loc,wsize,worker)
-        setHelp(b, stat.charAt(0).toUpperCase() + stat.slice(1) +
-                                                  ' upgrade ' + worker.shape)
+        setHelp(b, info.help(i))
         if (info.shape == 'rombus') b.style.transform = 'rotate(45deg)'
         doms[i] = b
         dom.appendChild(b)
