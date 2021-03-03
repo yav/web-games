@@ -92,7 +92,7 @@ const uiUpdate = hsUpdate (
   , Upgrade:          (pid,r,n) => { gui.player[pid].upgrade.change(r,n) }
   , ResetUpgrade:     (pid,r)   => { gui.player[pid].upgrade.reset(r) }
 
-  , ChangeUnit(pid,ty,loc,n) => { /* XXX */ }
-  , SetCity(loc,cityId,spot) => { /* XXX */ }
-  , SetRuin(loc,ruinId,spot) => { /* XXX */ }
+  // , ChangeUnit(pid,ty,loc,n) => { /* XXX */ }
+  // , SetCity(loc,cityId,spot) => { /* XXX */ }
+  // , SetRuin(loc,ruinId,spot) => { /* XXX */ }
   })
