@@ -241,6 +241,7 @@ body {
 
 .question.worker.empty {
   background-color: rgba(0,0,0,0);
+  background: rgba(0,0,0,0);
 }
 
 .worker.hand {
@@ -324,11 +325,26 @@ body {
   color: #fff;
 }
 
-.blue   { background-color: #06f; color: #fff; }
-.red    { background-color: #f00; color: #fff; }
-.yellow { background-color: #fc3; color: #000; }
-.green  { background-color: #8b3; color: #000; }
-.purple { background-color: #b0b; color: #fff; }
+.blue {
+background: repeating-linear-gradient(0deg, #06f, #06f 1px, #03c 1px, #03c 2px);
+color: #fff;
+}
+.red {
+background: repeating-linear-gradient(0deg, #f00, #f00 1px, #c00 1px, #c00 2px);
+color: #fff;
+}
+.yellow {
+background: repeating-linear-gradient(0deg, #fc3, #fc3 1px, #c90 1px, #c90 2px);
+color: #000;
+}
+.green {
+background: repeating-linear-gradient(0deg, #8b3, #8b3 1px, #580 1px, #580 2px);
+color: #000;
+}
+.purple {
+background: repeating-linear-gradient(0deg, #b0b, #b0b 1px, #808 1px, #808 2px);
+color: #fff;
+}
 
 
 .bonus-multiplier {
