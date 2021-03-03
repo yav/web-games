@@ -325,10 +325,10 @@ body {
 }
 
 .blue   { background-color: #06f; color: #fff; }
-.red    { background-color: #903; color: #fff; }
+.red    { background-color: #f00; color: #fff; }
 .yellow { background-color: #fc3; color: #000; }
 .green  { background-color: #8b3; color: #000; }
-.purple { background-color: #939; color: #fff; }
+.purple { background-color: #b0b; color: #fff; }
 
 
 .bonus-multiplier {
