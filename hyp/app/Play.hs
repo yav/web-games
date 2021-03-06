@@ -48,7 +48,7 @@ endTurn =
   do state <- getState
      let curP = turnPlayer (getField gameTurn state)
          newP = case dropWhile (/= curP) (gameTurnOrder state) of
-                  a : _ -> a
+                  _ : a : _ -> a
                   _     -> head (gameTurnOrder state)
      case getField gameEndOn state of
        Just p | p == newP -> endGame
