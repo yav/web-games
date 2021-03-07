@@ -17,6 +17,7 @@ import Action
 import PlayerState
 import Resource
 import Geometry
+import Tile
 
 import BasicAction
 import Common
@@ -60,7 +61,8 @@ takeTurn =
   do state <- getState
      let opts = actEndTurn   state ++
                 actPlaceCube state ++
-                actUseAction state
+                actUseAction state ++
+                actEnterCity state
      askInputs opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
@@ -92,6 +94,22 @@ actPlaceCube state =
          where
          avail = getField (playerBag .> mapAt BagReady) player
          opts  = filter (/= Gray) (map fst (bagToList avail))
+
+
+actEnterCity :: Opts
+actEnterCity state =
+  [ ( playerId :-> AskCity loc cityId
+    , "Enter city"
+    , do let city = getField (tileAt loc .> cityAt cityId) board
+         update (ChangeUnit playerId unit loc (-1))
+         update (SetCity loc cityId (Occupied playerId))
+         doGainBenefit playerId (cityActions city)
+         takeTurn
+    ) | (loc,cityId,unit) <- enterCityLocs playerId board
+  ]
+  where
+  (playerId,_) = currentPlayer state
+  board        = getField gameBoard state
 
 
 actEndTurn :: Opts

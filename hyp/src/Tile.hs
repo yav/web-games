@@ -65,6 +65,12 @@ declareFields ''Tile
 declareFields ''City
 declareFields ''Ruin
 
+cityAt :: CityId -> Field Tile City
+cityAt cityId = tileCities .> mapAt cityId
+
+ruinAt :: CityId -> Field Tile Ruin
+ruinAt ruinId = tileRuins .> mapAt ruinId
+
 
 playerUnits :: PlayerId -> Field Tile (Bag UnitType)
 playerUnits p = Field
@@ -103,7 +109,37 @@ isStartTile t =
     _         -> True
 
 
+-- | Pick a unit that can enter a city/ruin
+enterUnit :: PlayerId -> Tile -> [ UnitType ]
+enterUnit playerId tile
+  | bagContains LockedUnit units > 0 = [ LockedUnit ]
+  | bagContains FreeUnit   units > 0 = [ FreeUnit ]
+  | otherwise                        = []
+  where
+  units = getField (playerUnits playerId) tile
 
+tileEnterCities :: PlayerId -> Tile -> [ (CityId,UnitType) ]
+tileEnterCities playerId tile =
+  [ (cid,ty)
+    | (cid,city) <- Map.toList (getField tileCities tile)
+    , Empty      <- [getField citySpot city]
+    , ty         <- enterUnit playerId tile
+  ]
+
+tileEnterRuins :: PlayerId -> Tile -> [ (RuinId,UnitType) ]
+tileEnterRuins playerId tile =
+  [ (rid,ty)
+    | (rid,ruin) <- Map.toList (getField tileRuins tile)
+    , not (null (ruinTokens ruin))
+    , Empty      <- [getField ruinSpot ruin]
+    , ty         <- enterUnit playerId tile
+  ]
+
+
+
+
+
+--------------------------------------------------------------------------------
 
 instance ToJSON Tile where
   toJSON t = JS.object (if getField tileVisible t then vis else hidden)

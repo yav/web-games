@@ -5,7 +5,7 @@ import Data.Map(Map)
 import qualified Data.Map as Map
 import Data.List(find)
 
-import Data.Aeson(ToJSON(..))
+import Data.Aeson(ToJSON(..),FromJSON)
 
 import Common.Basics(PlayerId)
 import Common.Utils(enumAll)
@@ -20,7 +20,7 @@ data Board = Board
   }
 
 data Loc      = Loc { locX, locY :: Int }
-  deriving (Eq,Ord,Generic,ToJSON)
+  deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 declareFields ''Board
 
@@ -64,6 +64,19 @@ neighbours l b = [ loc
 countWorkers :: PlayerId -> Board -> Int
 countWorkers pid =
   sum . map (countWorkersOnTile pid) . Map.elems . getField boardMap
+
+
+enterCityLocs :: PlayerId -> Board -> [(Loc,CityId,UnitType)]
+enterCityLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
+                              , (s,u) <- tileEnterCities p t
+                    ]
+
+enterRuinLocs :: PlayerId -> Board -> [(Loc,RuinId,UnitType)]
+enterRuinLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
+                              , (s,u) <- tileEnterRuins p t
+                    ]
+
+
 
 --------------------------------------------------------------------------------
 emptyBoard :: Board

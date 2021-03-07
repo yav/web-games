@@ -1,7 +1,50 @@
-const hexSize   = 4 * iconSize
-// const boardSize = 7 * hexSize
-let originX = 0
-let originY = 0
+const hexSize = 4 * iconSize
+let originX   = 0
+let originY   = 0
+
+
+const uiBoard = (b) => {
+  const dom = div('board')
+  originX = 0
+  originY = 0
+  let minX = 10 * iconSize
+  let minY = 10 * iconSize
+  let maxX = 0
+  let maxY = 0
+  for (let i = 0; i < b.length; ++i) {
+    const pos = uiHexLoc(b[i][0])
+    if (pos.x < minX) minX = pos.x
+    if (pos.x > maxX) maxX = pos.x
+    if (pos.y < minY) minY = pos.y
+    if (pos.y > maxY) maxY = pos.y
+  }
+  const w = maxX - minX + hexSize
+  const h = maxY - minY + hexSize
+  setDim(dom,w,h)
+  originX = -minX;
+  originY = -minY;
+
+  const board = {}
+  for (let i = 0; i < b.length; ++i) {
+    const info = b[i]
+    const loc = info[0]
+    let ys = board[loc.locX]
+    if (ys === undefined) { ys = {}; board[loc.locX] = ys }
+    ys[loc.locY] = uiHex(dom,info)
+  }
+
+  const getHex = (loc) => board[loc.locX][loc.locY]
+
+  return {
+    dom: dom,
+    askCity: (loc,id,q) => getHex(loc).cities[id].ask(q),
+    askRuin: (loc,id,q) => getHex(loc).ruins[id].ask(q),
+    changeUnit: (loc,pid,ty,n) => getHex(loc).units[pid].change(ty,n),
+    setCity: (loc,id,x) => getHex(loc).cities[id].set(x),
+    setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x)
+  }
+}
+
 
 const uiHexLoc = (loc) => {
   const hexSpace = hexSize / 30
@@ -9,6 +52,85 @@ const uiHexLoc = (loc) => {
          , y: originY + (-0.75 * loc.locY) * (hexSize + hexSpace)
          }
 }
+
+const uiHexAllocator = () => {
+  const allocated = {}
+
+  return {
+    newLoc: () => {
+      let i = 0
+      while(allocated[i]) ++i
+      allocated[i] = true
+      return i
+    },
+    freeLoc: (i) => {
+      delete allocated[i]
+    }
+  }
+}
+
+
+
+const uiHex = (container,info) => {
+
+  const loc = info[0]
+  const h   = info[1]
+
+  const dom = div('hex')
+  setDim(dom,hexSize,hexSize)
+  const pos = uiHexLoc(loc)
+  setSize(dom,'left',pos.x)
+  setSize(dom,'top',pos.y)
+
+  const bg = div('bg')
+  bg.classList.add(h.tileTerrain)
+  dom.appendChild(bg)
+  container.appendChild(dom)
+
+
+  const k  = hexSize / 4
+  const ko = (k-iconSize) / 2
+  const order = [ 2, 7, 5, 4, 9, 0, 1, 6, 3, 8 ]
+  const start = 0 // Math.abs((loc.locX + loc.locY)) % 4
+
+  let thing = 0
+  const position = () => {
+    const i = order[(start + thing) % order.length]
+    let x = 0
+    let y = 0
+    if (i == 0 || i == 9) {
+      x = 2 * k - iconSize /2
+      y = ko
+      if (i == 9) y += 3 * k
+    } else {
+      x = ko + ((i - 1) % 4) * k
+      y = ko + (Math.floor ((i - 1) / 4) + 1) * k
+    }
+    return { x: pos.x + x, y: pos.y + y }
+  }
+
+  const cities  = {}
+  const ruins   = {}
+  const units   = {}
+
+  for (cityId in h.tileCities) {
+    cities[cityId] = uiCity(container,position(),cityId, h.tileCities[cityId])
+    ++thing
+  }
+
+  for (ruinId in h.tileRuins) {
+    ruinId[ruinId] = uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
+    ++thing
+  }
+
+  for (playerId in h.tilePlayers) {
+    units[playerId] =
+      uiSoldier(container,position(),playerId,h.tilePlayers[playerId])
+  }
+
+  return { cities: cities, ruins: ruins, units: units }
+}
+
 
 
 const uiSoldier = (el,pos,p,info) => {
@@ -63,7 +185,16 @@ const uiSoldier = (el,pos,p,info) => {
   dom.appendChild(fortDom)
   dom.appendChild(lockDom)
 
-  // XXX: methods
+  return {
+    change: (ty,n) => {
+      switch(ty) {
+        case 'FreeUnit': free += n; break
+        case 'LockedUnit': lock += n; break
+        case 'Fortification': fort +n; break
+      }
+      update()
+    }
+  }
 }
 
 
@@ -117,6 +248,7 @@ const uiCity = (el,pos,cityId, city) => {
   el.appendChild(dom)
 
   const capital = city.cityCapital
+
   if (capital) {
     const pic = svg('img/capitol.svg#capitol')
     pic.classList.add('inner')
@@ -136,12 +268,17 @@ const uiCity = (el,pos,cityId, city) => {
   dom.addEventListener('mouseleave',() => {
     if (!pinned) h.style.display = 'none'
   })
-  dom.addEventListener('click',() => {
-    h.style.display = 'inline-block'
-    pinned = !pinned
-  })
   h.style.display = 'none'
   el.appendChild(h)
+
+
+  const setOcc = uiOccupantOf(dom)
+  setOcc(city._citySpot)
+
+  return {
+    set: setOcc,
+    ask: (q) => existingQuestion(dom,q)
+  }
 }
 
 const uiRuin = (el, pos, ruinId, ruin) => {
@@ -163,7 +300,9 @@ const uiRuin = (el, pos, ruinId, ruin) => {
 
 
   return {
-    setOccupant: setOcc
+    set: setOcc,
+    ask: (q) => console.log(q) // XXX
+
   }
 
 }
@@ -171,99 +310,5 @@ const uiRuin = (el, pos, ruinId, ruin) => {
 
 
 
-const uiBoard = (b) => {
-  const dom = div('board')
-  let minX = 10 * iconSize
-  let minY = 10 * iconSize
-  let maxX = 0
-  let maxY = 0
-  for (let i = 0; i < b.length; ++i) {
-    const pos = uiHexLoc(b[i][0])
-    if (pos.x < minX) minX = pos.x
-    if (pos.x > maxX) maxX = pos.x
-    if (pos.y < minY) minY = pos.y
-    if (pos.y > maxY) maxY = pos.y
-  }
-  const w = maxX - minX + hexSize
-  const h = maxY - minY + hexSize
-  setDim(dom,w,h)
-  originX = -minX;
-  originY = -minY;
-  for (let i = 0; i < b.length; ++i) {
-    uiHex(dom,b[i])
-  }
-  return dom
-}
 
-const uiHexAllocator = () => {
-  const allocated = {}
-
-  return {
-    newLoc: () => {
-      let i = 0
-      while(allocated[i]) ++i
-      allocated[i] = true
-      return i
-    },
-    freeLoc: (i) => {
-      delete allocated[i]
-    }
-  }
-}
-
-
-const uiHex = (container,info) => {
-
-  const loc = info[0]
-  const h   = info[1]
-
-  const dom = div('hex')
-  setDim(dom,hexSize,hexSize)
-  const pos = uiHexLoc(loc)
-  setSize(dom,'left',pos.x)
-  setSize(dom,'top',pos.y)
-
-  const bg = div('bg')
-  bg.classList.add(h.tileTerrain)
-  dom.appendChild(bg)
-  container.appendChild(dom)
-
-
-  const k  = hexSize / 4
-  const ko = (k-iconSize) / 2
-  const order = [ 2, 7, 5, 4, 9, 0, 1, 6, 3, 8 ]
-  const start = 0 // Math.abs((loc.locX + loc.locY)) % 4
-
-  let thing = 0
-  const position = () => {
-    const i = order[(start + thing) % order.length]
-    let x = 0
-    let y = 0
-    if (i == 0 || i == 9) {
-      x = 2 * k - iconSize /2
-      y = ko
-      if (i == 9) y += 3 * k
-    } else {
-      x = ko + ((i - 1) % 4) * k
-      y = ko + (Math.floor ((i - 1) / 4) + 1) * k
-    }
-    return { x: pos.x + x, y: pos.y + y }
-  }
-
-  for (cityId in h.tileCities) {
-    uiCity(container,position(),cityId, h.tileCities[cityId])
-    ++thing
-  }
-
-  for (ruinId in h.tileRuins) {
-    uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
-    ++thing
-  }
-
-  for (playerId in h.tilePlayers) {
-    uiSoldier(container,position(),playerId,h.tilePlayers[playerId])
-  }
-
-  return pos
-}
 

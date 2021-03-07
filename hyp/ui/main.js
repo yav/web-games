@@ -46,7 +46,8 @@ function uiRedraw(state) {
   const game = state.game
   const body = document.getElementById('main')
 
-  body.appendChild(uiBoard(state.game._gameBoard))
+  gui.board = uiBoard(state.game._gameBoard)
+  body.appendChild(gui.board.dom)
 
 
   const players = game._gamePlayers
@@ -83,16 +84,15 @@ const uiUpdate = hsUpdate (
          .spot[loc.cubeSpot]
          .remove()
     }
-  , ChangeBag: (pid,nm,r,n) => { gui.player[pid].bag[nm].change(r,n) }
-  , ChangeGems: (pid,n) => { gui.player[pid].stats.changeGems(n) }
-  , ChangeGhosts: (pid,n) => { gui.player[pid].stats.changeGhosts(n) }
-  , ChangeWorkers: (pid,n) => { gui.player[pid].stats.changeWorkers(n) }
-  , Capture: (pid,capt) => { gui.player[pid].stats.capture(capt) }
-  , SetTurn:          (t)       => { gui.turn.redraw(t) }
-  , Upgrade:          (pid,r,n) => { gui.player[pid].upgrade.change(r,n) }
-  , ResetUpgrade:     (pid,r)   => { gui.player[pid].upgrade.reset(r) }
-
-  // , ChangeUnit(pid,ty,loc,n) => { /* XXX */ }
-  // , SetCity(loc,cityId,spot) => { /* XXX */ }
-  // , SetRuin(loc,ruinId,spot) => { /* XXX */ }
+  , ChangeBag: (pid,nm,r,n)     => gui.player[pid].bag[nm].change(r,n)
+  , ChangeGems: (pid,n)         => gui.player[pid].stats.changeGems(n)
+  , ChangeGhosts: (pid,n)       => gui.player[pid].stats.changeGhosts(n)
+  , ChangeWorkers: (pid,n)      => gui.player[pid].stats.changeWorkers(n)
+  , Capture: (pid,capt)         => gui.player[pid].stats.capture(capt)
+  , SetTurn: (t)                => gui.turn.redraw(t)
+  , Upgrade: (pid,r,n)          => gui.player[pid].upgrade.change(r,n)
+  , ResetUpgrade: (pid,r)       => gui.player[pid].upgrade.reset(r)
+  , ChangeUnit: (pid,ty,loc,n)  => gui.board.changeUnit(loc,pid,ty,n)
+  , SetCity: (loc,cityId,spot)  => { console.log(spot); gui.board.setCity(loc,cityId,spot) }
+  , SetRuin: (loc,ruinId,spot)  => gui.board.setCity(loc,ruinId,spot)
   })

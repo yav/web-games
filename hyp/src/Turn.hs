@@ -10,6 +10,8 @@ import Common.Field
 import Bag
 
 import Resource
+import Tile
+import Geometry
 import Action
 import PlayerState
 
@@ -24,11 +26,16 @@ data Turn = Turn
 data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
            | AskReady Resource                  -- ^ Resource in ready area
            | AskButton Text                     -- ^ A button
+
            | AskReadyAction  BasicAction        -- ^ Activate a produced action
            | AskIfAction Int                    -- ^ Activate cond. action
            | AskOrActionLeft Int                -- ^ Choose left of alt. act
            | AskOrActionRight Int               -- ^ Choose right of alt. act
+
            | AskUpgrade Resource                -- ^ Choose upgrade track
+
+           | AskCity Loc CityId                 -- ^ Choose this city
+           | AskRuin Loc RuinId                 -- ^ Choose this ruin
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 

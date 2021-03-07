@@ -22,6 +22,9 @@ bagChange x r (Bag b) =
       new = cur + x
   in if new > 0 then Map.insert r new b else Map.delete r b
 
+bagContains :: Ord a => a -> Bag a -> Int
+bagContains a (Bag b) = Map.findWithDefault 0 a b
+
 bagIsEmpty :: Bag a -> Bool
 bagIsEmpty (Bag b) = Map.null b
 
