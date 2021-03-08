@@ -12,6 +12,7 @@ import Common.Utils(enumAll)
 import Common.Field
 
 import Resource
+import Terrain
 import Tile
 
 data Board = Board
@@ -76,7 +77,20 @@ enterRuinLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
                               , (s,u) <- tileEnterRuins p t
                     ]
 
-
+moveLocs :: PlayerId -> Int -> Board -> [(Loc,[(Int,Loc)])]
+moveLocs playerId movePts board =
+  [ (from,opts)
+    | (from,fromTile) <- Map.toList (getField boardMap board)
+    , tileCanMoveFrom playerId fromTile
+    , let opts =
+            [ (cost, to)
+            | to <- neighbours from board
+            , let toTerrain = tileTerrain (getField (tileAt to) board)
+                  cost = totalMoveCost (tileTerrain fromTile) toTerrain
+            , cost <= movePts
+            ]
+    , not (null opts)
+  ]
 
 --------------------------------------------------------------------------------
 emptyBoard :: Board

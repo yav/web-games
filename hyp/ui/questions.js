@@ -23,9 +23,12 @@ const existingQuestion = (el,q) => {
   el.addEventListener('click',onClick)
 }
 
-const newQuestion = (el,q) => {
+const newQuestion = (el,q,fin) => {
   el.classList.add('question')
-  gui.questions[gui.questions.length] = () => { el.remove() }
+  gui.questions[gui.questions.length] = () => {
+    el.remove()
+    if(fin) fin()
+  }
 
   el.addEventListener('click',() => {
     removeQuestions()

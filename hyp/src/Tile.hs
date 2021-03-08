@@ -108,6 +108,12 @@ isStartTile t =
     TileNum _ -> False
     _         -> True
 
+-- | Check for opponents opponents oustide city
+tileHasOpponents :: PlayerId -> Tile -> Bool
+tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
+  where
+  hasOpponent (pid',bag) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
+                                           bagContains LockedUnit bag > 0)
 
 -- | Pick a unit that can enter a city/ruin
 enterUnit :: PlayerId -> Tile -> [ UnitType ]
@@ -117,6 +123,7 @@ enterUnit playerId tile
   | otherwise                        = []
   where
   units = getField (playerUnits playerId) tile
+
 
 tileEnterCities :: PlayerId -> Tile -> [ (CityId,UnitType) ]
 tileEnterCities playerId tile =
@@ -135,6 +142,16 @@ tileEnterRuins playerId tile =
     , ty         <- enterUnit playerId tile
   ]
 
+tileCanMoveFrom :: PlayerId -> Tile -> Bool
+tileCanMoveFrom playerId tile = bagContains FreeUnit units > 0
+  where
+  units = getField (playerUnits playerId) tile
+
+tileCanFlyFrom :: PlayerId -> Tile -> Bool
+tileCanFlyFrom playerId tile = bagContains LockedUnit units > 0 ||
+                               bagContains FreeUnit   units > 0
+  where
+  units = getField (playerUnits playerId) tile
 
 
 

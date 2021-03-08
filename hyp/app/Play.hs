@@ -112,6 +112,43 @@ actEnterCity state =
   board        = getField gameBoard state
 
 
+-- XXX: move as fly
+-- XXX: move fly
+actMove :: Opts
+actMove state =
+  [ ( playerId :-> AskUnit from
+    , "Move unit"
+    , doMove from tos
+    )
+  | (from,tos) <- moveLocs playerId movePts board
+  ]
+  where
+  (playerId,_)  = currentPlayer state
+  board         = getField gameBoard state
+  ready         = getField (gameTurn .> turnReady) state
+  movePts       = bagContains Move ready
+
+  doMove :: Loc -> [(Int,Loc)] -> Interact ()
+  doMove from tos =
+    do (cost,to) <-
+          case tos of
+               [t] -> pure t
+               _ -> do -- XXX: mark from
+                       ~(AskMap loc (Times Move n)) <- choose playerId
+                          [ (AskMap to (Times Move cost)
+                            , "Move to here") | (cost,to) <- tos ]
+                       pure (n,loc)
+
+       turn <- view (getField gameTurn)
+       update (SetTurn (turnRemoveReadyN cost Move turn))
+       update (ChangeUnit playerId FreeUnit from (-1))
+       tileTo <- view (getField (gameBoard .> tileAt to))
+       let unit = if tileHasOpponents playerId tileTo
+                                          then LockedUnit else FreeUnit
+       update (ChangeUnit playerId unit to 1)
+       takeTurn
+
+
 actEndTurn :: Opts
 actEndTurn state =
   [ ( playerId :-> AskButton "End Turn"

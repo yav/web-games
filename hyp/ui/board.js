@@ -39,9 +39,10 @@ const uiBoard = (b) => {
     dom: dom,
     askCity: (loc,id,q) => getHex(loc).cities[id].ask(q),
     askRuin: (loc,id,q) => getHex(loc).ruins[id].ask(q),
-    changeUnit: (loc,pid,ty,n) => getHex(loc).units[pid].change(ty,n),
+    askMap: (loc,what,q) => getHex(loc).askMove(what,q),
+    changeUnit: (loc,pid,ty,n) => getHex(loc).changeUnit(pid,ty,n),
     setCity: (loc,id,x) => getHex(loc).cities[id].set(x),
-    setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x)
+    setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x),
   }
 }
 
@@ -77,6 +78,7 @@ const uiHex = (container,info) => {
   const h   = info[1]
 
   const dom = div('hex')
+  dom.setAttribute('id', JSON.stringify(loc))
   setDim(dom,hexSize,hexSize)
   const pos = uiHexLoc(loc)
   setSize(dom,'left',pos.x)
@@ -93,8 +95,9 @@ const uiHex = (container,info) => {
   const order = [ 2, 7, 5, 4, 9, 0, 1, 6, 3, 8 ]
   const start = 0 // Math.abs((loc.locX + loc.locY)) % 4
 
-  let thing = 0
-  const position = () => {
+  const alloc = uiHexAllocator()
+
+  const position = (thing) => {
     const i = order[(start + thing) % order.length]
     let x = 0
     let y = 0
@@ -114,21 +117,56 @@ const uiHex = (container,info) => {
   const units   = {}
 
   for (cityId in h.tileCities) {
-    cities[cityId] = uiCity(container,position(),cityId, h.tileCities[cityId])
-    ++thing
+    const thing = alloc.newLoc()
+    cities[cityId] =
+      uiCity(container,position(thing),cityId, h.tileCities[cityId])
   }
 
   for (ruinId in h.tileRuins) {
-    ruinId[ruinId] = uiRuin(container,position(),ruinId, h.tileRuins[ruinId])
-    ++thing
+    const thing = alloc.newLoc()
+    ruinId[ruinId] =
+      uiRuin(container,position(thing),ruinId, h.tileRuins[ruinId])
   }
 
   for (playerId in h.tilePlayers) {
-    units[playerId] =
-      uiSoldier(container,position(),playerId,h.tilePlayers[playerId])
+    const thing = alloc.newLoc()
+    units[playerId] = {
+      slot: thing,
+      obj: uiSoldier(container,position(thing),playerId,h.tilePlayers[playerId])
+    }
   }
 
-  return { cities: cities, ruins: ruins, units: units }
+  return {
+    cities: cities,
+    ruins: ruins,
+
+    changeUnit: (pid,ty,n) => {
+      let known = units[pid]
+      if (known === undefined) {
+        const thing = alloc.newLoc()
+        known = {
+          slot: thing,
+          obj: uiSoldier(container,position(thing),pid,{})
+        }
+        units[pid] = known
+      }
+      const keep = known.obj.change(ty,n)
+      if (!keep) {
+        alloc.freeLoc(known.slot)
+        delete units[pid]
+      }
+    },
+
+    askMap: (q) => {
+      const el = uiBasicAction(what)
+      const slot = alloc.newLoc()
+      const loc = position(slot)
+      setSize(el,'left',loc.x)
+      setSize(el,'top',loc.y)
+      container.appendChild(el)
+      existingQuestion(el,q,() => alloc.freeLoc(slot))
+    }
+  }
 }
 
 
@@ -193,6 +231,7 @@ const uiSoldier = (el,pos,p,info) => {
         case 'Fortification': fort +n; break
       }
       update()
+      return free + lock + fort > 0
     }
   }
 }

@@ -36,6 +36,9 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
 
            | AskCity Loc CityId                 -- ^ Choose this city
            | AskRuin Loc RuinId                 -- ^ Choose this ruin
+
+           | AskUnit Loc
+           | AskMap Loc BasicAction             -- ^ Used for board questions
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 
@@ -50,7 +53,10 @@ newTurn p =
        }
 
 turnRemoveReady :: BasicAction -> Turn -> Turn
-turnRemoveReady act = updField turnReady (bagChange (-1) act)
+turnRemoveReady = turnRemoveReadyN 1
+
+turnRemoveReadyN :: Int -> BasicAction -> Turn -> Turn
+turnRemoveReadyN n act = updField turnReady (bagChange (-n) act)
 
 turnAddAction :: Action -> Turn -> Turn
 turnAddAction act =

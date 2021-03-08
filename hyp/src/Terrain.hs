@@ -4,7 +4,7 @@ import GHC.Generics(Generic)
 import Data.Aeson(ToJSON)
 
 data Terrain = Plains | Forest | Swamp | Mountain
-  deriving (Generic,ToJSON)
+  deriving (Eq,Generic,ToJSON)
 
 extraEntryCost :: Terrain -> Int
 extraEntryCost t =
@@ -19,4 +19,11 @@ extraExitCost t =
     Swamp    -> 1
     Mountain -> 1
     _        -> 0
+
+totalMoveCost :: Terrain -> Terrain -> Int
+totalMoveCost from to = 1 + extraCost
+  where
+  extraCost
+    | from == to = 0
+    | otherwise  = extraExitCost from + extraEntryCost to
 
