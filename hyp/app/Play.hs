@@ -120,34 +120,62 @@ actMove :: Opts
 actMove state =
   [ ( playerId :-> AskUnit from playerId
     , "Move unit"
-    , doMove from tos
+    , doMoveFrom from qs
     )
-  | (from,tos) <- moveLocs playerId movePts board
+  | (from,qs) <- Map.toList allOpts
   ]
   where
-  (playerId,_)  = currentPlayer state
-  board         = getField gameBoard state
-  ready         = getField (gameTurn .> turnReady) state
-  movePts       = bagContains Move ready
+  (playerId,player) = currentPlayer state
+  board     = getField gameBoard state
+  ready     = getField (gameTurn .> turnReady) state
+  movePts   = bagContains Move ready
+  flyPts    = bagContains Fly  ready
+  moveAsFly = not (null [ () | UseMoveAsFly <- continuousBenefits player ])
 
-  doMove :: Loc -> [(Int,Loc)] -> Interact ()
-  doMove from tos =
-    do (cost,to) <-
-          case tos of
-               [t] -> pure t
+  moveOpts
+    | moveAsFly = Map.empty
+    | otherwise =
+      Map.fromList [ (x, [ AskMap to (Times Move cost) | (cost,to) <- as ])
+                   | (x,as) <- moveLocs playerId movePts board
+                   ]
+
+  flyOpts
+    | flyPts > 0 || (moveAsFly && movePts > 0) =
+      Map.fromList [ (x, [ AskMap to Fly | to <- as ])
+                   | (x,as) <- flyLocs playerId board
+                   ]
+    | otherwise = Map.empty
+
+  allOpts = Map.unionWith (++) flyOpts moveOpts
+
+  doMoveFrom :: Loc -> [Input] -> Interact ()
+  doMoveFrom from opts =
+
+    do ch <- case opts of
+               [a] -> pure a
                _ -> do -- XXX: mark from
-                       ~(AskMap loc (Times Move n)) <- choose playerId
-                          [ (AskMap to (Times Move cost)
-                            , "Move to here") | (cost,to) <- tos ]
-                       pure (n,loc)
+                       choose playerId [ (o,"Move here") | o <- opts ]
 
        turn <- view (getField gameTurn)
-       update (SetTurn (turnRemoveReadyN cost Move turn))
-       update (ChangeUnit playerId FreeUnit from (-1))
-       tileTo <- view (getField (gameBoard .> tileAt to))
-       let unit = if tileHasOpponents playerId tileTo
-                                          then LockedUnit else FreeUnit
-       update (ChangeUnit playerId unit to 1)
+       case ch of
+         AskMap to Fly ->
+          do update (SetTurn (turnRemoveReady
+                             (if moveAsFly && movePts > 0
+                                then Move else Fly) turn))
+             tileFrom <- view (getField (gameBoard .> tileAt from))
+             let unit = if tileHasLocked playerId tileFrom > 0 then LockedUnit
+                                                               else FreeUnit
+             update (ChangeUnit playerId unit from (-1))
+             update (ChangeUnit playerId FreeUnit to 1)
+
+         ~(AskMap to (Times Move cost)) ->
+           do update (SetTurn (turnRemoveReadyN cost Move turn))
+              update (ChangeUnit playerId FreeUnit from (-1))
+              tileTo <- view (getField (gameBoard .> tileAt to))
+              let unit = if tileHasOpponents playerId tileTo
+                                                 then LockedUnit else FreeUnit
+              update (ChangeUnit playerId unit to 1)
+
        takeTurn
 
 

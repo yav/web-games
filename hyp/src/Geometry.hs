@@ -92,6 +92,13 @@ moveLocs playerId movePts board =
     , not (null opts)
   ]
 
+flyLocs :: PlayerId -> Board -> [(Loc,[Loc])]
+flyLocs playerId board =
+  [ (from, neighbours from board)
+    | (from,fromTile) <- Map.toList (getField boardMap board)
+    , tileCanFlyFrom playerId fromTile
+  ]
+
 --------------------------------------------------------------------------------
 emptyBoard :: Board
 emptyBoard = Board { _boardMap = Map.empty

@@ -117,19 +117,19 @@ const uiHex = (container,info) => {
   const ruins   = {}
   const units   = {}
 
-  for (cityId in h.tileCities) {
+  for (const cityId in h.tileCities) {
     const thing = alloc.newLoc()
     cities[cityId] =
       uiCity(container,position(thing),cityId, h.tileCities[cityId])
   }
 
-  for (ruinId in h.tileRuins) {
+  for (const ruinId in h.tileRuins) {
     const thing = alloc.newLoc()
     ruinId[ruinId] =
       uiRuin(container,position(thing),ruinId, h.tileRuins[ruinId])
   }
 
-  for (playerId in h.tilePlayers) {
+  for (const playerId in h.tilePlayers) {
     const thing = alloc.newLoc()
     units[playerId] = {
       slot: thing,
@@ -304,8 +304,8 @@ const uiCity = (el,pos,cityId, city) => {
   const h = div('part')
   const help = uiAction(city.cityActions).dom
   h.appendChild(help)
-  setSize(h,'left',pos.x)
-  setSize(h,'top',pos.y + iconSize)
+  setSize(h,'left',pos.x - iconSize * 0.5)
+  setSize(h,'top',pos.y - iconSize * 1.5)
   let pinned = false
   dom.addEventListener('mouseenter',() => h.style.display = 'inline-block')
   dom.addEventListener('mouseleave',() => {

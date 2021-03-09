@@ -292,6 +292,7 @@ svg.gray     { fill: #ccc }
 .bag  .question { outline-color: white; }
 .tech .question { outline-color: black; }
 .turn .question { outline-color: black; }
+.board .question { outline-color: white; }
 
 .turn {
   display: inline-block;

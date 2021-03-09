@@ -1,6 +1,7 @@
 
 const uiTurn = (tu) => {
   const dom = div('turn')
+  dom.appendChild(span(tu.turnPlayer))
 
   let sReady = {}
   let sIfs   = {}

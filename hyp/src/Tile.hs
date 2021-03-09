@@ -153,7 +153,9 @@ tileCanFlyFrom playerId tile = bagContains LockedUnit units > 0 ||
   where
   units = getField (playerUnits playerId) tile
 
-
+tileHasLocked :: PlayerId -> Tile -> Int
+tileHasLocked playerId =
+  bagContains LockedUnit . getField (playerUnits playerId)
 
 
 --------------------------------------------------------------------------------
