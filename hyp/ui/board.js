@@ -39,7 +39,8 @@ const uiBoard = (b) => {
     dom: dom,
     askCity: (loc,id,q) => getHex(loc).cities[id].ask(q),
     askRuin: (loc,id,q) => getHex(loc).ruins[id].ask(q),
-    askMap: (loc,what,q) => getHex(loc).askMove(what,q),
+    askUnit: (loc,pid,q) => getHex(loc).askUnit(pid,q),
+    askMap: (loc,act,q) => getHex(loc).askMap(act,q),
     changeUnit: (loc,pid,ty,n) => getHex(loc).changeUnit(pid,ty,n),
     setCity: (loc,id,x) => getHex(loc).cities[id].set(x),
     setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x),
@@ -140,6 +141,8 @@ const uiHex = (container,info) => {
     cities: cities,
     ruins: ruins,
 
+    askUnit: (pid,q) => units[pid].obj.ask(q),
+
     changeUnit: (pid,ty,n) => {
       let known = units[pid]
       if (known === undefined) {
@@ -157,14 +160,14 @@ const uiHex = (container,info) => {
       }
     },
 
-    askMap: (q) => {
-      const el = uiBasicAction(what)
+    askMap: (act,q) => {
+      const el = uiBasicAction(act)
       const slot = alloc.newLoc()
       const loc = position(slot)
       setSize(el,'left',loc.x)
       setSize(el,'top',loc.y)
       container.appendChild(el)
-      existingQuestion(el,q,() => alloc.freeLoc(slot))
+      newQuestion(el,q,() => alloc.freeLoc(slot))
     }
   }
 }
@@ -232,7 +235,8 @@ const uiSoldier = (el,pos,p,info) => {
       }
       update()
       return free + lock + fort > 0
-    }
+    },
+    ask: (q) => { console.log('ask'); existingQuestion(dom,q) }
   }
 }
 

@@ -44,6 +44,7 @@ startTurn =
 endGame :: Interact ()
 endGame = pure ()
 
+-- XXX: unlock units in combat
 endTurn :: Interact ()
 endTurn =
   do state <- getState
@@ -62,6 +63,7 @@ takeTurn =
      let opts = actEndTurn   state ++
                 actPlaceCube state ++
                 actUseAction state ++
+                actMove      state ++
                 actEnterCity state
      askInputs opts
 
@@ -116,7 +118,7 @@ actEnterCity state =
 -- XXX: move fly
 actMove :: Opts
 actMove state =
-  [ ( playerId :-> AskUnit from
+  [ ( playerId :-> AskUnit from playerId
     , "Move unit"
     , doMove from tos
     )

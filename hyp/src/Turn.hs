@@ -37,7 +37,7 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
            | AskCity Loc CityId                 -- ^ Choose this city
            | AskRuin Loc RuinId                 -- ^ Choose this ruin
 
-           | AskUnit Loc
+           | AskUnit Loc PlayerId
            | AskMap Loc BasicAction             -- ^ Used for board questions
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 

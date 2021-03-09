@@ -64,7 +64,9 @@ const uiQuestion = (q) => {
     AskOrActionLeft: (n)  => gui.turn.askOrLeft(n,q),
     AskOrActionRight: (n) => gui.turn.askOrRight(n,q),
     AskCity: (loc,id)     => gui.board.askCity(loc,id,q),
-    AskRuin: (loc,id)     => gui.board.askRuin(loc,id,q)
+    AskRuin: (loc,id)     => gui.board.askRuin(loc,id,q),
+    AskUnit: (loc,pid)    => gui.board.askUnit(loc,pid,q),
+    AskMap: (loc,a)       => gui.board.askMap(loc,a,q)
   })(q.chChoice)
 
 }
