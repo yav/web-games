@@ -114,8 +114,6 @@ actEnterCity state =
   board        = getField gameBoard state
 
 
--- XXX: move as fly
--- XXX: move fly
 actMove :: Opts
 actMove state =
   [ ( playerId :-> AskUnit from playerId

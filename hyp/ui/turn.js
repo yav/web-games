@@ -39,6 +39,8 @@ const uiTurn = (tu) => {
       dom.innerHTML = ''
       draw(t)
     },
+    // XXX: some basic actions have the same top-level tag
+    // (upgarde, gain resource, etc)
     askBasic: (r,q) => { existingQuestion(sReady[r.tag],q) },
     askIf: (n,q) => { existingQuestion(sIfs[n].left,q) },
     askOrLeft: (n,q) => { existingQuestion(sOrs[n].left,q) },
