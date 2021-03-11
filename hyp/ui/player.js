@@ -67,7 +67,7 @@ const uiPlayerStats = (p) => {
     },
     changeWorkers: (n) => {
       workers += n
-      workerBagde.textContent = workers
+      workerBadge.textContent = workers
     },
     capture: addCaptured
   }
