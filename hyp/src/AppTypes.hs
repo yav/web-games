@@ -40,6 +40,7 @@ data Update =
   | SetCity Loc CityId TileSpot
   | SetRuin Loc RuinId TileSpot
 
+  | ChangeTile Loc Tile
 
   deriving (Generic,ToJSON)
 
@@ -143,4 +144,7 @@ doUpdate upd =
       Right . setField (gameBoard .> tileAt loc
                                   .> tileRuins .> mapAt ruinId .> ruinSpot)
                        val
+
+    ChangeTile loc t ->
+      Right . setField (gameBoard .> tileAt loc) t
 

@@ -95,4 +95,5 @@ const uiUpdate = hsUpdate (
   , ChangeUnit: (pid,ty,loc,n)  => gui.board.changeUnit(loc,pid,ty,n)
   , SetCity: (loc,cityId,spot)  => { console.log(spot); gui.board.setCity(loc,cityId,spot) }
   , SetRuin: (loc,ruinId,spot)  => gui.board.setCity(loc,ruinId,spot)
+  , ChangeTile: (loc,t) => gui.board.changeTile(loc,t)
   })

@@ -44,6 +44,10 @@ const uiBoard = (b) => {
     changeUnit: (loc,pid,ty,n) => getHex(loc).changeUnit(pid,ty,n),
     setCity: (loc,id,x) => getHex(loc).cities[id].set(x),
     setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x),
+    changeTile: (loc,t) => {
+      getHex(loc).remove()
+      board[loc.locX][loc.locY] = uiHex(dom,[loc,t])
+    }
   }
 }
 
@@ -168,7 +172,9 @@ const uiHex = (container,info) => {
       setSize(el,'top',loc.y)
       container.appendChild(el)
       newQuestion(el,q,() => alloc.freeLoc(slot))
-    }
+    },
+
+    remove: () => dom.remove()
   }
 }
 

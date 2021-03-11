@@ -27,7 +27,7 @@ setup :: Interact ()
 setup =
   do state <- getState
      forM_ (gameTurnOrder state) \p ->
-       do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll ] -- XXX: test
+       do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll, c == Green ] -- XXX: test
           replicateM_ 3 (doDrawCube p)
      startTurn
 
@@ -167,6 +167,8 @@ actMove state =
                                                                else FreeUnit
              update (ChangeUnit playerId unit from (-1))
              update (ChangeUnit playerId FreeUnit to 1)
+             b <- view (getField gameBoard)
+             sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
 
          ~(AskMap to (Times Move cost)) ->
            do update (SetTurn (turnRemoveReadyN cost Move turn))
@@ -175,6 +177,8 @@ actMove state =
               let unit = if tileHasOpponents playerId tileTo
                                                  then LockedUnit else FreeUnit
               update (ChangeUnit playerId unit to 1)
+              b <- view (getField gameBoard)
+              sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
 
        takeTurn
 

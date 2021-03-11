@@ -99,6 +99,14 @@ flyLocs playerId board =
     , tileCanFlyFrom playerId fromTile
   ]
 
+revealTiles :: Loc -> Board -> [(Loc,Tile)]
+revealTiles l board =
+  [ (x,setField tileVisible True t)
+  | x <- neighbours l board
+  , let t = getField (tileAt x) board
+  , not (getField tileVisible t)
+  ]
+
 --------------------------------------------------------------------------------
 emptyBoard :: Board
 emptyBoard = Board { _boardMap = Map.empty
