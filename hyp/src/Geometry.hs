@@ -77,6 +77,12 @@ enterRuinLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
                               , (s,u) <- tileEnterRuins p t
                     ]
 
+cloneLocs :: PlayerId -> Board -> [Loc]
+cloneLocs playerId board =
+  [ l | (l,t) <- Map.toList (getField boardMap board)
+      , tileHasUnits playerId t
+  ]
+
 moveLocs :: PlayerId -> Int -> Board -> [(Loc,[(Int,Loc)])]
 moveLocs playerId movePts board =
   [ (from,opts)

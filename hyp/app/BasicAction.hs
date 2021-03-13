@@ -9,19 +9,23 @@ import Common.Utils
 import Common.Interact
 
 import Resource
+import Geometry
 import Action
 import Turn
 import PlayerState
 import AppTypes
 
+import Common
+
 doBasicAction :: PlayerId -> BasicAction -> Interact ()
 doBasicAction playerId ba =
   case ba of
-    Move -> todo
-    Fly -> todo
-    PlaceWorker -> todo
-    CloneWorker -> todo
-    Attack -> todo
+    Move -> pure ()
+    Fly -> pure ()
+    Attack -> pure ()
+
+    CloneWorker -> doSimple ba $ doCloneWorker playerId
+    PlaceWorker -> doSimple ba $ doPlaceWorker playerId
     RangedAttack -> todo
     Fortify -> todo
     Develop ctr -> doSimple ba $ doUpgrade playerId ctr
@@ -35,7 +39,7 @@ doBasicAction playerId ba =
 
     -- these are auto activated so no need to remove
     LooseResource _ -> todo
-    Gem -> update (ChangeGems playerId 1)
+    Gem -> doGainGem playerId
     LooseGem -> update (ChangeGems playerId (-1))
     LooseDevelop -> todo
     RemoveWorker -> todo
@@ -54,6 +58,29 @@ doSimple ba m =
      update (SetTurn (turnRemoveReady ba t))
 
 
+doCloneWorker :: PlayerId -> Interact ()
+doCloneWorker playerId =
+  do board <- view (getField gameBoard)
+     workers <- view (getField (playerState playerId .> playerWorkers))
+     let locs = cloneLocs playerId board
+     case locs of
+       _ : _ | workers > 0 -> askWhere locs
+       _ -> pure ()
+  where
+  askWhere locs =
+    do l <- case locs of
+              [l] -> pure l
+              _   -> do ~(AskMap l _) <- choose playerId
+                            [ (AskMap l CloneWorker,"Place unite") | l <- locs ]
+                        pure l
+       doPlaceWorkerOn playerId l
+
+doPlaceWorker :: PlayerId -> Interact ()
+doPlaceWorker playerId =
+  do cont <- view (continuousBenefits . getField (playerState playerId))
+     if not (null [ () | UseWorkerAsClone <- cont ])
+       then doCloneWorker playerId
+       else doPlaceWorkerOnCapital playerId
 
 doUpgrade :: PlayerId -> DevelopConstratint -> Interact ()
 doUpgrade playerId ctr =

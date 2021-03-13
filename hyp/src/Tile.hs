@@ -185,6 +185,20 @@ tileHasLocked :: PlayerId -> Tile -> Int
 tileHasLocked playerId =
   bagContains LockedUnit . getField (playerUnits playerId)
 
+tileHasUnits :: PlayerId -> Tile -> Bool
+tileHasUnits playerId tile =
+  bagContains LockedUnit units > 0 ||
+  bagContains FreeUnit   units > 0 ||
+  any (isPresent . getField citySpot) cities ||
+  any (isPresent . getField ruinSpot) ruins
+  where
+  units  = getField (playerUnits playerId) tile
+  cities = getField tileCities tile
+  ruins  = getField tileRuins tile
+  isPresent r = case r of
+                  Occupied p -> p == playerId
+                  _          -> False
+
 
 --------------------------------------------------------------------------------
 
