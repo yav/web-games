@@ -7,12 +7,14 @@ const uiTurn = (tu) => {
   let sIfs   = {}
   let sOrs   = {}
 
+  const actKey = (a) => JSON.stringify(a)
+
   const draw = (t) => {
     basic = {}
     const ready = t._turnReady
     for (let i = 0; i < ready.length; ++i) {
       const an = ready[i]
-      const r = an[0].tag
+      const r = actKey(an[0])
       sReady[r] = uiBasicAction({tag:'Times',contents:ready[i]})
       dom.appendChild(sReady[r])
     }
@@ -39,9 +41,7 @@ const uiTurn = (tu) => {
       dom.innerHTML = ''
       draw(t)
     },
-    // XXX: some basic actions have the same top-level tag
-    // (upgarde, gain resource, etc)
-    askBasic: (r,q) => { existingQuestion(sReady[r.tag],q) },
+    askBasic: (r,q) => { existingQuestion(sReady[actKey(r)],q) },
     askIf: (n,q) => { existingQuestion(sIfs[n].left,q) },
     askOrLeft: (n,q) => { existingQuestion(sOrs[n].left,q) },
     askOrRight: (n,q) => { existingQuestion(sOrs[n].right,q) }
