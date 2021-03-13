@@ -27,7 +27,7 @@ setup :: Interact ()
 setup =
   do state <- getState
      forM_ (gameTurnOrder state) \p ->
-       do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll, c == Green ] -- XXX: test
+       do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll, c == Orange ] -- XXX: test
           replicateM_ 3 (doDrawCube p)
      startTurn
 
@@ -151,8 +151,10 @@ actMove state =
 
     do ch <- case opts of
                [a] -> pure a
-               _ -> do -- XXX: mark from
-                       choose playerId [ (o,"Move here") | o <- opts ]
+               _ -> do update (SetUnithighlight from playerId True)
+                       a <- choose playerId [ (o,"Move here") | o <- opts ]
+                       update (SetUnithighlight from playerId False)
+                       pure a
 
        turn <- view (getField gameTurn)
        case ch of
@@ -213,9 +215,7 @@ actUseAction state =
     , performBasicAction playerId b
     )
   | b <- map fst (bagToList (getField turnReady turn))
-      -- XXX: not all actions are activated though the action menu
-      -- (e.g., attack by clicking on the map, same for move, fly)
-
+  , clickable b
   ] ++
   [ ( playerId :-> AskIfAction n
     , "Use action"

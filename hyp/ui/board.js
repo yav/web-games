@@ -42,6 +42,7 @@ const uiBoard = (b) => {
     askUnit: (loc,pid,q) => getHex(loc).askUnit(pid,q),
     askMap: (loc,act,q) => getHex(loc).askMap(act,q),
     changeUnit: (loc,pid,ty,n) => getHex(loc).changeUnit(pid,ty,n),
+    setUnitHighlight: (loc,pid,yes) => getHex(loc).setUnitHighlight(pid,yes),
     setCity: (loc,id,x) => getHex(loc).cities[id].set(x),
     setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x),
     changeTile: (loc,t) => {
@@ -147,6 +148,9 @@ const uiHex = (container,info) => {
 
     askUnit: (pid,q) => units[pid].obj.ask(q),
 
+    // assumes unit exits
+    setUnitHighlight: (pid,yes) => units[pid].obj.setHighlight(yes),
+
     changeUnit: (pid,ty,n) => {
       let known = units[pid]
       if (known === undefined) {
@@ -193,9 +197,10 @@ const uiSoldier = (el,pos,p,info) => {
   setDim(pic,iconSize,iconSize)
   dom.appendChild(pic)
 
-  let fort = info.Fortification || 0
-  let free = info.FreeUnit || 0
-  let lock = info.LockedUnit || 0
+  const units = info._pUnits || {}
+  let fort = units.Fortification || 0
+  let free = units.FreeUnit || 0
+  let lock = units.LockedUnit || 0
 
   const counterDom = badge('')
   counterDom.classList.add('top')
@@ -209,6 +214,11 @@ const uiSoldier = (el,pos,p,info) => {
   lockDom.innerHTML = '&#9876;'
   lockDom.classList.add('top')
   lockDom.classList.add('right')
+
+  const setHighlight = (yes) => {
+    if (yes) dom.classList.add('highlight')
+        else dom.classList.remove('highlight')
+  }
 
   const update = () => {
     const tot = free + lock
@@ -228,11 +238,13 @@ const uiSoldier = (el,pos,p,info) => {
   }
 
   update()
+  setHighlight(info._pHighlight)
   dom.appendChild(counterDom)
   dom.appendChild(fortDom)
   dom.appendChild(lockDom)
 
   return {
+    setHighlight: setHighlight,
     change: (ty,n) => {
       switch(ty) {
         case 'FreeUnit': free += n; break

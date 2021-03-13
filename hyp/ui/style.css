@@ -233,6 +233,12 @@ svg.gray     { fill: #ccc }
   z-index: 1;
 }
 
+.highlight {
+  outline: 0.075em solid;
+  outline-offset: 0.1em;
+  outline-color: white;
+}
+
 .board .action {
   z-index: 2;
 }

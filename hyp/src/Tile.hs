@@ -35,7 +35,18 @@ data Tile = Tile
   , _tileCities   :: Map CityId City
   , _tileRuins    :: Map RuinId Ruin
   , _tileVisible  :: Bool
-  , tilePlayers   :: Map PlayerId (Bag UnitType)
+  , tilePlayers   :: Map PlayerId PlayerUnits
+  }
+
+data PlayerUnits = PlayerUnits
+  { _pUnits     :: Bag UnitType
+  , _pHighlight :: Bool
+  } deriving (Generic,ToJSON)
+
+noUnits :: PlayerUnits
+noUnits = PlayerUnits
+  { _pUnits = bagEmpty
+  , _pHighlight = False
   }
 
 data UnitType = FreeUnit | LockedUnit | Fortification
@@ -51,7 +62,7 @@ data TileSpot =
     deriving (Generic,ToJSON)
 
 data City = City
-  { _citySpot    :: TileSpot
+  { _citySpot   :: TileSpot
   , cityActions :: Action
   , cityCapital :: Maybe PlayerId
   } deriving (Generic, ToJSON)
@@ -64,6 +75,7 @@ data Ruin = Ruin
 declareFields ''Tile
 declareFields ''City
 declareFields ''Ruin
+declareFields ''PlayerUnits
 
 cityAt :: CityId -> Field Tile City
 cityAt cityId = tileCities .> mapAt cityId
@@ -71,15 +83,30 @@ cityAt cityId = tileCities .> mapAt cityId
 ruinAt :: CityId -> Field Tile Ruin
 ruinAt ruinId = tileRuins .> mapAt ruinId
 
+playerUnitsHiglight :: PlayerId -> Field Tile Bool
+playerUnitsHiglight p = Field
+  { getField = getField pHighlight . Map.findWithDefault noUnits p . tilePlayers
+  , setField = \b t ->
+    t { tilePlayers =
+        let ps = tilePlayers t
+        in case Map.lookup p ps of
+             Nothing -> ps
+             Just us -> Map.insert p (setField pHighlight b us) ps
+      }
+  }
 
 playerUnits :: PlayerId -> Field Tile (Bag UnitType)
 playerUnits p = Field
-  { getField = Map.findWithDefault bagEmpty p . tilePlayers
-  , setField = \b t -> t { tilePlayers =
-                            if bagIsEmpty b
-                              then Map.delete p (tilePlayers t)
-                              else Map.insert p b (tilePlayers t)
-                         }
+  { getField = getField pUnits . Map.findWithDefault noUnits p . tilePlayers
+  , setField = \b t ->
+      t { tilePlayers =
+          let ps = tilePlayers t
+          in if bagIsEmpty b
+               then Map.delete p ps
+               else let new = setField pUnits b
+                            $ Map.findWithDefault noUnits p ps
+                    in Map.insert p new ps
+        }
   }
 
 countWorkersOnTile :: PlayerId -> Tile -> Int
@@ -112,8 +139,9 @@ isStartTile t =
 tileHasOpponents :: PlayerId -> Tile -> Bool
 tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
   where
-  hasOpponent (pid',bag) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
-                                           bagContains LockedUnit bag > 0)
+  hasOpponent (pid',us) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
+                                          bagContains LockedUnit bag > 0)
+    where bag = getField pUnits us
 
 -- | Pick a unit that can enter a city/ruin
 enterUnit :: PlayerId -> Tile -> [ UnitType ]

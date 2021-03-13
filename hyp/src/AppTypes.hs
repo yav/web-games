@@ -36,6 +36,7 @@ data Update =
   | ResetUpgrade      PlayerId Resource
 
   | ChangeUnit PlayerId UnitType Loc Int
+  | SetUnithighlight Loc PlayerId Bool
 
   | SetCity Loc CityId TileSpot
   | SetRuin Loc RuinId TileSpot
@@ -134,6 +135,8 @@ doUpdate upd =
       Right . updField (gameBoard .> tileAt loc .> playerUnits playerId)
                        (bagChange n ty)
 
+    SetUnithighlight loc p yes ->
+      Right . setField (gameBoard .> tileAt loc .> playerUnitsHiglight p) yes
 
     SetCity loc cityId val ->
       Right . setField (gameBoard .> tileAt loc

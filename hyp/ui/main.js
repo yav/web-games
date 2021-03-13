@@ -93,6 +93,7 @@ const uiUpdate = hsUpdate (
   , Upgrade: (pid,r,n)          => gui.player[pid].upgrade.change(r,n)
   , ResetUpgrade: (pid,r)       => gui.player[pid].upgrade.reset(r)
   , ChangeUnit: (pid,ty,loc,n)  => gui.board.changeUnit(loc,pid,ty,n)
+  , SetUnithighlight: (loc,pid,yes) => gui.board.setUnitHighlight(loc,pid,yes)
   , SetCity: (loc,cityId,spot)  => { console.log(spot); gui.board.setCity(loc,cityId,spot) }
   , SetRuin: (loc,ruinId,spot)  => gui.board.setCity(loc,ruinId,spot)
   , ChangeTile: (loc,t) => gui.board.changeTile(loc,t)
