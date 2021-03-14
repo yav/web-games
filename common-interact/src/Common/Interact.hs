@@ -11,6 +11,7 @@ module Common.Interact
   , Interact
   , askInputs
   , choose
+  , chooseMaybe
   , view
   , update
   , localUpdate
@@ -191,6 +192,14 @@ interaction_ how = fst . interaction how
 choose :: PlayerId -> [(Input,Text)] -> Interact Input
 choose playerId opts =
   askInputs [ (playerId :-> ch, help, pure ch) | (ch,help) <- opts ]
+
+-- | Ask a question only if there is a choice
+chooseMaybe :: PlayerId -> [(Input,Text)] -> Interact (Maybe Input)
+chooseMaybe playerId opts =
+  case opts of
+    []  -> pure Nothing
+    [t] -> pure (Just (fst t))
+    _   -> Just <$> choose playerId opts
 
 askInputs :: [ (WithPlayer Input, Text, Interact a) ] -> Interact a
 askInputs opts =
