@@ -28,7 +28,7 @@ setup =
   do state <- getState
      forM_ (gameTurnOrder state) \p ->
        do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Green, Purple ] ] -- XXX: test
+              c `elem` [ Green, Purple,Gray ] ] -- XXX: test
           replicateM_ 3 (doDrawCube p)
      startTurn
 

@@ -25,6 +25,7 @@ data Turn = Turn
 
 data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
            | AskReady Resource                  -- ^ Resource in ready area
+           | AskDiscard Resource                -- ^ Resource in ready area
            | AskButton Text                     -- ^ A button
            | AskSupply Resource                 -- ^ A resource in the supply
 

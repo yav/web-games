@@ -49,9 +49,8 @@ const uiQuestion = (q) => {
                      .techs.tech[x.cubeTech].alt[x.cubeAlt].spot[x.cubeSpot].dom
       existingQuestion(dom,q)
     },
-    AskReady: (r) => {
-      gui.player[playerId].bag.BagReady.ask(r,q)
-    },
+    AskReady: (r) => gui.player[playerId].bag.BagReady.ask(r,q),
+    AskDiscard: (r) => gui.player[playerId].bag.BagDiscard.ask(r,q),
     AskButton: (txt) => {
       const btn = div('button')
       btn.textContent = txt

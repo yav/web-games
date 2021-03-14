@@ -29,7 +29,8 @@ library
     Geometry,
     Layout,
     Turn,
-    AppTypes
+    AppTypes,
+    Properties
 
   build-depends:
     base, containers, text,

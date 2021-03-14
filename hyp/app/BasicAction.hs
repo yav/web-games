@@ -32,8 +32,8 @@ doBasicAction playerId ba =
     Develop ctr -> doSimple ba $ doUpgrade playerId ctr
 
     GainTech -> todo
-    DrawResource -> doSimple ba (void $ doDrawCube playerId)
-    ReturnResource -> todo
+    DrawResource -> doSimple ba $ void $ doDrawCube playerId
+    ReturnResource -> doSimple ba $ doReturnResource playerId
     SwapResource _ _ -> todo
     GainResource r -> doSimple ba $ doGainResource playerId r
     Spy -> todo
@@ -44,9 +44,9 @@ doBasicAction playerId ba =
     LooseGem -> update (ChangeGems playerId (-1))
     LooseDevelop -> todo
     RemoveWorker -> todo
-    Neighbours ba -> todo
+    Neighbours ba' -> todo
 
-    Times ba n -> replicateM_ n (doBasicAction playerId ba) -- hm
+    Times ba' n -> replicateM_ n (doBasicAction playerId ba') -- hm
 
   where
   todo = pure ()
@@ -121,4 +121,34 @@ doGainResource playerId req =
              do ~(AskSupply r) <-
                     choose playerId [ (AskSupply r, "Gain cube") | r <- rs ]
                 doGainCube playerId r
+
+doReturnResource :: PlayerId -> Interact ()
+doReturnResource playerId =
+  do player <- view (getField (playerState playerId))
+     let bags        = getField playerBag player
+         resources b = map fst $ bagToList $ getField (mapAt b) bags
+         ready       = map AskReady (resources BagReady)
+         discard     = map AskDiscard (resources BagDiscard)
+         fromTech    = map AskCubeLoc (returnSpots player)
+         questions   = zip (discard ++ ready ++ fromTech)
+                           (repeat "Return resource")
+     mb <- chooseMaybe playerId questions
+     case mb of
+       Nothing -> pure ()
+       Just act ->
+         case act of
+           AskCubeLoc loc ->
+             case getField (costSpot loc .> spotResource) player of
+               Just r ->
+                 do update (RemoveCube playerId loc)
+                    update (ChangeBag playerId BagSource r 1)
+               Nothing -> pure () -- bug
+
+           AskReady r ->
+             do update (ChangeBag playerId BagReady   r (-1))
+                update (ChangeBag playerId BagSource  r 1)
+
+           ~(AskDiscard r) ->
+             do update (ChangeBag playerId BagDiscard r (-1))
+                update (ChangeBag playerId BagSource  r 1)
 

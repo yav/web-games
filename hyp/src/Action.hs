@@ -30,6 +30,7 @@ data BasicAction =
   | Times BasicAction Int
     deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON,ToJSONKey)
 
+
 data DevelopConstratint = Same Int | Different Int | Any
     deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
@@ -39,6 +40,7 @@ data Action =
   | Action [BasicAction]
   | Or BasicAction BasicAction
     deriving (Generic,ToJSON)
+
 
 data Event =
     GainAttack
@@ -75,6 +77,41 @@ data TechBenefit =
 
 declareFields ''Tech
 declareFields ''TechAlt
+
+techReturnSpots :: Tech -> [(Int,Int)]
+techReturnSpots tech = [ (altId,spot)
+                       | (altId,alt) <- [0..] `zip` getField techAlts tech
+                       , spot <- altReturnSpots alt
+                       ]
+  where
+  altReturnSpots alt =
+    let cost = getField techCost alt
+    in case costFreeSpots cost of
+         [] | techAltHas ReturnResource alt -> []
+         _ -> map fst (costFullSpots cost)
+
+techHas :: BasicAction -> Tech -> Bool
+techHas act = any (techAltHas act) . getField techAlts
+
+techAltHas :: BasicAction -> TechAlt -> Bool
+techAltHas act alt =
+  case techBenefit alt of
+    OneTime y -> actHas y
+    _         -> False
+
+  where
+  actHas x =
+    case x of
+      Action as -> any actBasic as
+      Or a b    -> actBasic a || actBasic b
+      If a bs   -> any actBasic (a:bs)
+
+  actBasic a =
+    case a of
+      Times b _ -> actBasic b
+      _         -> act == a
+
+
 
 contModifyAction :: ContinuousAciton -> Action -> Action
 contModifyAction cont act =

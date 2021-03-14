@@ -118,6 +118,13 @@ placeSpots ps = [ spot
   where
   available = map fst (bagToList (getField (playerBag .> mapAt BagReady) ps))
 
+returnSpots :: PlayerState -> [CubeLoc]
+returnSpots ps =
+  [ CubeLoc { cubeTech = techId, cubeAlt = altId, cubeSpot = spotId }
+  | (techId,tech) <- Map.toList (getField playerTech ps)
+  , (altId,spotId) <- techReturnSpots tech
+  ]
+
 continuousBenefits :: PlayerState -> [ContinuousAciton]
 continuousBenefits player =
   [ c
