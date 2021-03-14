@@ -8,11 +8,27 @@ import Common.Basics(PlayerId)
 
 import Resource
 import Geometry
+import RuinToken
 import Tile
 
+{-
+populateTiles :: RNG -> Board -> Board
+populateTiles rng0 = undefined
+  where
+  (tokBronze,rng1) = shuffle bronzeTokens rng0
+  (tokSilver,rng2) = shuffle silverTokens rng1
+  (tokGold,_)      = shuffle silverTokens rng2
+
+  doTile t
+-}
+
+--XXX
+populateTiles :: RNG -> Board -> Board
+populateTiles _ b = b
 
 setupBoard :: RNG -> Bool -> [(Maybe PlayerId,Maybe Resource)] -> Board
-setupBoard rng0 useFog rs = foldr placePlayer core' (startLocs `zip` rs')
+setupBoard rng0 useFog rs = populateTiles rng2
+                          $ foldr placePlayer core' (startLocs `zip` rs')
   where
   n = length rs
 
@@ -21,9 +37,6 @@ setupBoard rng0 useFog rs = foldr placePlayer core' (startLocs `zip` rs')
   (central : _, rng1) = shuffle (map makeVis centralTiles) rng0
   (peripheral,rng2)   = shuffle (map makeVis peripheralTiles) rng1
   (always,sometimes)  = splitAt 6 peripheral
-
-  -- XXX: shuffle and place tokens + ghosts
-
 
   extraSpots          = [ path [W,NW], path [E,SE] ]
 

@@ -22,15 +22,18 @@ import Bag
 data TileName =
     TileNum Int
   | Capital
-  | TNE (Maybe Resource)
-  | TNW (Maybe Resource)
+  | TNE (Maybe Resource)  -- not really resources, just identifies start tiles
+  | TNW (Maybe Resource)  -- not really resources, just identifies start tiles
     deriving (Eq,Ord)
+
+data TileType = TileStartgin | TilePeripheral | TileCenter
 
 type CityId = Int
 type RuinId = Int
 
 data Tile = Tile
   { tileNumber    :: TileName
+  , tileType      :: TileType
   , tileTerrain   :: Terrain
   , _tileCities   :: Map CityId City
   , _tileRuins    :: Map RuinId Ruin
@@ -201,6 +204,10 @@ tileHasUnits playerId tile =
 
 
 --------------------------------------------------------------------------------
+-- Setup
+
+
+--------------------------------------------------------------------------------
 
 instance ToJSON Tile where
   toJSON t = JS.object (if getField tileVisible t then vis else hidden)
@@ -220,9 +227,10 @@ instance ToJSON Ruin where
 
 
 --------------------------------------------------------------------------------
-defTile' :: TileName -> Terrain -> [City] -> [Ruin] -> Tile
-defTile' name ter cs rs = Tile
+defTile' :: TileName -> TileType -> Terrain -> [City] -> [Ruin] -> Tile
+defTile' name ty ter cs rs = Tile
   { tileNumber    = name
+  , tileType      = ty
   , tileTerrain   = ter
   , _tileCities   = Map.fromList (zip [ 0 .. ] cs)
   , _tileRuins    = Map.fromList (zip [ 0 .. ] rs)
@@ -230,7 +238,7 @@ defTile' name ter cs rs = Tile
   , tilePlayers   = Map.empty
   }
 
-defTile :: Int -> Terrain -> [City] -> [Ruin] -> Tile
+defTile :: Int -> TileType -> Terrain -> [City] -> [Ruin] -> Tile
 defTile n = defTile' (TileNum n)
 
 defCity :: Action -> City
@@ -245,30 +253,32 @@ defRuin t = Ruin { _ruinSpot = Empty, ruinType = t, ruinTokens = [] }
 
 centralTiles :: [Tile]
 centralTiles =
-  [ defTile 31 Forest
+  let mkTile n = defTile n TileCenter
+  in
+  [ mkTile 31 Forest
       [ defCity $ Action [ DrawResource, Gem ]
       , defCity $ Action [ Develop (Same 2), Gem ]
       ]
       []
 
-  , defTile 32 Plains
+  , mkTile 32 Plains
       [ defCity $ If (LooseResource AnyNormal)
                                         [ Gem `Times` 2, Develop (Same 2) ] ]
       [ defRuin Gold ]
 
-  , defTile 33 Swamp
+  , mkTile 33 Swamp
       [ defCity $ Action [ DrawResource, Develop (Same 4) ] ]
       []
 
-  , defTile 34 Mountain
+  , mkTile 34 Mountain
       [ defCity $ Action [ Gem, Develop (Same 3) ] ]
       [ defRuin Gold ]
 
-  , defTile 35 Mountain
+  , mkTile 35 Mountain
       [ defCity $ If RemoveWorker [ Gem `Times` 3 ] ]
       []
 
-  , defTile 36 Forest
+  , mkTile 36 Forest
       [ defCity $ Action [ Gem `Times` 2 ] ]
       [ defRuin Gold, defRuin Gold ]
   ]
@@ -276,124 +286,126 @@ centralTiles =
 
 peripheralTiles :: [Tile]
 peripheralTiles =
-  [ defTile 1 Plains
+  let mkTile n = defTile n TilePeripheral
+  in
+  [ mkTile 1 Plains
       [ defCity $ Action [ Gem ] ]
       []
 
-  , defTile 2 Plains
+  , mkTile 2 Plains
       [ defCity $ Action [ Develop (Same 2) ] ]
       []
 
-  , defTile 3 Plains
+  , mkTile 3 Plains
       [ defCity $ Action [ DrawResource, Develop (Same 2) ] ]
       []
 
-  , defTile 4 Plains
+  , mkTile 4 Plains
       [ defCity $ Action [ Develop (Same 3) ] ]
       []
 
-  , defTile 5 Plains
+  , mkTile 5 Plains
       [ defCity $ Action [ Gem ] ]
       []
 
-  , defTile 6 Plains
+  , mkTile 6 Plains
       [ defCity $ Action [ DrawResource, Develop (Same 2) ] ]
       []
 
-  , defTile 7 Plains
+  , mkTile 7 Plains
       []
       [ defRuin Silver ]
 
-  , defTile 8 Plains
+  , mkTile 8 Plains
       []
       [ defRuin Silver ]
 
-  , defTile 9 Plains
+  , mkTile 9 Plains
       []
       [ defRuin Silver ]
 
-  , defTile 10 Plains
+  , mkTile 10 Plains
       []
       [ defRuin Silver ]
 
 
-  , defTile 11 Forest
+  , mkTile 11 Forest
       [ defCity $ Action [ Gem ] ]
       []
 
-  , defTile 12 Forest
+  , mkTile 12 Forest
       [ defCity $ Action [ DrawResource, Develop (Same 2) ] ]
       []
 
-  , defTile 13 Forest
+  , mkTile 13 Forest
       [ defCity $ Action [ Develop (Same 3) ] ]
       []
 
-  , defTile 14 Forest
+  , mkTile 14 Forest
       [ defCity $ Action [ Develop (Same 2) ] ]
       [ defRuin Silver ]
 
-  , defTile 15 Plains
+  , mkTile 15 Plains
       [ ]
       [ defRuin Silver ]
 
-  , defTile 16 Forest
+  , mkTile 16 Forest
       [ ]
       [ defRuin Silver, defRuin Silver ]
 
-  , defTile 17 Swamp
+  , mkTile 17 Swamp
       [ ]
       [ defRuin Silver ]
 
-  , defTile 18 Swamp
+  , mkTile 18 Swamp
       [ ]
       [ defRuin Silver ]
 
-  , defTile 19 Mountain
+  , mkTile 19 Mountain
       [ defCity $ Action [ Gem ] ]
       []
 
-  , defTile 20 Mountain
+  , mkTile 20 Mountain
       [ ]
       [ defRuin Silver ]
 
-  , defTile 21 Plains
+  , mkTile 21 Plains
       [ ]
       [ defRuin Silver ]
 
-  , defTile 22 Mountain
+  , mkTile 22 Mountain
       [ ]
       [ defRuin Silver, defRuin Silver ]
 
-  , defTile 23 Plains
+  , mkTile 23 Plains
       [ defCity $ Action [ Develop (Same 4)  ] ]
       []
 
-  , defTile 24 Plains
+  , mkTile 24 Plains
       [ defCity $ Action [ Move `Times` 2 ] ]
       []
 
-  , defTile 25 Plains
+  , mkTile 25 Plains
       [ defCity $ Action [ DrawResource, Move ] ]
       []
 
-  , defTile 26 Forest
+  , mkTile 26 Forest
       [ defCity $ Action [ Gem ] ]
       []
 
-  , defTile 27 Forest
+  , mkTile 27 Forest
       [ defCity $ Action [ Develop (Same 3) ] ]
       [ defRuin Silver ]
 
-  , defTile 28 Plains
+  , mkTile 28 Plains
       [ ]
       [ defRuin Silver, defRuin Silver ]
 
-  , defTile 29 Swamp
+  , mkTile 29 Swamp
       [ ]
       [ defRuin Silver, defRuin Silver ]
 
-  , defTile 30 Mountain
+  , mkTile 30 Mountain
       [ defCity $ Action [ Fly ] ]
       [ ]
   ]
@@ -401,69 +413,71 @@ peripheralTiles =
 
 startTiles :: [Tile]
 startTiles =
-  [ defTile' Capital Plains
+  let mkTile n = defTile' n TileStartgin
+  in
+  [ mkTile Capital Plains
       [ defCity $ Action [ Move, Develop Any ] ]
       []
 
-  , defTile' (TNW Nothing) Plains
+  , mkTile (TNW Nothing) Plains
       []
       [ defRuin Bronze ]
 
-  , defTile' (TNE Nothing ) Plains
+  , mkTile (TNE Nothing ) Plains
       [ defCity $ Move `Or` Develop Any ]
       []
 
 
-  , defTile' (TNW (Just Blue)) Swamp
+  , mkTile (TNW (Just Blue)) Swamp
       []
       [ defRuin Bronze ]
 
-  , defTile' (TNE (Just Blue)) Plains
+  , mkTile (TNE (Just Blue)) Plains
       [ defCity $ Move `Or` DrawResource ]
       []
 
 
-  , defTile' (TNW (Just Purple)) Plains
+  , mkTile (TNW (Just Purple)) Plains
       [ defCity $ Action [ Develop Any ] ]
       []
 
-  , defTile' (TNE (Just Purple)) Plains
+  , mkTile (TNE (Just Purple)) Plains
       [ defCity $ Action [ Move ] ]
       []
 
 
-  , defTile' (TNW (Just Red)) Plains
+  , mkTile (TNW (Just Red)) Plains
       []
       [ defRuin Bronze ]
 
-  , defTile' (TNE (Just Red)) Plains
+  , mkTile (TNE (Just Red)) Plains
       [ defCity $ Move `Or` Attack ]
       []
 
 
-  , defTile' (TNW (Just Orange)) Mountain
+  , mkTile (TNW (Just Orange)) Mountain
       []
       [ defRuin Bronze, defRuin Bronze ]
 
-  , defTile' (TNE (Just Orange)) Plains
+  , mkTile (TNE (Just Orange)) Plains
       [ defCity $ Move `Or` Develop (Same 2) ]
       []
 
 
-  , defTile' (TNW (Just Yellow)) Plains
+  , mkTile (TNW (Just Yellow)) Plains
       [ defCity $ Move `Or` Develop Any ]
       []
 
-  , defTile' (TNE (Just Yellow)) Plains
+  , mkTile (TNE (Just Yellow)) Plains
       []
       [ defRuin Bronze ]
 
 
-  , defTile' (TNW (Just Green)) Plains
+  , mkTile (TNW (Just Green)) Plains
       []
       [ defRuin Bronze ]
 
-  , defTile' (TNE (Just Green)) Plains
+  , mkTile (TNE (Just Green)) Plains
       [ defCity $ (Move `Times` 2) `Or` Develop Any ]
       []
   ]
