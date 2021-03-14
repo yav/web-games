@@ -291,20 +291,6 @@ doReset playerId =
      replicateM_ 3 (doDrawCube playerId)
 
 
-doGainCube :: PlayerId -> Resource -> Interact ()
-doGainCube pid r = update (ChangeBag pid BagSource r 1)
-
-doDrawCube :: PlayerId -> Interact Bool
-doDrawCube playerId =
-  do state <- getState
-     let player = getField (playerState playerId) state
-     case cubeToDraw player of
-       Nothing -> pure False
-       Just (r,p1) ->
-         do localUpdate_ (setField (playerState playerId) p1)
-            update (ChangeBag playerId BagSource r (-1))
-            update (ChangeBag playerId BagReady  r ( 1))
-            pure True
 
 checkGainBenefit :: PlayerId -> CubeLoc -> Interact ()
 checkGainBenefit playerId lastCube =

@@ -1,6 +1,6 @@
 module BasicAction where
 
-import Control.Monad(replicateM_)
+import Control.Monad(replicateM_,void)
 import Data.List(delete)
 
 import Common.Basics
@@ -8,6 +8,7 @@ import Common.Field
 import Common.Utils
 import Common.Interact
 
+import Bag
 import Resource
 import Geometry
 import Action
@@ -31,10 +32,10 @@ doBasicAction playerId ba =
     Develop ctr -> doSimple ba $ doUpgrade playerId ctr
 
     GainTech -> todo
-    DrawResource -> todo
+    DrawResource -> doSimple ba (void $ doDrawCube playerId)
     ReturnResource -> todo
     SwapResource _ _ -> todo
-    GainResource _ -> todo
+    GainResource r -> doSimple ba $ doGainResource playerId r
     Spy -> todo
 
     -- these are auto activated so no need to remove
@@ -107,5 +108,17 @@ doUpgrade playerId ctr =
     | otherwise = pure ()
 
 
-
+doGainResource :: PlayerId -> ResourceReq -> Interact ()
+doGainResource playerId req =
+  do sup <- view (getField gameSupply)
+     case req of
+      Exact r -> doGainCube playerId r
+      AnyNormal ->
+        case map fst (bagToList sup) of
+          []  -> pure ()
+          [r] -> doGainCube playerId r
+          rs  ->
+             do ~(AskSupply r) <-
+                    choose playerId [ (AskSupply r, "Gain cube") | r <- rs ]
+                doGainCube playerId r
 

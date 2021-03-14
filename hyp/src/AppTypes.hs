@@ -9,6 +9,7 @@ import GHC.Generics
 import Data.Aeson(ToJSON)
 
 import Common.Basics
+import Common.Utils(enumAll)
 import Common.Field
 import Common.RNG
 
@@ -25,6 +26,7 @@ data Update =
     PlaceCube PlayerId CubeLoc Resource
   | RemoveCube PlayerId CubeLoc
   | SetTurn Turn
+  | ChangeSupply Resource Int
 
   | ChangeBag PlayerId BagName Resource Int
   | ChangeGems PlayerId Int
@@ -52,8 +54,8 @@ data State = State
   , _gameTurn     :: Turn
   , gameTurnOrder :: [PlayerId]
   , _gameEndOn    :: Maybe PlayerId
-  , _gameBoard     :: Board
-  -- map
+  , _gameBoard    :: Board
+  , _gameSupply   :: Bag Resource
   -- tech market
 
   } deriving (Generic,ToJSON)
@@ -71,6 +73,7 @@ initialState rng useFog ps = State
   , _gamePlayers  = Map.fromList pstates
   , _gameBoard = brd
   , _gameTurn = newTurn (head ps)
+  , _gameSupply = bagFromNumList [ (r,24) | r <- enumAll, r /= Gray ]
   }
   where
   mkP r p = let (r1,r2) = splitRNG r
@@ -150,4 +153,7 @@ doUpdate upd =
 
     ChangeTile loc t ->
       Right . setField (gameBoard .> tileAt loc) t
+
+    ChangeSupply r n ->
+      Right . updField gameSupply (bagChange n r)
 
