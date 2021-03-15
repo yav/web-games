@@ -3,6 +3,8 @@ const uiPlayer = (p, s) => {
   const dom = div('player')
   const bag = {}
 
+  setSize(dom, 'width', 17.5 * iconSize)
+
   for (b in s._playerBag) {
     bag[b] = uiBag(b,s._playerBag[b])
   }

@@ -142,7 +142,7 @@ svg.gray     { fill: #ccc }
 
 .tech {
   background-color: white;
-  display: block;
+  display: inline-block;
 }
 
 .tech .heading {
@@ -278,7 +278,7 @@ svg.gray     { fill: #ccc }
 
 .bag {
   vertical-align: middle;
-  display: block;
+  display: inline-block;
   background-color: black;
   min-width:  1em;
   position: relative;
