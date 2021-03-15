@@ -11,20 +11,11 @@ import Geometry
 import RuinToken
 import Tile
 
-{-
-populateTiles :: RNG -> Board -> Board
-populateTiles rng0 = undefined
-  where
-  (tokBronze,rng1) = shuffle bronzeTokens rng0
-  (tokSilver,rng2) = shuffle silverTokens rng1
-  (tokGold,_)      = shuffle silverTokens rng2
 
-  doTile t
--}
-
---XXX
 populateTiles :: RNG -> Board -> Board
-populateTiles _ b = b
+populateTiles r = runSetupM (shuffleTokens r) .
+                  traverseField boardMap (traverse setupTile)
+
 
 setupBoard :: RNG -> Bool -> [(Maybe PlayerId,Maybe Resource)] -> Board
 setupBoard rng0 useFog rs = populateTiles rng2

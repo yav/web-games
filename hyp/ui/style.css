@@ -24,6 +24,11 @@ body {
 .gray        { background-color: #ccc !important }
 .inner       { background-color: transparent !important; }
 
+.Bronze      { background-color: #960 !important; color: #000 !important; }
+.Silver      { background-color: #ccc !important; color: #000 !important; }
+.Gold        { background-color: #ff0 !important; color: #000 !important; }
+
+
 svg.red      { fill: #c00 }
 svg.green    { fill: #090 }
 svg.purple   { fill: #909 }

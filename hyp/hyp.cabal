@@ -35,6 +35,7 @@ library
   build-depends:
     base, containers, text,
     aeson,
+    monadLib,
     common-utils
 
   ghc-options: -Wall

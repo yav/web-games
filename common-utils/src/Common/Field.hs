@@ -21,6 +21,9 @@ infixr 4 `updField`
 updField :: Field r a -> (a -> a) -> r -> r
 updField x f = \r -> setField x (f (getField x r)) r
 
+traverseField :: Functor m => Field r a -> (a -> m a) -> r -> m r
+traverseField x f = \r -> (\v -> setField x v r) <$> f (getField x r)
+
 
 mapAt :: Ord a => a -> Field (Map a b) b
 mapAt a = Field

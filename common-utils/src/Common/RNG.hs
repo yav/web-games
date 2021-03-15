@@ -61,4 +61,3 @@ shuffle xs (RNG g0)
        MVector.write v a y
        MVector.write v b x
 
-

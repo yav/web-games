@@ -1,11 +1,19 @@
 module RuinToken where
 
+import Data.Map(Map)
+import qualified Data.Map as Map
+import Data.Aeson(ToJSON)
+import GHC.Generics(Generic)
+
+import Common.RNG
 import Common.Utils(enumAll)
+
 
 import Resource
 import Action
 
 data TokenType = Bronze | Silver | Gold
+  deriving (Eq,Ord,Show,Generic,ToJSON)
 
 startTokens :: TokenType -> Int
 startTokens ty =
@@ -18,6 +26,16 @@ data Token = Token
   { tokenType   :: TokenType
   , tokenAction :: Action
   }
+
+type RuinTokens = Map TokenType [Token]
+
+shuffleTokens :: RNG -> RuinTokens
+shuffleTokens r0 = Map.fromList [ (Bronze,b), (Silver,s), (Gold,g) ]
+  where
+  (b,r1) = shuffle bronzeTokens r0
+  (s,r2) = shuffle silverTokens r1
+  (g,_)  = shuffle goldTokens   r2
+
 
 tokenList :: TokenType -> [Action] -> [Token]
 tokenList ty as = [ Token { tokenType = ty, tokenAction = a } | a <- as ]

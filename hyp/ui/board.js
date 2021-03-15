@@ -357,7 +357,11 @@ const uiRuin = (el, pos, ruinId, ruin) => {
   setOcc(ruin.ruinSpot)
 
   let tokens = ruin.ruinTokens
-  // XXX: tokens
+  const tokenDom = badge(tokens)
+  tokenDom.classList.add('top')
+  tokenDom.classList.add('left')
+  tokenDom.classList.add(ruin.ruinType)
+  dom.appendChild(tokenDom)
 
 
   return {
