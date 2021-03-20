@@ -13,24 +13,24 @@ emptyPlayerBoard =
       , [Exact Green, Exact Purple ] ~> Action [ Move, PlaceWorker ]
       ]
 
-  , def "Millitary"
-      [ [ Exact Red, AnyNormal ]   ~> (Attack `Or` (Fortify `Times` 2))
-      , [ Exact Red, Exact Green ] ~> Action [ Attack, Move ]
-      ]
-
-  , def "Population"
-      [ [ Exact Purple, AnyNormal ] ~> Action [ PlaceWorker, Fortify ]
-      , [ Exact Purple, Exact Red ] ~> Action [ PlaceWorker, Attack ]
-      ]
-
   , def "Engineering"
       [ [ Exact Orange, AnyNormal ]  ~> Action [ Develop (Different 2) ]
       , [ Exact Orange, Exact Blue ] ~> Action [ Develop (Same 2) ]
       ]
 
+  , def "Millitary"
+      [ [ Exact Red, AnyNormal ]   ~> (Attack `Or` (Fortify `Times` 2))
+      , [ Exact Red, Exact Green ] ~> Action [ Attack, Move ]
+      ]
+
   , def "Commerce"
       [ [ Exact Yellow, AnyNormal ]    ~> Action [ Gem ]
       , [ Exact Yellow, Exact Orange ] ~> Action [ Gem, Develop Any ]
+      ]
+
+  , def "Population"
+      [ [ Exact Purple, AnyNormal ] ~> Action [ PlaceWorker, Fortify ]
+      , [ Exact Purple, Exact Red ] ~> Action [ PlaceWorker, Attack ]
       ]
 
   , def "Research"

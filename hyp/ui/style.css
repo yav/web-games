@@ -3,6 +3,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: start;
+  justify-content: center;
   padding: 0;
   background-color: #102;
 }
@@ -313,7 +314,7 @@ svg.gray {
   margin: 1em;
   background-color: #203;
   border-radius: 0.5em;
-  outline: 1px solid #ecf;
+  outline: 0.2em solid #ecf;
   outline-offset: 0.2em;
   overflow: auto;
 }
@@ -472,7 +473,6 @@ svg.gray {
   display: block;
   background-color: white;
   border: 0.1em solid #ecf;
-  border-radius: 0.2em;
   padding-left: 0.2em;
   color: black;
   left: 0;
