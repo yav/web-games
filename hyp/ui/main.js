@@ -46,8 +46,14 @@ function uiRedraw(state) {
   const game = state.game
   const body = document.getElementById('main')
 
+  gui.mainPanel = div('mainPanel')
+  body.appendChild(gui.mainPanel)
+
+  gui.turn = uiTurn(game._gameTurn)
+  gui.mainPanel.appendChild(gui.turn.dom)
+
   gui.board = uiBoard(state.game._gameBoard)
-  body.appendChild(gui.board.dom)
+  gui.mainPanel.appendChild(gui.board.dom)
 
 
   const players = game._gamePlayers
@@ -59,10 +65,6 @@ function uiRedraw(state) {
   }
 
 
-  gui.menu = div('menu')
-  body.appendChild(gui.menu)
-  gui.turn = uiTurn(game._gameTurn)
-  body.appendChild(gui.turn.dom)
 
   uiQuestions(state.questions)
 }

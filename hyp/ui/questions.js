@@ -55,7 +55,7 @@ const uiQuestion = (q) => {
       const btn = div('button')
       btn.textContent = txt
       newQuestion(btn,q)
-      gui.menu.appendChild(btn)
+      gui.turn.dom.appendChild(btn)
     },
     AskUpgrade: (c)       => gui.player[playerId].upgrade.ask(c,q),
     AskReadyAction: (r)   => gui.turn.askBasic(r,q),

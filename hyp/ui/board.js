@@ -20,9 +20,9 @@ const uiBoard = (b) => {
   }
   const w = maxX - minX + hexSize
   const h = maxY - minY + hexSize
-  setDim(dom,w,h)
-  originX = -minX;
-  originY = -minY;
+  setDim(dom,w+iconSize,h+iconSize)
+  originX = -minX + iconSize/2;
+  originY = -minY + iconSize/2;
 
   const board = {}
   for (let i = 0; i < b.length; ++i) {
@@ -89,6 +89,20 @@ const uiHex = (container,info) => {
   const pos = uiHexLoc(loc)
   setSize(dom,'left',pos.x)
   setSize(dom,'top',pos.y)
+
+  const bord = div('hex')
+  const w = 0.025
+  setDim(bord,(1+2*w)*hexSize,(1+2*w)*hexSize)
+  const off = w * hexSize
+  setSize(bord,'left',pos.x - off)
+  setSize(bord,'top',pos.y - off)
+  bord.classList.add('border')
+  container.appendChild(bord)
+  console.log(h)
+  if (h.tileCapital !== null) {
+    bord.classList.add(playerColors[h.tileCapital])
+    bord.style.zIndex = 1
+  }
 
   const bg = div('bg')
   bg.classList.add(h.tileTerrain)
@@ -308,16 +322,7 @@ const uiCity = (el,pos,cityId, city) => {
   setSize(dom,'top',pos.y)
   el.appendChild(dom)
 
-  const capital = city.cityCapital
-
-  if (capital) {
-    const pic = svg('img/capitol.svg#capitol')
-    pic.classList.add('inner')
-    pic.classList.add(playerColors[capital])
-    setDim(pic,iconSize,iconSize)
-    dom.appendChild(pic)
-  }
-  else dom.classList.add('city')
+  dom.classList.add('city')
 
   const h = div('part')
   const help = uiAction(city.cityActions).dom

@@ -37,6 +37,7 @@ data Tile = Tile
   , _tileRuins    :: Map RuinId Ruin
   , _tileVisible  :: Bool
   , tilePlayers   :: Map PlayerId PlayerUnits
+  , _tileCapital  :: Maybe PlayerId
   }
 
 data PlayerUnits = PlayerUnits
@@ -65,7 +66,6 @@ data TileSpot =
 data City = City
   { _citySpot   :: TileSpot
   , cityActions :: Action
-  , cityCapital :: Maybe PlayerId
   } deriving (Generic, ToJSON)
 
 data Ruin = Ruin
@@ -126,9 +126,7 @@ countWorkersOnTile pid t = free + fromMap citySpot tileCities +
 
 
 setCapital :: Maybe PlayerId -> Tile -> Tile
-setCapital p = updField tileCities (fmap citySetCapital)
-  where
-  citySetCapital c = c { cityCapital = p }
+setCapital p = setField tileCapital p
 
 isStartTile :: Tile -> Bool
 isStartTile t =
@@ -245,6 +243,7 @@ instance ToJSON Tile where
           , "tileCities" .= getField tileCities t
           , "tileRuins" .= getField tileRuins t
           , "tilePlayers" .= tilePlayers t
+          , "tileCapital" .= getField tileCapital t
           ]
 
 instance ToJSON Ruin where
@@ -264,6 +263,7 @@ defTile' name ter cs rs = Tile
   , _tileRuins    = Map.fromList (zip [ 0 .. ] rs)
   , _tileVisible  = False
   , tilePlayers   = Map.empty
+  , _tileCapital  = Nothing
   }
 
 defTile :: Int -> Terrain -> [City] -> [Ruin] -> Tile
@@ -272,7 +272,6 @@ defTile n = defTile' (TileNum n)
 defCity :: Action -> City
 defCity as = City { _citySpot   = Empty
                   , cityActions = as
-                  , cityCapital = Nothing
                   }
 
 defRuin :: TokenType -> Ruin

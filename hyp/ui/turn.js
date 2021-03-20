@@ -1,7 +1,6 @@
 
 const uiTurn = (tu) => {
   const dom = div('turn')
-  dom.appendChild(span(tu.turnPlayer))
 
   let sReady = {}
   let sIfs   = {}
@@ -10,6 +9,7 @@ const uiTurn = (tu) => {
   const actKey = (a) => JSON.stringify(a)
 
   const draw = (t) => {
+    dom.appendChild(span(tu.turnPlayer))
     basic = {}
     const ready = t._turnReady
     for (let i = 0; i < ready.length; ++i) {
