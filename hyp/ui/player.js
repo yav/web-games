@@ -1,4 +1,11 @@
 
+const uiPlayerBadge = (p) => {
+  const dom = div('player-badge')
+  dom.textContent = p
+  dom.classList.add(playerColors[p])
+  return dom
+}
+
 const uiPlayer = (p, s) => {
   const dom = div('player')
   const bag = {}
@@ -9,12 +16,11 @@ const uiPlayer = (p, s) => {
     bag[b] = uiBag(b,s._playerBag[b])
   }
   const ui = { bag: bag
-             , stats:    uiPlayerStats(s)
+             , stats:    uiPlayerStats(p,s)
              , upgrade:  uiUpgrade(s._playerDevel)
              , techs:    uiPlayerTech(s._playerTech)
              , dom: dom
              }
-  dom.appendChild(span(p + (playerId === p ? ' (us)' : '')))
   dom.appendChild(ui.stats.dom)
   dom.appendChild(ui.bag['BagSource'].dom)
   dom.appendChild(ui.upgrade.dom)
@@ -24,7 +30,7 @@ const uiPlayer = (p, s) => {
   return ui
 }
 
-const uiPlayerStats = (p) => {
+const uiPlayerStats = (player,p) => {
   const dom = div('stats')
 
   let gems = p._playerGems
@@ -56,6 +62,10 @@ const uiPlayerStats = (p) => {
 
   for (let i = 0; i < p._playerCaptured.length; ++i)
     addCaptured(p._playerCaptured[i])
+
+  const badge = uiPlayerBadge(player)
+  badge.style.float = 'right'
+  dom.appendChild(badge)
 
   return {
     dom: dom,

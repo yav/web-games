@@ -56,15 +56,24 @@ function uiRedraw(state) {
   gui.mainPanel.appendChild(gui.board.dom)
 
 
-  const players = game._gamePlayers
+  let drawNext = 0
+  const turnOrder = game.gameTurnOrder
+  const playerNum = turnOrder.length
+  for (; drawNext < playerNum; ++drawNext) {
+    if (turnOrder[drawNext] == playerId) break
+  }
+  if (drawNext >= playerNum) drawNext = 0
+
   const ps = {}
   gui.player = ps
-  for (p in players) {
+  const players = game._gamePlayers
+  for (let todo = playerNum; todo > 0; --todo) {
+    const p = turnOrder[drawNext]
     ps[p] = uiPlayer(p, players[p])
     body.appendChild(ps[p].dom)
+    ++drawNext
+    if (drawNext >= playerNum) drawNext = 0
   }
-
-
 
   uiQuestions(state.questions)
 }

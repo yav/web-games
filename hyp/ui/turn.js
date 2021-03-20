@@ -9,7 +9,9 @@ const uiTurn = (tu) => {
   const actKey = (a) => JSON.stringify(a)
 
   const draw = (t) => {
-    dom.appendChild(span(tu.turnPlayer))
+    dom.appendChild(span('Turn: '))
+    dom.appendChild(uiPlayerBadge(tu.turnPlayer))
+    dom.appendChild(span(' '))
     basic = {}
     const ready = t._turnReady
     for (let i = 0; i < ready.length; ++i) {

@@ -91,14 +91,13 @@ const uiHex = (container,info) => {
   setSize(dom,'top',pos.y)
 
   const bord = div('hex')
-  const w = 0.025
+  const w = 0.04
   setDim(bord,(1+2*w)*hexSize,(1+2*w)*hexSize)
   const off = w * hexSize
   setSize(bord,'left',pos.x - off)
   setSize(bord,'top',pos.y - off)
   bord.classList.add('border')
   container.appendChild(bord)
-  console.log(h)
   if (h.tileCapital !== null) {
     bord.classList.add(playerColors[h.tileCapital])
     bord.style.zIndex = 1
