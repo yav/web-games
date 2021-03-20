@@ -64,8 +64,6 @@ function uiRedraw(state) {
   gui.turn = uiTurn(game._gameTurn)
   body.appendChild(gui.turn.dom)
 
-
-
   uiQuestions(state.questions)
 }
 

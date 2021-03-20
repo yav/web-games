@@ -17,9 +17,9 @@ const uiPlayer = (p, s) => {
   dom.appendChild(span(p + (playerId === p ? ' (us)' : '')))
   dom.appendChild(ui.stats.dom)
   dom.appendChild(ui.bag['BagSource'].dom)
+  dom.appendChild(ui.upgrade.dom)
   dom.appendChild(ui.bag['BagReady'].dom)
   dom.appendChild(ui.bag['BagDiscard'].dom)
-  dom.appendChild(ui.upgrade.dom)
   dom.appendChild(ui.techs.dom)
   return ui
 }

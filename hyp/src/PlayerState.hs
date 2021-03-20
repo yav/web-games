@@ -51,8 +51,8 @@ declareFields ''PlayerState
 
 emptyPlayerState :: RNG -> PlayerState
 emptyPlayerState rng =
-  foldl (flip playerGainTech) s0 $ emptyPlayerBoard ++
-                                   reverse (deck1 ++ deck2 ++ deck3 ++ deck4)
+  foldl (flip playerGainTech) s0 emptyPlayerBoard
+                                  -- reverse (deck1 ++ deck2 ++ deck3 ++ deck4)
   where
   s0 =
    PlayerState

@@ -3,7 +3,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   padding: 0;
-  background-color: #036;
+  background-color: #102;
 }
 
 
@@ -191,8 +191,10 @@ svg.gray     { fill: #ccc }
   display: inline-block;
   position: relative;
   margin: 1em;
-  background: #000;
+  background-color: blue;
   border-radius: 0.5em;
+  outline: 1px solid #c9b;
+  outline-offset: 0.2em;
 }
 
 .hex {
@@ -269,6 +271,7 @@ svg.gray     { fill: #ccc }
   background-color: white;
   color: black;
   border: 0.2em solid #963;
+  margin: 0.2em;
 }
 
 .player .stats {
