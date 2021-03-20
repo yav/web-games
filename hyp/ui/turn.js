@@ -10,7 +10,7 @@ const uiTurn = (tu) => {
 
   const draw = (t) => {
     dom.appendChild(span('Turn: '))
-    dom.appendChild(uiPlayerBadge(tu.turnPlayer))
+    dom.appendChild(uiPlayerBadge(t.turnPlayer))
     dom.appendChild(span(' '))
     basic = {}
     const ready = t._turnReady
