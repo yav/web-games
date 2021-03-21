@@ -1,10 +1,62 @@
 module Tech where
 
 import Data.Text(Text)
+import Data.Map(Map)
+import qualified Data.Map as Map
+import Data.List(mapAccumL)
+import GHC.Generics(Generic)
+import Data.Aeson(FromJSON,ToJSON(toJSON),ToJSONKey(..),
+                    genericToJSONKey,defaultJSONKeyOptions)
+
+import Common.Field
+import Common.RNG
 
 import Resource
 import Action
 
+data DeckName = Deck1 | Deck2 | Deck3 | Deck4
+  deriving (Eq,Ord,Show,Enum,Bounded,Generic,FromJSON,ToJSON)
+
+data Market = Market
+  { _marketDeck  :: [Tech]
+  , _marketOffer :: [Tech]
+  }
+
+declareFields ''Market
+
+instance ToJSON Market where
+  toJSON = toJSON . getField marketOffer
+
+instance ToJSONKey DeckName where
+  toJSONKey = genericToJSONKey defaultJSONKeyOptions
+
+newMarkets :: RNG -> (Map DeckName Market, RNG)
+newMarkets rng0 = case mapAccumL doDeck rng0 decks of
+                    (xs,r) -> (Map.fromList r, xs)
+  where
+  doDeck r (x,as) = case shuffle as r of
+                      (bs,r1) -> (r1,(x,Market { _marketDeck = ds
+                                               , _marketOffer = os
+                                               }))
+                         where (os,ds) = splitAt 2 bs
+
+  decks = [(Deck1,deck1),(Deck2,deck2),(Deck3,deck3),(Deck4,deck4)]
+
+resetMarket :: Market -> Market
+resetMarket m =
+  case splitAt 2 (getField marketDeck m ++ getField marketOffer m) of
+    (as,bs) -> Market { _marketDeck = bs, _marketOffer = as }
+
+-- | Assumes tech exists
+getMarket :: Int -> Market -> (Tech,Market)
+getMarket n m =
+  case splitAt n (getField marketOffer m) of
+    ~(as,b:bs) ->
+      case getField marketDeck m of
+        []   -> (b, setField marketOffer (as ++ bs) m)
+        x:xs -> (b, Market { _marketDeck = xs, _marketOffer = as ++ x : bs })
+
+--------------------------------------------------------------------------------
 
 defTech ::
   Int           {-^ VP -} ->

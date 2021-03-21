@@ -20,6 +20,8 @@ import Tile
 import Layout
 import PlayerState
 import Turn
+import Tech
+import Action
 
 
 data Update =
@@ -45,6 +47,8 @@ data Update =
 
   | ChangeTile Loc Tile
 
+  | SetMarket DeckName Market
+
   deriving (Generic,ToJSON)
 
 
@@ -56,7 +60,7 @@ data State = State
   , _gameEndOn    :: Maybe PlayerId
   , _gameBoard    :: Board
   , _gameSupply   :: Bag Resource
-  -- tech market
+  , _gameMarkets  :: Map DeckName Market
 
   } deriving (Generic,ToJSON)
 
@@ -74,11 +78,13 @@ initialState rng useFog ps = State
   , _gameBoard = brd
   , _gameTurn = newTurn (head ps)
   , _gameSupply = bagFromNumList [ (r,24) | r <- enumAll, r /= Gray ]
+  , _gameMarkets = markets
   }
   where
   mkP r p = let (r1,r2) = splitRNG r
             in (r1, (p, emptyPlayerState r2))
-  (boardRng,pstates) = mapAccumL mkP rng ps
+  (marketRng,pstates) = mapAccumL mkP rng ps
+  (markets,boardRng) = newMarkets marketRng
   brd = setupBoard boardRng useFog [ (Just p, Nothing) | p <- ps ]
 
 playerState :: PlayerId -> Field State PlayerState
@@ -157,3 +163,5 @@ doUpdate upd =
     ChangeSupply r n ->
       Right . updField gameSupply (bagChange n r)
 
+    SetMarket d m ->
+      Right . setField (gameMarkets .> mapAt d) m

@@ -11,6 +11,7 @@ import Resource
 import Tile
 import Geometry
 import PlayerState
+import Tech
 import AppTypes
 
 doPlaceWorkerOnCapital :: PlayerId -> Interact ()
@@ -49,5 +50,4 @@ doDrawCube playerId =
             update (ChangeBag playerId BagSource r (-1))
             update (ChangeBag playerId BagReady  r ( 1))
             pure True
-
 

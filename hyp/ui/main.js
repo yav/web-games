@@ -75,6 +75,9 @@ function uiRedraw(state) {
     if (drawNext >= playerNum) drawNext = 0
   }
 
+  gui.markets = uiMarkets(game._gameMarkets)
+  body.appendChild(gui.markets.dom)
+
   uiQuestions(state.questions)
 }
 

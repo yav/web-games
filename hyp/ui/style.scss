@@ -1,5 +1,5 @@
 $page-bg:     #102;
-$page-border: #ecf;
+$page-border: #636; /* #ecf; */
 $board-bg:    #203;
 
 $red    : #c00;
@@ -288,11 +288,12 @@ svg.gray     { fill: $gray; }
   padding-right: 0.2em;
   border-radius: 0.2em;
   margin:        0.2em;
+  padding: 0;
 }
 
 .player {
   display: inline-block;
-  background-color: white;
+  background-color: $board-bg;
   color: black;
   border: 0.2em solid $page-border;
   margin-left: 0.2em;
@@ -302,6 +303,7 @@ svg.gray     { fill: $gray; }
 .player .stats {
   background-color: #000;
   color: #fff;
+  margin: 0;
 }
 
 .bag {
@@ -336,7 +338,7 @@ svg.gray     { fill: $gray; }
 .turn {
   display: block;
   background-color: white;
-  border: 0.1em solid $page-border;
+  border: 0.2em solid $page-border;
   padding-left: 0.2em;
   color: black;
   left: 0;
@@ -358,4 +360,12 @@ svg.gray     { fill: $gray; }
   border-radius: 0.2em;
   margin: 0.2em;
   display: inline-block;
+}
+
+/* -------------------------------------------------------- */
+.market {
+  border: 0.2em solid $page-border;
+  background-color: $board-bg;
+  color: $page-border !important;
+  margin: 0.2em;
 }
