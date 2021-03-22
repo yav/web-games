@@ -196,11 +196,10 @@ svg.gray     { fill: $gray; }
   padding:0;
   display: inline-block;
   position: relative;
-  margin: 0.2em;
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
   background-color: $board-bg;
   border-radius: 0.5em;
-  /* outline: 0.2em solid $page-border; */
-  /* outline: 0.2em solid $page-border; */
   border: 0.2em solid $page-border;
   overflow: auto;
 }
@@ -303,8 +302,9 @@ svg.gray     { fill: $gray; }
   background-color: $board-bg;
   color: black;
   border: 0.2em solid $page-border;
-  margin-left: 0.2em;
-  margin-bottom: 0.2em;
+  border-radius: 0.5em;
+  margin-left: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .player .stats {
@@ -346,6 +346,7 @@ svg.gray     { fill: $gray; }
   display: block;
   background-color: white;
   border: 0.2em solid $page-border;
+  border-radius: 0.5em;
   padding-left: 0.2em;
   color: black;
   left: 0;
@@ -370,13 +371,17 @@ svg.gray     { fill: $gray; }
 }
 
 /* -------------------------------------------------------- */
+.markets {
+  border: 0.2em solid $page-border;
+  border-radius: 0.5em;
+  background-color: $board-bg;
+  color: $page-border !important;
+}
+
 .market {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  border: 0.2em solid $page-border;
-  background-color: $board-bg;
-  color: $page-border !important;
   margin: 0.2em;
 }
 
