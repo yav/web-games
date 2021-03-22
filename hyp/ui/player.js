@@ -1,3 +1,28 @@
+const uiPlayers = (turnOrder, players) => {
+  let drawNext = 0
+  const playerNum = turnOrder.length
+  for (; drawNext < playerNum; ++drawNext) {
+    if (turnOrder[drawNext] == playerId) break
+  }
+  if (drawNext >= playerNum) drawNext = 0
+
+  const dom = div('players')
+
+  const ps = {}
+
+  for (let todo = playerNum; todo > 0; --todo) {
+    const p = turnOrder[drawNext]
+    ps[p] = uiPlayer(p, players[p])
+    dom.appendChild(ps[p].dom)
+    ++drawNext
+    if (drawNext >= playerNum) drawNext = 0
+  }
+
+  return {
+    dom: dom,
+    players: ps
+  }
+}
 
 const uiPlayerBadge = (p) => {
   const dom = div('player-badge')

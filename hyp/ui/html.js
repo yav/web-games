@@ -7,6 +7,10 @@ function div(classes) {
   return dom
 }
 
+const br = () => {
+  return document.createElement('br')
+}
+
 
 function span(x) {
   const dom = document.createElement('span')

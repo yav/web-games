@@ -312,11 +312,12 @@ svg.gray {
   padding: 0;
   display: inline-block;
   position: relative;
-  margin: 1em;
+  margin: 0.2em;
   background-color: #203;
   border-radius: 0.5em;
-  outline: 0.2em solid #636;
-  outline-offset: 0.2em;
+  /* outline: 0.2em solid $page-border; */
+  /* outline: 0.2em solid $page-border; */
+  border: 0.2em solid #636;
   overflow: auto;
 }
 
@@ -429,6 +430,12 @@ svg.gray {
   padding: 0;
 }
 
+.players {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
 .player {
   display: inline-block;
   background-color: #203;
@@ -510,9 +517,18 @@ svg.gray {
 
 /* -------------------------------------------------------- */
 .market {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
   border: 0.2em solid #636;
   background-color: #203;
   color: #636 !important;
+  margin: 0.2em;
+}
+
+.deck-name {
+  display: inline-block;
+  text-align: center;
   margin: 0.2em;
 }
 
