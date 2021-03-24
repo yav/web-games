@@ -43,9 +43,9 @@ const uiTurn = (tu) => {
       dom.innerHTML = ''
       draw(t)
     },
-    askBasic: (r,q) => { existingQuestion(sReady[actKey(r)],q) },
-    askIf: (n,q) => { existingQuestion(sIfs[n].left,q) },
-    askOrLeft: (n,q) => { existingQuestion(sOrs[n].left,q) },
-    askOrRight: (n,q) => { existingQuestion(sOrs[n].right,q) }
+    askBasic: (r,q) => { existingQuestion(sReady[actKey(r)],true,q) },
+    askIf: (n,q) => { existingQuestion(sIfs[n].left,true,q) },
+    askOrLeft: (n,q) => { existingQuestion(sOrs[n].left,true,q) },
+    askOrRight: (n,q) => { existingQuestion(sOrs[n].right,true,q) }
   }
 }

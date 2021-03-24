@@ -5,9 +5,9 @@ const removeQuestions = () => {
   gui.questions = []
 }
 
-const existingQuestion = (el,q) => {
+const existingQuestion = (el,above,q) => {
   el.classList.add('question')
-  const help = tooltip(el,false,q.chHelp)
+  const help = tooltip(el,above,q.chHelp)
 
   const onClick = () => {
     removeQuestions()
@@ -47,7 +47,7 @@ const uiQuestion = (q) => {
     AskCubeLoc: (x) => {
       const dom = gui.player[playerId]
                      .techs.tech[x.cubeTech].alt[x.cubeAlt].spot[x.cubeSpot].dom
-      existingQuestion(dom,q)
+      existingQuestion(dom,false,q)
     },
     AskReady: (r) => gui.player[playerId].bag.BagReady.ask(r,q),
     AskDiscard: (r) => gui.player[playerId].bag.BagDiscard.ask(r,q),

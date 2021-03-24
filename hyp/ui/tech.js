@@ -104,7 +104,7 @@ const uiTech = (t) => {
   return {
     dom: dom,
     alt: as,
-    ask: (q) => existingQuestion(dom,q)
+    ask: (q) => existingQuestion(dom,true,q)
   }
 }
 

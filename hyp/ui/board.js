@@ -267,7 +267,7 @@ const uiSoldier = (el,pos,p,info) => {
       update()
       return free + lock + fort > 0
     },
-    ask: (q) => { console.log('ask'); existingQuestion(dom,q) }
+    ask: (q) => { console.log('ask'); existingQuestion(dom,false,q) }
   }
 }
 
@@ -342,7 +342,7 @@ const uiCity = (el,pos,cityId, city) => {
 
   return {
     set: setOcc,
-    ask: (q) => existingQuestion(dom,q)
+    ask: (q) => existingQuestion(dom,false,q)
   }
 }
 

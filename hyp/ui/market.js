@@ -43,7 +43,7 @@ const uiMarket = (deck,offer) => {
   return {
     dom: dom,
     setOffers: setOffers,
-    askMarketDeck: (q) => existingQuestion(name,q),
+    askMarketDeck: (q) => existingQuestion(name,false,q),
     askMarketItem: (n,q) => offers[n].ask(q)
   }
 

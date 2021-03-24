@@ -173,7 +173,7 @@ const uiBag = (name,bag) => {
       const x = cubes[r] ? cubes[r].number : 0
       setR(r, x+n)
     },
-    ask:    (r,q) => { existingQuestion(cubes[r].dom,q) }
+    ask:    (r,q) => { existingQuestion(cubes[r].dom,false,q) }
   }
 }
 
@@ -223,6 +223,6 @@ const uiUpgrade = (bag) => {
       if (ui.number < 0) ui.number = 0
       ui.ba.textContent = ui.number
     },
-    ask: (c,q) => { existingQuestion(number[c].dom,q) }
+    ask: (c,q) => { existingQuestion(number[c].dom,false,q) }
   }
 }
