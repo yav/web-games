@@ -266,6 +266,7 @@ svg.gray {
 .tech {
   background-color: white;
   display: inline-block;
+  position: relative;
 }
 
 .tech .heading {
@@ -488,6 +489,10 @@ svg.gray {
   outline-color: white;
 }
 
+.market .question {
+  outline-color: white;
+}
+
 .turn {
   display: block;
   background-color: white;
@@ -535,6 +540,7 @@ svg.gray {
   display: inline-block;
   text-align: center;
   margin: 0.2em;
+  position: relative;
 }
 
 /*# sourceMappingURL=style.css.map */

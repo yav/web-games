@@ -18,7 +18,6 @@ import Resource
 import Action
 import Bag
 import BoardActions
-import Tech
 
 
 type TechId = Int
@@ -70,6 +69,9 @@ emptyPlayerState rng =
 playerGainTech :: Tech -> PlayerState -> PlayerState
 playerGainTech t = updField playerTech add
   where add mp = Map.insert (Map.size mp) t mp
+
+playerNextTechId :: PlayerState -> TechId
+playerNextTechId = Map.size . getField playerTech
 
 techAltFor :: CubeLoc -> Field PlayerState TechAlt
 techAltFor loc =

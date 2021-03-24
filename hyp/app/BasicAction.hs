@@ -2,6 +2,7 @@ module BasicAction where
 
 import Control.Monad(replicateM_,void)
 import Data.List(delete)
+import qualified Data.Map as Map
 
 import Common.Basics
 import Common.Field
@@ -15,6 +16,7 @@ import Action
 import Turn
 import PlayerState
 import AppTypes
+import Tech
 
 import Common
 
@@ -31,7 +33,7 @@ doBasicAction playerId ba =
     Fortify -> todo
     Develop ctr -> doSimple ba $ doUpgrade playerId ctr
 
-    GainTech -> todo
+    GainTech -> doSimple ba $ doGainTech playerId True
     DrawResource -> doSimple ba $ void $ doDrawCube playerId
     ReturnResource -> doSimple ba $ doReturnResource playerId
     SwapResource _ _ -> todo
@@ -151,4 +153,32 @@ doReturnResource playerId =
            ~(AskDiscard r) ->
              do update (ChangeBag playerId BagDiscard r (-1))
                 update (ChangeBag playerId BagSource  r 1)
+
+doGainTech :: PlayerId -> Bool -> Interact ()
+doGainTech playerId withReset =
+  do market <- view (getField gameMarkets)
+     let resetOpts d
+           | withReset = [ (AskMarketDeck d, "Reset technologies") ]
+           | otherwise = []
+         optsFor (d,m) =
+           resetOpts d ++
+           [ (AskMarketItem d n, "Gain tech")
+           | (n,_) <- zip [ 0 .. ] (getField marketOffer m)
+           ]
+
+     ch <- choose playerId (concatMap optsFor (Map.toList market))
+     case ch of
+       AskMarketDeck d ->
+         case Map.lookup d market of
+           Just m1 -> do update (SetMarket d (resetMarket m1))
+                         doGainTech playerId False
+           Nothing -> pure ()
+       ~(AskMarketItem d n) ->
+         case Map.lookup d market of
+           Just m1 ->
+             do let (t,m2) = getMarket n m1
+                player <- view (getField (playerState playerId))
+                update (AddTech playerId (playerNextTechId player) t)
+                update (SetMarket d m2)
+           Nothing -> pure ()
 

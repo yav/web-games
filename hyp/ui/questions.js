@@ -65,7 +65,9 @@ const uiQuestion = (q) => {
     AskCity: (loc,id)     => gui.board.askCity(loc,id,q),
     AskRuin: (loc,id)     => gui.board.askRuin(loc,id,q),
     AskUnit: (loc,pid)    => gui.board.askUnit(loc,pid,q),
-    AskMap: (loc,a)       => gui.board.askMap(loc,a,q)
+    AskMap: (loc,a)       => gui.board.askMap(loc,a,q),
+    AskMarketItem: (d,n)  => gui.markets.askMarketItem(d,n,q),
+    AskMarketDeck: (d)    => gui.markets.askMarketDeck(d,q)
   })(q.chChoice)
 
 }

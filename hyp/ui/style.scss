@@ -149,6 +149,7 @@ svg.gray     { fill: $gray; }
 .tech {
   background-color: white;
   display: inline-block;
+  position: relative;
 }
 
 .tech .heading {
@@ -341,6 +342,7 @@ svg.gray     { fill: $gray; }
 .tech .question { outline-color: black; }
 .turn .question { outline-color: black; }
 .board .question { outline-color: white; }
+.market .question { outline-color: white; }
 
 .turn {
   display: block;
@@ -389,4 +391,5 @@ svg.gray     { fill: $gray; }
   display: inline-block;
   text-align: center;
   margin: 0.2em;
+  position: relative;
 }

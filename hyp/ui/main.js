@@ -93,5 +93,7 @@ const uiUpdate = hsUpdate (
   , SetUnithighlight: (loc,pid,yes) => gui.board.setUnitHighlight(loc,pid,yes)
   , SetCity: (loc,cityId,spot)  => { console.log(spot); gui.board.setCity(loc,cityId,spot) }
   , SetRuin: (loc,ruinId,spot)  => gui.board.setCity(loc,ruinId,spot)
-  , ChangeTile: (loc,t) => gui.board.changeTile(loc,t)
+  , ChangeTile: (loc,t)         => gui.board.changeTile(loc,t)
+  , SetMarket: (d,m)            => gui.markets.setOffers(d,m)
+  , AddTech: (pid,tid,t)        => gui.player[pid].techs.add(tid,t)
   })

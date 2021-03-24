@@ -39,6 +39,8 @@ data Update =
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
 
+  | AddTech PlayerId TechId Tech
+
   | ChangeUnit PlayerId UnitType Loc Int
   | SetUnithighlight Loc PlayerId Bool
 
@@ -165,3 +167,8 @@ doUpdate upd =
 
     SetMarket d m ->
       Right . setField (gameMarkets .> mapAt d) m
+
+    AddTech playerId techId tech ->
+      Right . updField (playerState playerId .> playerTech)
+                       (Map.insert techId tech)
+

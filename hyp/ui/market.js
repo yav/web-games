@@ -13,17 +13,23 @@ const uiMarkets = (ms) => {
 
   return {
     dom: dom,
-    setOffers: (d,m) => decks[d].setOffers(m)
+    setOffers: (d,m) => decks[d].setOffers(m),
+    askMarketDeck: (d,q) => decks[d].askMarketDeck(q),
+    askMarketItem: (d,n,q) => decks[d].askMarketItem(n,q)
   }
 }
 
 
 const uiMarket = (deck,offer) => {
   const dom = div('market')
-  let offers
-  dom.appendChild(uiMarketName(deck))
+  let offers = []
+  const name = uiMarketName(deck)
+  dom.appendChild(name)
 
   const setOffers = (os) => {
+    for (let i = 0; i < offers.length; ++i)
+      offers[i].dom.remove()
+
     offers = []
     for (let i = 0; i < os.length; ++i) {
       const o = uiTech(os[i])
@@ -36,7 +42,9 @@ const uiMarket = (deck,offer) => {
 
   return {
     dom: dom,
-    setOffers: setOffers
+    setOffers: setOffers,
+    askMarketDeck: (q) => existingQuestion(name,q),
+    askMarketItem: (n,q) => offers[n].ask(q)
   }
 
 }

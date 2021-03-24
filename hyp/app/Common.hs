@@ -11,7 +11,6 @@ import Resource
 import Tile
 import Geometry
 import PlayerState
-import Tech
 import AppTypes
 
 doPlaceWorkerOnCapital :: PlayerId -> Interact ()

@@ -101,7 +101,11 @@ const uiTech = (t) => {
     as[i] = uiActivation(alts[i])
     dom.appendChild(as[i].dom)
   }
-  return { dom: dom, alt: as }
+  return {
+    dom: dom,
+    alt: as,
+    ask: (q) => existingQuestion(dom,q)
+  }
 }
 
 

@@ -119,7 +119,14 @@ const uiPlayerTech = (a) => {
   for (let i = 0; i < ts.length; ++i) {
     dom.appendChild(ts[i].dom)
   }
-  return { dom: dom, tech: ts }
+  return {
+    dom: dom,
+    tech: ts,
+    add: (tid,t) => {
+      ts[tid] = uiTech(t)
+      dom.appendChild(ts[tid].dom)
+    }
+  }
 }
 
 

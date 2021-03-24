@@ -14,6 +14,7 @@ import Tile
 import Geometry
 import Action
 import PlayerState
+import Tech
 
 data Turn = Turn
   { turnPlayer   :: PlayerId
@@ -41,6 +42,9 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
 
            | AskUnit Loc PlayerId
            | AskMap Loc BasicAction             -- ^ Used for board questions
+
+           | AskMarketDeck DeckName
+           | AskMarketItem DeckName Int
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 
