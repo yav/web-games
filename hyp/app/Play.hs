@@ -27,15 +27,16 @@ setup :: Interact ()
 setup =
   do state <- getState
      forM_ (gameTurnOrder state) \p ->
-       do sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Blue, Blue] ] -- XXX: test
+       do replicateM_ 3 (doPlaceWorkerOnCapital p)
+          sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
+              c `elem` [ Green ] ] -- XXX: test
           replicateM_ 3 (doDrawCube p)
      startTurn
 
 
 startTurn :: Interact ()
 startTurn =
-  do -- XXX: start of turn actions + remove fortify + refill to 3 if needed
+  do -- XXX: start of turn actions + remove fortify
      state <- getState
      let playerId = turnPlayer (getField gameTurn state)
      let n = countWorkers playerId (getField gameBoard state)
@@ -45,7 +46,6 @@ startTurn =
 endGame :: Interact ()
 endGame = pure ()
 
--- XXX: unlock units in combat
 endTurn :: Interact ()
 endTurn =
   do state <- getState
@@ -188,7 +188,8 @@ actEndTurn :: Opts
 actEndTurn state =
   [ ( playerId :-> AskButton "End Turn"
     , "End Turn"
-    , do discardReady
+    , do unblockUnits
+         discardReady
          drawNew
          endTurn
     )
@@ -207,6 +208,12 @@ actEndTurn state =
        if have
           then replicateM_ 2 (doDrawCube playerId)
           else doReset playerId
+
+  unblockUnits =
+    do units <- view (blockedUnits playerId . getField gameBoard)
+       forM_ units \(loc,num) ->
+         do update (ChangeUnit playerId LockedUnit loc (-num))
+            update (ChangeUnit playerId FreeUnit   loc num)
 
 
 actUseAction :: Opts
@@ -267,7 +274,18 @@ performOrAction playerId which =
 
 doReset :: PlayerId -> Interact ()
 doReset playerId =
-  do player <- getField (playerState playerId) <$> getState
+  do player <- view (getField (playerState playerId))
+
+     -- unlock units
+     locked <- view (lockedUnits playerId . getField gameBoard)
+     forM_ locked \(loc,inCities,inRuins) ->
+       do forM_ inCities \cityId ->
+            do update (SetCity loc cityId Empty)
+               update (ChangeUnit playerId FreeUnit loc 1)
+
+          forM_ inRuins \ruinId ->
+            do update (SetRuin loc ruinId Empty)
+               update (ChangeUnit playerId FreeUnit loc 1)
 
      -- discards to bag
      let discarded = bagToList (getField (playerBag .> mapAt BagDiscard) player)
@@ -286,7 +304,6 @@ doReset playerId =
             update (ChangeBag playerId BagSource r 1)
 
      -- XXX: ask for cont.
-     -- XXX: reactivate map
 
      replicateM_ 3 (doDrawCube playerId)
 

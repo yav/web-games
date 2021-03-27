@@ -11,6 +11,7 @@ import Common.Basics(PlayerId)
 import Common.Utils(enumAll)
 import Common.Field
 
+import Bag(bagContains)
 import Resource
 import Terrain
 import Tile
@@ -96,6 +97,20 @@ moveLocs playerId movePts board =
             , cost <= movePts
             ]
     , not (null opts)
+  ]
+
+blockedUnits :: PlayerId -> Board -> [(Loc,Int)]
+blockedUnits playerId board =
+  [ (loc,n)
+  | (loc,tile) <- Map.toList (getField boardMap board)
+  , let n = bagContains LockedUnit (getField (playerUnits playerId) tile)
+  , n > 0
+  ]
+
+lockedUnits :: PlayerId -> Board -> [(Loc,[CityId],[RuinId])]
+lockedUnits playerId board =
+  [ (loc, tileUnitsInCities playerId tile, tileUnitsInRuins playerId tile)
+  | (loc,tile) <- Map.toList (getField boardMap board)
   ]
 
 flyLocs :: PlayerId -> Board -> [(Loc,[Loc])]

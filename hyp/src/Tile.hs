@@ -198,6 +198,25 @@ tileHasUnits playerId tile =
                   Occupied p -> p == playerId
                   _          -> False
 
+tileUnitsInCities :: PlayerId -> Tile -> [CityId]
+tileUnitsInCities playerId tile =
+  [ cityId
+  | (cityId,city) <- Map.toList (getField tileCities tile)
+  , case getField citySpot city of
+      Occupied p -> p == playerId
+      _          -> False
+  ]
+
+tileUnitsInRuins :: PlayerId -> Tile -> [RuinId]
+tileUnitsInRuins playerId tile =
+  [ ruinId
+  | (ruinId,ruin) <- Map.toList (getField tileRuins tile)
+  , case getField ruinSpot ruin of
+      Occupied p -> p == playerId
+      _          -> False
+  ]
+
+
 
 --------------------------------------------------------------------------------
 -- Setup
