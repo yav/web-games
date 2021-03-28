@@ -8,15 +8,44 @@ const uiPlayers = (turnOrder, players) => {
 
   const dom = div('players')
 
-  const ps = {}
+  const tabs = div('tabs')
+  dom.appendChild(tabs)
 
+  const ps = {}
+  const pTabs = {}
+
+  let selected
+  const doSelect = (p) => {
+    if (selected === p) return
+
+    if (selected !== undefined) {
+      ps[selected].dom.classList.add('hidden')
+      pTabs[selected].classList.remove('selected')
+    }
+
+    selected = p
+    ps[selected].dom.classList.remove('hidden')
+    pTabs[selected].classList.add('selected')
+  }
+
+  const first = drawNext
   for (let todo = playerNum; todo > 0; --todo) {
     const p = turnOrder[drawNext]
     ps[p] = uiPlayer(p, players[p])
+    ps[p].dom.classList.add('hidden')
     dom.appendChild(ps[p].dom)
+
+    // tab
+    const ptab = div('player-tab')
+    pTabs[p] = ptab
+    ptab.appendChild(uiPlayerBadge(p))
+    tabs.appendChild(ptab)
+    ptab.addEventListener('click', () => doSelect(p))
+
     ++drawNext
     if (drawNext >= playerNum) drawNext = 0
   }
+  doSelect(turnOrder[first])
 
   return {
     dom: dom,
@@ -28,6 +57,7 @@ const uiPlayerBadge = (p) => {
   const dom = div('player-badge')
   dom.textContent = p
   dom.classList.add(playerColors[p])
+  dom.classList.add('text')
   return dom
 }
 

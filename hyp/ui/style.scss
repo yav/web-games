@@ -10,6 +10,13 @@ $orange : #f60;
 $yellow : #fc0;
 $gray   : #ccc;
 
+$txt-red    : #fff;
+$txt-green  : #fff;
+$txt-purple : #fff;
+$txt-blue   : #fff;
+$txt-orange : #000;
+$txt-yellow : #000;
+
 
 
 
@@ -31,6 +38,13 @@ body {
 .fg-blue        { color: $blue    !important; }
 .fg-orange      { color: $orange  !important; }
 .fg-yellow      { color: $yellow  !important; }
+
+.text.red       { color: $txt-red        !important; }
+.text.green     { color: $txt-green      !important; }
+.text.purple    { color: $txt-purple     !important; }
+.text.blue      { color: $txt-blue       !important; }
+.text.orange    { color: $txt-orange     !important; }
+.text.yellow    { color: $txt-yellow     !important; }
 
 .red            { background-color: $red        !important; }
 .green          { background-color: $green      !important; }
@@ -283,19 +297,37 @@ svg.gray     { fill: $gray; }
 
 /* ------------------------------------------------------------------- */
 
-.player-badge {
+.player-tab {
+  margin-left: 1em;
   display: inline-block;
+  cursor: pointer;
+}
+
+.selected.player-tab {
+  border: 0.2em solid $page-border;
+  background-color: $board-bg;
+  border-radius: 0.2em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 0;
+}
+
+.player-badge {
+  display:      inline-block;
   padding-left:  0.2em;
   padding-right: 0.2em;
   border-radius: 0.2em;
   margin:        0.2em;
-  padding: 0;
 }
 
 .players {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+}
+
+.hidden.player {
+  display: none;
 }
 
 .player {

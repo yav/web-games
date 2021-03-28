@@ -34,6 +34,30 @@ body {
   color: #fc0 !important;
 }
 
+.text.red {
+  color: #fff !important;
+}
+
+.text.green {
+  color: #fff !important;
+}
+
+.text.purple {
+  color: #fff !important;
+}
+
+.text.blue {
+  color: #fff !important;
+}
+
+.text.orange {
+  color: #000 !important;
+}
+
+.text.yellow {
+  color: #000 !important;
+}
+
 .red {
   background-color: #c00 !important;
 }
@@ -421,19 +445,37 @@ svg.gray {
 }
 
 /* ------------------------------------------------------------------- */
+.player-tab {
+  margin-left: 1em;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.selected.player-tab {
+  border: 0.2em solid #636;
+  background-color: #203;
+  border-radius: 0.2em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 0;
+}
+
 .player-badge {
   display: inline-block;
   padding-left: 0.2em;
   padding-right: 0.2em;
   border-radius: 0.2em;
   margin: 0.2em;
-  padding: 0;
 }
 
 .players {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+}
+
+.hidden.player {
+  display: none;
 }
 
 .player {
