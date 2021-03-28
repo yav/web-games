@@ -481,6 +481,10 @@ svg.gray {
   outline-color: black;
 }
 
+.tech.question {
+  outline-color: white;
+}
+
 .turn .question {
   outline-color: black;
 }

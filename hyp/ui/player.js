@@ -122,6 +122,7 @@ const uiPlayerTech = (a) => {
   return {
     dom: dom,
     tech: ts,
+    ask: (tid,q) => existingQuestion(ts[tid].dom,true,q),
     add: (tid,t) => {
       ts[tid] = uiTech(t)
       dom.appendChild(ts[tid].dom)

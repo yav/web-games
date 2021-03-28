@@ -67,7 +67,8 @@ const uiQuestion = (q) => {
     AskUnit: (loc,pid)    => gui.board.askUnit(loc,pid,q),
     AskMap: (loc,a)       => gui.board.askMap(loc,a,q),
     AskMarketItem: (d,n)  => gui.markets.askMarketItem(d,n,q),
-    AskMarketDeck: (d)    => gui.markets.askMarketDeck(d,q)
+    AskMarketDeck: (d)    => gui.markets.askMarketDeck(d,q),
+    AskPlayerTech: (t)    => gui.player[playerId].techs.ask(t,q)
   })(q.chChoice)
 
 }

@@ -295,18 +295,37 @@ doReset playerId =
            update (ChangeBag playerId BagSource r 1)
 
      -- from non-continus cards
-     let ok b = case b of
-                  Continuous {} -> False
-                  OneTime {}    -> True
+     let ok = not . isContinuous
      forM_ (Map.toList (getField playerTech player)) \(tid,t) ->
        forM_ (fullSpots ok tid t) \(spot,r) ->
          do update (RemoveCube playerId spot)
             update (ChangeBag playerId BagSource r 1)
 
-     -- XXX: ask for cont.
+     -- ask to reset continuous, if any
+     resetCont
 
      replicateM_ 3 (doDrawCube playerId)
 
+  where
+  resetCont =
+    do player <- view (getField (playerState playerId))
+       -- we assume that everything else has been reset, so remaining cubes
+       -- are all on continuous tech
+       let withCubes = Map.filter techHasCubes (getField playerTech player)
+       case Map.keys withCubes of
+         [] -> pure ()
+         ts ->
+          do ch <- choose playerId
+                      $ (AskButton "End Reset", "Do not reset the rest")
+                      : [ (AskPlayerTech t, "Remove all cubes") | t <- ts ]
+             case ch of
+               AskPlayerTech t ->
+                 do let tech = getField (playerTech .> mapAt t) player
+                    forM_ (fullSpots (const True) t tech) \(loc,r) ->
+                      do update (RemoveCube playerId loc)
+                         update (ChangeBag playerId BagSource r 1)
+                    resetCont
+               _ -> pure ()
 
 
 checkGainBenefit :: PlayerId -> CubeLoc -> Interact ()

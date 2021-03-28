@@ -340,6 +340,7 @@ svg.gray     { fill: $gray; }
 
 .bag  .question { outline-color: white; }
 .tech .question { outline-color: black; }
+.tech.question { outline-color: white; }
 .turn .question { outline-color: black; }
 .board .question { outline-color: white; }
 .market .question { outline-color: white; }

@@ -18,6 +18,7 @@ import Resource
 import Action
 import Bag
 import BoardActions
+import Tech
 
 
 type TechId = Int
@@ -50,9 +51,11 @@ declareFields ''PlayerState
 
 emptyPlayerState :: RNG -> PlayerState
 emptyPlayerState rng =
-  foldl (flip playerGainTech) s0 emptyPlayerBoard
-                                  -- reverse (deck1 ++ deck2 ++ deck3 ++ deck4)
+  foldl (flip playerGainTech) s0 (emptyPlayerBoard
+                                  ++ reverse (filter dbgCont (deck1 ++ deck2 ++ deck3 ++ deck4)))
   where
+  dbgCont t = any (isContinuous . techBenefit) (getField techAlts t)
+
   s0 =
    PlayerState
       { _playerBag       = Map.fromList [ (b,bagEmpty) | b <- enumAll ]
@@ -111,6 +114,7 @@ fullSpots ok tid t =
   , r        <- maybeToList (getField spotResource spot)
   ]
 
+
 placeSpots :: PlayerState -> [CubeLoc]
 placeSpots ps = [ spot
                 | (techId,tech) <- Map.toList (getField playerTech ps)
@@ -135,5 +139,6 @@ continuousBenefits player =
   , Continuous c <- [ techBenefit alt ]
   , and [ isJust (getField spotResource spot) | spot <- getField techCost alt ]
   ]
+
 
 
