@@ -51,6 +51,7 @@ const uiQuestion = (q) => {
     },
     AskReady: (r) => gui.player[playerId].bag.BagReady.ask(r,q),
     AskDiscard: (r) => gui.player[playerId].bag.BagDiscard.ask(r,q),
+    AskSupply: (r) => gui.supply.ask(r,q),
     AskButton: (txt) => {
       const btn = div('button')
       btn.textContent = txt

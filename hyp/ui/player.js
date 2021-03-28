@@ -67,8 +67,10 @@ const uiPlayer = (p, s) => {
 
   setSize(dom, 'width', 17.5 * iconSize)
 
+  const label = { BagReady: 'Available', BagSource: 'In bag'
+                , BagDiscard: 'Discarded' }
   for (b in s._playerBag) {
-    bag[b] = uiBag(b,s._playerBag[b])
+    bag[b] = uiBag(label[b],s._playerBag[b])
   }
   const ui = { bag: bag
              , stats:    uiPlayerStats(p,s)

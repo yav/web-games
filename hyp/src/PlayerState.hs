@@ -52,9 +52,10 @@ declareFields ''PlayerState
 emptyPlayerState :: RNG -> PlayerState
 emptyPlayerState rng =
   foldl (flip playerGainTech) s0 (emptyPlayerBoard
-                                  ++ reverse (filter dbgCont (deck1 ++ deck2 ++ deck3 ++ deck4)))
+                                  ++ reverse (filter dbg (deck1 ++ deck2 ++ deck3 ++ deck4)))
   where
-  dbgCont t = any (isContinuous . techBenefit) (getField techAlts t)
+  dbg t = any dbgP (getField techAlts t)
+  dbgP = techAltHas (SwapResource AnyNormal AnyNormal)
 
   s0 =
    PlayerState
@@ -124,12 +125,22 @@ placeSpots ps = [ spot
   where
   available = map fst (bagToList (getField (playerBag .> mapAt BagReady) ps))
 
+-- | Valid return spots on tech
 returnSpots :: PlayerState -> [CubeLoc]
-returnSpots ps =
+returnSpots = removeReturnSpots techReturnSpots
+
+removeSpots :: ResourceReq -> PlayerState -> [CubeLoc]
+removeSpots req = removeReturnSpots (techRemoveSpots req)
+
+removeReturnSpots :: (Tech -> [(Int,Int)]) -> PlayerState -> [CubeLoc]
+removeReturnSpots checkTech ps =
   [ CubeLoc { cubeTech = techId, cubeAlt = altId, cubeSpot = spotId }
   | (techId,tech) <- Map.toList (getField playerTech ps)
-  , (altId,spotId) <- techReturnSpots tech
+  , (altId,spotId) <- checkTech tech
   ]
+
+
+
 
 continuousBenefits :: PlayerState -> [ContinuousAciton]
 continuousBenefits player =

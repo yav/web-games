@@ -1,6 +1,6 @@
 module BasicAction where
 
-import Control.Monad(replicateM_,void)
+import Control.Monad(replicateM_,void,unless)
 import Data.List(delete)
 import qualified Data.Map as Map
 
@@ -23,8 +23,8 @@ import Common
 doBasicAction :: PlayerId -> BasicAction -> Interact ()
 doBasicAction playerId ba =
   case ba of
-    Move -> pure ()
-    Fly -> pure ()
+    Move   -> pure ()
+    Fly    -> pure ()
     Attack -> pure ()
 
     CloneWorker -> doSimple ba $ doCloneWorker playerId
@@ -36,12 +36,12 @@ doBasicAction playerId ba =
     GainTech -> doSimple ba $ doGainTech playerId True
     DrawResource -> doSimple ba $ void $ doDrawCube playerId
     ReturnResource -> doSimple ba $ doReturnResource playerId
-    SwapResource _ _ -> todo
+    SwapResource r1 r2 -> doSimple ba $ doSwapResource playerId r1 r2
     GainResource r -> doSimple ba $ doGainResource playerId r
     Spy -> todo
 
     -- these are auto activated so no need to remove
-    LooseResource _ -> todo
+    LooseResource r -> doRemoveResource playerId r
     Gem -> doGainGem playerId
     LooseGem -> update (ChangeGems playerId (-1))
     LooseDevelop -> todo
@@ -126,33 +126,37 @@ doGainResource playerId req =
 
 doReturnResource :: PlayerId -> Interact ()
 doReturnResource playerId =
-  do player <- view (getField (playerState playerId))
-     let bags        = getField playerBag player
-         resources b = map fst $ bagToList $ getField (mapAt b) bags
-         ready       = map AskReady (resources BagReady)
-         discard     = map AskDiscard (resources BagDiscard)
-         fromTech    = map AskCubeLoc (returnSpots player)
-         questions   = zip (discard ++ ready ++ fromTech)
-                           (repeat "Return resource")
-     mb <- chooseMaybe playerId questions
-     case mb of
-       Nothing -> pure ()
-       Just act ->
-         case act of
-           AskCubeLoc loc ->
-             case getField (costSpot loc .> spotResource) player of
-               Just r ->
-                 do update (RemoveCube playerId loc)
-                    update (ChangeBag playerId BagSource r 1)
-               Nothing -> pure () -- bug
+  doRemoveCube playerId Nothing
+  \_ r -> update (ChangeBag playerId BagSource r 1)
 
-           AskReady r ->
-             do update (ChangeBag playerId BagReady   r (-1))
-                update (ChangeBag playerId BagSource  r 1)
+doRemoveResource :: PlayerId -> ResourceReq -> Interact ()
+doRemoveResource playerId req =
+  doRemoveCube playerId (Just req)
+  \_ r -> update (ChangeSupply r 1)
 
-           ~(AskDiscard r) ->
-             do update (ChangeBag playerId BagDiscard r (-1))
-                update (ChangeBag playerId BagSource  r 1)
+doSwapResource :: PlayerId -> ResourceReq -> ResourceReq -> Interact ()
+doSwapResource playerId inT outT =
+  doRemoveCube playerId (Just inT)
+  \gloc rIn ->
+    do unless (rIn == Gray) (update (ChangeSupply rIn 1))
+       rOut <- case outT of
+                 Exact r ->
+                   do yes <- haveInSupply r
+                      pure (if yes then r else rIn)
+                 AnyNormal ->
+                   do let opt r  = (AskSupply r, "Replace with this")
+                      opts <- view (map (opt . fst) . bagToList
+                                                    . getField gameSupply)
+                      mb <- chooseMaybe playerId opts
+                      case mb of
+                        Nothing             -> pure rIn
+                        Just ~(AskSupply r) ->
+                           do update (ChangeSupply r (-1))
+                              pure r
+
+       case gloc of
+         OnTech loc -> update (PlaceCube playerId loc rOut)
+         InBag b    -> update (ChangeBag playerId b rOut 1)
 
 doGainTech :: PlayerId -> Bool -> Interact ()
 doGainTech playerId withReset =
@@ -179,6 +183,7 @@ doGainTech playerId withReset =
              do let (t,m2) = getMarket n m1
                 player <- view (getField (playerState playerId))
                 update (AddTech playerId (playerNextTechId player) t)
+                update (ChangeBag playerId BagDiscard Gray 1)
                 update (SetMarket d m2)
            Nothing -> pure ()
 

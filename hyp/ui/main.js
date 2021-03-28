@@ -39,31 +39,38 @@ const uiHelp = (title,ps) => {
 
 
 
-function uiRedraw(state) {
+const uiRedraw = (state) => {
   gui = {}
   gui.questions = []
 
   const game = state.game
   const body = document.getElementById('main')
 
-  gui.mainPanel = div('mainPanel')
-  body.appendChild(gui.mainPanel)
+  const mainPanel = div('mainPanel')
+  body.appendChild(mainPanel)
+
+  const topBar = div('top-bar')
+  mainPanel.appendChild(topBar)
 
   gui.turn = uiTurn(game._gameTurn)
-  gui.mainPanel.appendChild(gui.turn.dom)
+  topBar.appendChild(gui.turn.dom)
+
+  gui.supply = uiBag('Supply', game._gameSupply)
+  topBar.appendChild(gui.supply.dom)
 
   gui.board = uiBoard(state.game._gameBoard)
-  gui.mainPanel.appendChild(gui.board.dom)
+  mainPanel.appendChild(gui.board.dom)
 
   const ps = uiPlayers(game.gameTurnOrder, game._gamePlayers)
   gui.player = ps.players
   body.appendChild(ps.dom)
 
   gui.markets = uiMarkets(game._gameMarkets)
-  gui.mainPanel.appendChild(gui.markets.dom)
+  mainPanel.appendChild(gui.markets.dom)
 
   uiQuestions(state.questions)
 }
+
 
 
 const uiUpdate = hsUpdate (
@@ -96,4 +103,5 @@ const uiUpdate = hsUpdate (
   , ChangeTile: (loc,t)         => gui.board.changeTile(loc,t)
   , SetMarket: (d,m)            => gui.markets.setOffers(d,m)
   , AddTech: (pid,tid,t)        => gui.player[pid].techs.add(tid,t)
+  , ChangeSupply: (r,n)         => gui.supply.change(r,n)
   })

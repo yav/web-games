@@ -89,16 +89,29 @@ isContinuous b =
     _             -> False
 
 techReturnSpots :: Tech -> [(Int,Int)]
-techReturnSpots tech = [ (altId,spot)
-                       | (altId,alt) <- [0..] `zip` getField techAlts tech
-                       , spot <- altReturnSpots alt
-                       ]
+techReturnSpots tech =
+  [ (altId,spot)
+  | (altId,alt) <- [0..] `zip` getField techAlts tech
+  , spot <- altReturnSpots alt
+  ]
   where
   altReturnSpots alt =
     let cost = getField techCost alt
     in case costFreeSpots cost of
          [] | techAltHas ReturnResource alt -> []
          _ -> map fst (costFullSpots cost)
+
+techRemoveSpots :: ResourceReq -> Tech -> [(Int,Int)]
+techRemoveSpots req tech =
+  [ (altId,spot)
+  | (altId,alt) <- [0..] `zip` getField techAlts tech
+  , spot <- altRemoveSpots alt
+  ]
+  where
+  altRemoveSpots alt =
+    [ i | (i,r) <- costFullSpots (getField techCost alt), matches req r ]
+
+
 
 techHas :: BasicAction -> Tech -> Bool
 techHas act = any (techAltHas act) . getField techAlts

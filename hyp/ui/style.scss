@@ -31,6 +31,7 @@ body {
 }
 
 
+
 /* Resources and player colors */
 .fg-red         { color: $red     !important; }
 .fg-green       { color: $green   !important; }
@@ -298,6 +299,7 @@ svg.gray     { fill: $gray; }
 /* ------------------------------------------------------------------- */
 
 .player-tab {
+  margin-top: 0.2em;
   margin-left: 1em;
   display: inline-block;
   cursor: pointer;
@@ -377,8 +379,18 @@ svg.gray     { fill: $gray; }
 .board .question { outline-color: white; }
 .market .question { outline-color: white; }
 
+.top-bar {
+  width: 100%;
+  display: flex;
+}
+
+.top-bar .bag {
+  float: right;
+}
+
 .turn {
-  display: block;
+  display: inline-block;
+  flex-grow: 1;
   background-color: white;
   border: 0.2em solid $page-border;
   border-radius: 0.5em;

@@ -446,6 +446,7 @@ svg.gray {
 
 /* ------------------------------------------------------------------- */
 .player-tab {
+  margin-top: 0.2em;
   margin-left: 1em;
   display: inline-block;
   cursor: pointer;
@@ -539,8 +540,18 @@ svg.gray {
   outline-color: white;
 }
 
+.top-bar {
+  width: 100%;
+  display: flex;
+}
+
+.top-bar .bag {
+  float: right;
+}
+
 .turn {
-  display: block;
+  display: inline-block;
+  flex-grow: 1;
   background-color: white;
   border: 0.2em solid #636;
   border-radius: 0.5em;

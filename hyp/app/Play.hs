@@ -29,7 +29,7 @@ setup =
      forM_ (gameTurnOrder state) \p ->
        do replicateM_ 3 (doPlaceWorkerOnCapital p)
           sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Green ] ] -- XXX: test
+              c `elem` [ Green, Blue ] ] -- XXX: test
           replicateM_ 3 (doDrawCube p)
      startTurn
 
