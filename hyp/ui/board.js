@@ -143,7 +143,7 @@ const uiHex = (container,info) => {
 
   for (const ruinId in h.tileRuins) {
     const thing = alloc.newLoc()
-    ruinId[ruinId] =
+    ruins[ruinId] =
       uiRuin(container,position(thing),ruinId, h.tileRuins[ruinId])
   }
 
@@ -370,7 +370,7 @@ const uiRuin = (el, pos, ruinId, ruin) => {
 
   return {
     set: setOcc,
-    ask: (q) => console.log(q) // XXX
+    ask: (q) => existingQuestion(dom,false,q)
 
   }
 
