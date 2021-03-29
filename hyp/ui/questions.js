@@ -58,18 +58,18 @@ const uiQuestion = (q) => {
       newQuestion(btn,q)
       gui.turn.dom.appendChild(btn)
     },
-    AskUpgrade: (c)       => gui.player[playerId].upgrade.ask(c,q),
-    AskReadyAction: (r)   => gui.turn.askBasic(r,q),
-    AskIfAction: (n)      => gui.turn.askIf(n,q),
-    AskOrActionLeft: (n)  => gui.turn.askOrLeft(n,q),
-    AskOrActionRight: (n) => gui.turn.askOrRight(n,q),
-    AskCity: (loc,id)     => gui.board.askCity(loc,id,q),
-    AskRuin: (loc,id)     => gui.board.askRuin(loc,id,q),
-    AskUnit: (loc,pid)    => gui.board.askUnit(loc,pid,q),
-    AskMap: (loc,a)       => gui.board.askMap(loc,a,q),
-    AskMarketItem: (d,n)  => gui.markets.askMarketItem(d,n,q),
-    AskMarketDeck: (d)    => gui.markets.askMarketDeck(d,q),
-    AskPlayerTech: (t)    => gui.player[playerId].techs.ask(t,q)
+    AskUpgrade: (c)         => gui.player[playerId].upgrade.ask(c,q),
+    AskReadyAction: (r)     => gui.turn.askBasic(r,q),
+    AskIfAction: (n)        => gui.turn.askIf(n,q),
+    AskOrActionLeft: (n)    => gui.turn.askOrLeft(n,q),
+    AskOrActionRight: (n)   => gui.turn.askOrRight(n,q),
+    AskCity: (loc,id)       => gui.board.askCity(loc,id,q),
+    AskRuin: (loc,id)       => gui.board.askRuin(loc,id,q),
+    AskUnit: (loc,pid)      => gui.board.askUnit(loc,pid,q),
+    AskMap: (loc,a)         => gui.board.askMap(loc,a,q),
+    AskMarketItem: (d,n)    => gui.markets.askMarketItem(d,n,q),
+    AskMarketDeck: (d)      => gui.markets.askMarketDeck(d,q),
+    AskPlayerTech: (pid,t)  => gui.player[pid].techs.ask(t,q)
   })(q.chChoice)
 
 }

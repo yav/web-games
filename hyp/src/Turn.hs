@@ -29,7 +29,7 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
            | AskDiscard Resource                -- ^ Resource in ready area
            | AskButton Text                     -- ^ A button
            | AskSupply Resource                 -- ^ A resource in the supply
-           | AskPlayerTech TechId               -- ^ A player's tech
+           | AskPlayerTech PlayerId TechId      -- ^ A player's tech
 
            | AskReadyAction  BasicAction        -- ^ Activate a produced action
            | AskIfAction Int                    -- ^ Activate cond. action

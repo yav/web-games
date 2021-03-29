@@ -27,26 +27,27 @@ doBasicAction playerId ba =
     Fly    -> pure ()
     Attack -> pure ()
 
-    CloneWorker -> doSimple ba $ doCloneWorker playerId
-    PlaceWorker -> doSimple ba $ doPlaceWorker playerId
-    RangedAttack -> todo
-    Fortify -> todo
-    Develop ctr -> doSimple ba $ doUpgrade playerId ctr
+    CloneWorker         -> doSimple ba $ doCloneWorker playerId
+    PlaceWorker         -> doSimple ba $ doPlaceWorker playerId
+    RangedAttack        -> todo
+    Fortify             -> todo
+    Develop ctr         -> doSimple ba $ doUpgrade playerId ctr
 
-    GainTech -> doSimple ba $ doGainTech playerId True
-    DrawResource -> doSimple ba $ void $ doDrawCube playerId
-    ReturnResource -> doSimple ba $ doReturnResource playerId
-    SwapResource r1 r2 -> doSimple ba $ doSwapResource playerId r1 r2
-    GainResource r -> doSimple ba $ doGainResource playerId r
-    Spy -> todo
+    GainTech            -> doSimple ba $ doGainTech playerId True
+    DrawResource        -> doSimple ba $ void $ doDrawCube playerId
+    ReturnResource      -> doSimple ba $ doReturnResource playerId
+    SwapResource r1 r2  -> doSimple ba $ doSwapResource playerId r1 r2
+    GainResource r      -> doSimple ba $ doGainResource playerId r
+    Spy                 -> todo
 
     -- these are auto activated so no need to remove
-    LooseResource r -> doRemoveResource playerId r
-    Gem -> doGainGem playerId
-    LooseGem -> update (ChangeGems playerId (-1))
-    LooseDevelop -> todo
-    RemoveWorker -> todo
-    Neighbours ba' -> todo
+    LooseResource r     -> doRemoveResource playerId r
+    Gem                 -> doGainGem playerId
+    LooseGem            -> update (ChangeGems playerId (-1))
+    LooseDevelop        -> todo
+    RemoveWorker        -> todo
+
+    Neighbours ba'      -> todo
 
     Times ba' n -> replicateM_ n (doBasicAction playerId ba') -- hm
 

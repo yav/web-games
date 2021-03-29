@@ -316,10 +316,10 @@ doReset playerId =
          [] -> pure ()
          ts ->
           do ch <- choose playerId
-                      $ (AskButton "End Reset", "Do not reset the rest")
-                      : [ (AskPlayerTech t, "Remove all cubes") | t <- ts ]
+                  $ (AskButton "End Reset", "Do not reset the rest")
+                  : [ (AskPlayerTech playerId t, "Remove all cubes") | t <- ts ]
              case ch of
-               AskPlayerTech t ->
+               AskPlayerTech _ t ->
                  do let tech = getField (playerTech .> mapAt t) player
                     forM_ (fullSpots (const True) t tech) \(loc,r) ->
                       do update (RemoveCube playerId loc)
