@@ -22,6 +22,7 @@ import PlayerState
 import Turn
 import Tech
 import Action
+import RuinToken
 
 
 data Update =
@@ -35,6 +36,7 @@ data Update =
   | ChangeGhosts PlayerId Int
   | ChangeWorkers PlayerId Int
   | Capture PlayerId PlayerId   -- captured is 2nd
+  | SetRuinToken PlayerId (Maybe Token)
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
@@ -46,6 +48,7 @@ data Update =
 
   | SetCity Loc CityId TileSpot
   | SetRuin Loc RuinId TileSpot
+  | DropToken Loc RuinId
 
   | ChangeTile Loc Tile
 
@@ -69,7 +72,6 @@ data State = State
 declareFields ''State
 
 type Finished = State
-type View = State
 
 
 initialState :: RNG -> Bool -> [PlayerId] -> State
@@ -101,8 +103,17 @@ currentPlayer state = (playerId,player)
 
 --------------------------------------------------------------------------------
 
-playerView :: PlayerId -> State -> View
-playerView _ = id -- XXX: hide other player's ruin tokenundefineds
+playerView :: PlayerId -> State -> State
+playerView pid = updField gamePlayers (Map.mapWithKey hide)
+  where
+  hide x s = if x == pid then s else hideTokens s
+
+playerUpdateView :: PlayerId -> Update -> Update
+playerUpdateView pid upd =
+  case upd of
+    SetRuinToken pid' (Just t) | pid /= pid' ->
+      SetRuinToken pid' (Just (hideToken t))
+    _ -> upd
 
 
 doUpdate :: Update -> State -> Either Finished State
@@ -133,6 +144,9 @@ doUpdate upd =
       Right . updField (playerState playerId .> playerCaptured)
                        (Set.insert capturedId)
 
+    SetRuinToken playerId mb ->
+      Right . setField (playerState playerId .> playerToken) mb
+
     SetTurn t ->
       Right . setField gameTurn t
 
@@ -158,6 +172,11 @@ doUpdate upd =
       Right . setField (gameBoard .> tileAt loc
                                   .> tileRuins .> mapAt ruinId .> ruinSpot)
                        val
+
+    DropToken loc ruinId ->
+      Right . updField (gameBoard .> tileAt loc
+                                  .> tileRuins .> mapAt ruinId .> ruinTokens)
+                       (drop 1)
 
     ChangeTile loc t ->
       Right . setField (gameBoard .> tileAt loc) t

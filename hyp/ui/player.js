@@ -120,6 +120,27 @@ const uiPlayerStats = (player,p) => {
   for (let i = 0; i < p._playerCaptured.length; ++i)
     addCaptured(p._playerCaptured[i])
 
+  let token = null
+  const setToken = (t) => {
+    console.log(t)
+    if (token) token.remove()
+    if (!t) { token = null; return }
+
+    if (typeof t === 'string') {
+      token = div('icon token')
+      token.classList.add(t)
+      setSize(token,'font-size', iconSize/4)
+      setDim(token,iconSize,iconSize)
+      token.textContent = t
+    } else {
+      token = uiAction(t.tokenAction).dom
+    }
+    dom.appendChild(token)
+  }
+  setToken(p._playerToken)
+
+
+
   const badge = uiPlayerBadge(player)
   badge.style.float = 'right'
   dom.appendChild(badge)
@@ -138,7 +159,8 @@ const uiPlayerStats = (player,p) => {
       workers += n
       workerBadge.textContent = workers
     },
-    capture: addCaptured
+    capture: addCaptured,
+    setToken: setToken
   }
 }
 

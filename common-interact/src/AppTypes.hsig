@@ -5,16 +5,16 @@ import Data.Aeson(ToJSON,FromJSON)
 
 data State
 data Finished
-data View
 
-instance ToJSON View
+instance ToJSON State
 instance ToJSON Finished
 
 data Update
 
 instance ToJSON Update
 doUpdate   :: Update -> State -> Either Finished State
-playerView :: PlayerId -> State -> View
+playerView :: PlayerId -> State -> State
+playerUpdateView :: PlayerId -> Update -> Update
 
 data Input
 instance ToJSON   Input

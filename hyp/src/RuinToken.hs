@@ -2,7 +2,8 @@ module RuinToken where
 
 import Data.Map(Map)
 import qualified Data.Map as Map
-import Data.Aeson(ToJSON)
+import Data.Aeson(ToJSON(..),(.=))
+import qualified Data.Aeson as JS
 import GHC.Generics(Generic)
 
 import Common.RNG
@@ -23,9 +24,20 @@ startTokens ty =
     Gold   -> 3
 
 data Token = Token
-  { tokenType   :: TokenType
-  , tokenAction :: Action
+  { tokenType    :: TokenType
+  , tokenAction  :: Action
+  , tokenVisible :: Bool
   }
+
+hideToken :: Token -> Token
+hideToken t = t { tokenVisible = False }
+
+instance ToJSON Token where
+  toJSON t
+    | tokenVisible t = JS.object [ "tokenType" .= tokenType t
+                                 , "tokenAction" .= tokenAction t
+                                 ]
+    | otherwise = toJSON (tokenType t)
 
 type RuinTokens = Map TokenType [Token]
 
@@ -38,7 +50,8 @@ shuffleTokens r0 = Map.fromList [ (Bronze,b), (Silver,s), (Gold,g) ]
 
 
 tokenList :: TokenType -> [Action] -> [Token]
-tokenList ty as = [ Token { tokenType = ty, tokenAction = a } | a <- as ]
+tokenList ty as =
+  [ Token { tokenType = ty, tokenAction = a, tokenVisible = True } | a <- as ]
 
 bronzeTokens :: [Token]
 bronzeTokens =

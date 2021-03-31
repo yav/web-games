@@ -3,7 +3,7 @@ module Play where
 import Data.Text(Text)
 import Control.Monad(forM_,replicateM_)
 import qualified Data.Map as Map
-import Data.Maybe(isJust)
+import Data.Maybe(isJust,listToMaybe)
 
 import Common.Basics
 import Common.Utils(enumAll)
@@ -21,8 +21,6 @@ import Tile
 
 import BasicAction
 import Common
-
-import Debug.Trace
 
 setup :: Interact ()
 setup =
@@ -118,20 +116,26 @@ actEnterCity state =
 
 actEnterRuin :: Opts
 actEnterRuin state =
- let x =
-         [ ( playerId :-> AskRuin loc ruinId
-           , "Enter ruin"
-           , do let ruin = getField (tileAt loc .> ruinAt ruinId) board
-                update (ChangeUnit playerId unit loc (-1))
-                update (SetRuin loc ruinId (Occupied playerId))
-                -- XXX: gain token if any
-                takeTurn
-           ) | (loc,ruinId,unit) <- enterRuinLocs playerId board
-         ]
- in trace ("RUINS: " ++ show (length x)) x
+  [ ( playerId :-> AskRuin loc ruinId
+    , "Enter ruin"
+    , do update (ChangeUnit playerId unit loc (-1))
+         update (SetRuin loc ruinId (Occupied playerId))
+         tryGetToken loc ruinId
+         takeTurn
+    ) | (loc,ruinId,unit) <- enterRuinLocs playerId board
+  ]
   where
   (playerId,_) = currentPlayer state
   board        = getField gameBoard state
+
+  tryGetToken loc ruinId =
+    do let f = (tileAt loc .> ruinAt ruinId)
+       case listToMaybe (getField (f .> ruinTokens) board) of
+         Nothing -> pure ()
+         Just t  ->
+            do update (DropToken loc ruinId)
+               -- XXX: check for existing token
+               update (SetRuinToken playerId (Just t))
 
 
 actMove :: Opts

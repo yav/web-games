@@ -8,8 +8,10 @@ type State    = Game
 type Finished = GameFinished
 type Update   = GameUpdate
 type Input    = Choice
-type View     = Game
 
-playerView :: PlayerId -> State -> View
+playerView :: PlayerId -> State -> State
 playerView _ = id
+
+playerUpdateView :: PlayerId -> Update -> Update
+playerUpdateView _ = id
 

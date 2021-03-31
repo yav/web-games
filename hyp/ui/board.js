@@ -45,6 +45,7 @@ const uiBoard = (b) => {
     setUnitHighlight: (loc,pid,yes) => getHex(loc).setUnitHighlight(pid,yes),
     setCity: (loc,id,x) => getHex(loc).cities[id].set(x),
     setRuin: (loc,id,x) => getHex(loc).ruins[id].set(x),
+    dropToken: (loc,id) => getHex(loc).ruins[id].changeCount(-1),
     changeTile: (loc,t) => {
       getHex(loc).remove()
       board[loc.locX][loc.locY] = uiHex(dom,[loc,t])
@@ -370,7 +371,11 @@ const uiRuin = (el, pos, ruinId, ruin) => {
 
   return {
     set: setOcc,
-    ask: (q) => existingQuestion(dom,false,q)
+    ask: (q) => existingQuestion(dom,false,q),
+    changeCount: (n) => {
+      tokens = tokens + n
+      tokenDom.textContent = tokens
+    }
 
   }
 
