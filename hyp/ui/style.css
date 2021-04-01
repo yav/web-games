@@ -505,6 +505,7 @@ svg.gray {
 }
 
 .token {
+  position: relative;
   border: 0.1em solid #636;
   border-radius: 100%;
 }

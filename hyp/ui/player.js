@@ -165,7 +165,8 @@ const uiPlayerStats = (player,p) => {
       workerBadge.textContent = workers
     },
     capture: addCaptured,
-    setToken: setToken
+    setToken: setToken,
+    askToken: (q) => existingQuestion(tokens[0],true,q)
   }
 }
 

@@ -14,7 +14,6 @@ import Tile
 import Geometry
 import Action
 import PlayerState
-import RuinToken
 import Tech
 
 data Turn = Turn
@@ -31,6 +30,7 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
            | AskButton Text                     -- ^ A button
            | AskSupply Resource                 -- ^ A resource in the supply
            | AskPlayerTech PlayerId TechId      -- ^ A player's tech
+           | AskPlayerToken
 
            | AskReadyAction  BasicAction        -- ^ Activate a produced action
            | AskIfAction Int                    -- ^ Activate cond. action

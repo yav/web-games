@@ -66,10 +66,24 @@ takeTurn =
                 actUseAction state ++
                 actMove      state ++
                 actEnterCity state ++
-                actEnterRuin state
+                actEnterRuin state ++
+                actUseRuinToken state
      askInputs opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
+
+actUseRuinToken :: Opts
+actUseRuinToken state =
+  [ ( playerId :-> AskPlayerToken
+    , "Use token"
+    , do update (SetRuinToken playerId [])
+         doGainBenefit playerId (tokenAction t)
+         takeTurn
+    )
+  | t <- getField playerToken player
+  ]
+  where
+  (playerId,player) = currentPlayer state
 
 
 actPlaceCube :: Opts

@@ -358,6 +358,7 @@ svg.gray     { fill: $gray; }
 }
 
 .token {
+  position: relative;
   border: 0.1em solid $page-border;
   border-radius: 100%;
 }
