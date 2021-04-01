@@ -122,7 +122,6 @@ const uiPlayerStats = (player,p) => {
 
   let token = null
   const setToken = (t) => {
-    console.log(t)
     if (token) token.remove()
     if (!t) { token = null; return }
 

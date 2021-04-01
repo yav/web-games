@@ -9,6 +9,12 @@ const uiTurn = (tu) => {
   const actKey = (a) => JSON.stringify(a)
 
   const draw = (t) => {
+    const undo = div('button question')
+    undo.innerHTML = '&#x2190;'
+    undo.addEventListener('click', () => sendJSON({tag: 'undo'}))
+    tooltip(undo,false,'Undo')
+    dom.appendChild(undo)
+
     dom.appendChild(span('Turn: '))
     dom.appendChild(uiPlayerBadge(t.turnPlayer))
     dom.appendChild(span(' '))

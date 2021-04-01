@@ -45,6 +45,7 @@ const uiRedraw = (state) => {
 
   const game = state.game
   const body = document.getElementById('main')
+  body.innerHTML = ""
 
   const mainPanel = div('mainPanel')
   body.appendChild(mainPanel)
