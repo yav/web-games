@@ -504,6 +504,11 @@ svg.gray {
   margin: 0.2em;
 }
 
+.token {
+  border: 0.1em solid #636;
+  border-radius: 100%;
+}
+
 /* ----------------------------------------------------------------------- */
 .question {
   outline: 0.075em dashed;

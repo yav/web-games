@@ -130,9 +130,10 @@ const uiPlayerStats = (player,p) => {
       token.classList.add(t)
       setSize(token,'font-size', iconSize/4)
       setDim(token,iconSize,iconSize)
-      token.textContent = t
+      token.innerHTML = '<br>' + t
     } else {
       token = uiAction(t.tokenAction).dom
+      token.classList.add('token')
     }
     dom.appendChild(token)
   }

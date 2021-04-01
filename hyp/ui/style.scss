@@ -357,6 +357,13 @@ svg.gray     { fill: $gray; }
   margin: 0.2em;
 }
 
+.token {
+  border: 0.1em solid $page-border;
+  border-radius: 100%;
+}
+
+
+
 
 
 /* ----------------------------------------------------------------------- */
