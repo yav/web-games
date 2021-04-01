@@ -36,7 +36,7 @@ data Update =
   | ChangeGhosts PlayerId Int
   | ChangeWorkers PlayerId Int
   | Capture PlayerId PlayerId   -- captured is 2nd
-  | SetRuinToken PlayerId (Maybe Token)
+  | SetRuinToken PlayerId [Token]
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
@@ -111,8 +111,7 @@ playerView pid = updField gamePlayers (Map.mapWithKey hide)
 playerUpdateView :: PlayerId -> Update -> Update
 playerUpdateView pid upd =
   case upd of
-    SetRuinToken pid' (Just t) | pid /= pid' ->
-      SetRuinToken pid' (Just (hideToken t))
+    SetRuinToken pid' ts | pid /= pid' -> SetRuinToken pid' (map hideToken ts)
     _ -> upd
 
 

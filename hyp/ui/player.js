@@ -87,6 +87,21 @@ const uiPlayer = (p, s) => {
   return ui
 }
 
+const uiRuinToken = (t) => {
+  if (typeof t === 'string') {
+    const token = div('icon token')
+    token.classList.add(t)
+    setSize(token,'font-size', iconSize/4)
+    setDim(token,iconSize,iconSize)
+    token.innerHTML = '<br>' + t
+    return token
+  } else {
+    const token = uiAction(t.tokenAction).dom
+    token.classList.add('token')
+    return token
+  }
+}
+
 const uiPlayerStats = (player,p) => {
   const dom = div('stats')
 
@@ -120,26 +135,16 @@ const uiPlayerStats = (player,p) => {
   for (let i = 0; i < p._playerCaptured.length; ++i)
     addCaptured(p._playerCaptured[i])
 
-  let token = null
-  const setToken = (t) => {
-    if (token) token.remove()
-    if (!t) { token = null; return }
-
-    if (typeof t === 'string') {
-      token = div('icon token')
-      token.classList.add(t)
-      setSize(token,'font-size', iconSize/4)
-      setDim(token,iconSize,iconSize)
-      token.innerHTML = '<br>' + t
-    } else {
-      token = uiAction(t.tokenAction).dom
-      token.classList.add('token')
+  let tokens = []
+  const setToken = (ts) => {
+    for (let i = 0; i < tokens.length; ++i) tokens[i].remove()
+    tokens = []
+    for (let i = 0; i < ts.length; ++i) {
+      tokens[i] = uiRuinToken(ts[i])
+      dom.appendChild(tokens[i])
     }
-    dom.appendChild(token)
   }
   setToken(p._playerToken)
-
-
 
   const badge = uiPlayerBadge(player)
   badge.style.float = 'right'

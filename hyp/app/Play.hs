@@ -1,7 +1,7 @@
 module Play where
 
 import Data.Text(Text)
-import Control.Monad(forM_,replicateM_)
+import Control.Monad(forM_,replicateM_,unless)
 import qualified Data.Map as Map
 import Data.Maybe(isJust,listToMaybe)
 
@@ -18,6 +18,7 @@ import PlayerState
 import Resource
 import Geometry
 import Tile
+import RuinToken
 
 import BasicAction
 import Common
@@ -125,7 +126,7 @@ actEnterRuin state =
     ) | (loc,ruinId,unit) <- enterRuinLocs playerId board
   ]
   where
-  (playerId,_) = currentPlayer state
+  (playerId,player) = currentPlayer state
   board        = getField gameBoard state
 
   tryGetToken loc ruinId =
@@ -134,9 +135,28 @@ actEnterRuin state =
          Nothing -> pure ()
          Just t  ->
             do update (DropToken loc ruinId)
-               -- XXX: check for existing token
-               update (SetRuinToken playerId (Just t))
-
+               let ts = getField playerToken player
+               update (SetRuinToken playerId (t:ts))
+               unless (null ts)
+                 do ~(AskButton ch) <- choose playerId
+                       [ ( AskButton "Play New"
+                         , "Play new token, keep the old one"
+                         )
+                       , ( AskButton "Play Old"
+                         , "Play old token, keep the new one"
+                         )
+                       , ( AskButton "Discard Old"
+                         , "Discard old token, keep the new one"
+                         )
+                       ]
+                    case ch of
+                      "Play New" ->
+                          do update (SetRuinToken playerId ts)
+                             doGainBenefit playerId (tokenAction t)
+                      "Play Old" ->
+                         do update (SetRuinToken playerId [t])
+                            mapM_ (doGainBenefit playerId . tokenAction) ts
+                      _ -> update (SetRuinToken playerId [t])
 
 actMove :: Opts
 actMove state =

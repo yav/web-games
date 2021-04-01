@@ -14,6 +14,7 @@ import Tile
 import Geometry
 import Action
 import PlayerState
+import RuinToken
 import Tech
 
 data Turn = Turn
@@ -35,6 +36,8 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
            | AskIfAction Int                    -- ^ Activate cond. action
            | AskOrActionLeft Int                -- ^ Choose left of alt. act
            | AskOrActionRight Int               -- ^ Choose right of alt. act
+
+           | AskTurnToken Int                   -- ^ Pick one of the turn tokens
 
            | AskUpgrade Resource                -- ^ Choose upgrade track
 
@@ -107,6 +110,4 @@ turnAutoExecute t = ( concatMap rebuild exec
   where
   (exec,stay) = partition (autoExecute . fst) (bagToList (getField turnReady t))
   rebuild (a,n) = replicate n a
-
-
 

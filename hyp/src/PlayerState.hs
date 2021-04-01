@@ -30,7 +30,7 @@ data PlayerState = PlayerState
   , _playerGhosts    :: Int
   , _playerWorkers   :: Int
   , _playerCaptured  :: Set PlayerId
-  , _playerToken     :: Maybe Token
+  , _playerToken     :: [Token]
   , _playerDevel     :: Map Resource Int
   , _playerTech      :: Map TechId Tech
   , _playerRNG       :: RNG
@@ -66,7 +66,7 @@ emptyPlayerState rng =
       , _playerGhosts    = 0
       , _playerCaptured  = Set.empty
       , _playerWorkers   = 10
-      , _playerToken     = Just (head bronzeTokens) -- XXX: Nothing
+      , _playerToken     = take 1 bronzeTokens -- XXX: Nothing
       , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll, r /= Gray ]
       , _playerTech      = Map.empty
       , _playerRNG       = rng
