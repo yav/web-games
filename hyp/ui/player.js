@@ -94,6 +94,7 @@ const uiRuinToken = (t) => {
     setSize(token,'font-size', iconSize/4)
     setDim(token,iconSize,iconSize)
     token.innerHTML = '<br>' + t
+    tooltip(token,false,t + ' token')
     return token
   } else {
     const token = uiAction(t.tokenAction).dom
@@ -284,6 +285,6 @@ const uiUpgrade = (bag) => {
       if (ui.number < 0) ui.number = 0
       ui.ba.textContent = ui.number
     },
-    ask: (c,q) => { existingQuestion(number[c].dom,false,q) }
+    ask: (c,q) => { existingQuestion(number[c].dom,true,q) }
   }
 }

@@ -6,7 +6,7 @@ import qualified Data.Map as Map
 import Data.Maybe(isJust,listToMaybe)
 
 import Common.Basics
-import Common.Utils(enumAll)
+import Common.Utils(enumAll,showText)
 import Common.Field
 import Common.Interact
 
@@ -29,7 +29,10 @@ setup =
      forM_ (gameTurnOrder state) \p ->
        do replicateM_ 3 (doPlaceWorkerOnCapital p)
           sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Green, Blue ] ] -- XXX: test
+              c `elem` [ Orange, Blue ] ] -- XXX: test
+
+          -- XXX 
+          sequence_ [ update (Upgrade p r 3) | r <- enumAll, r /= Gray ]
           replicateM_ 3 (doDrawCube p)
      startTurn
 
@@ -67,7 +70,8 @@ takeTurn =
                 actMove      state ++
                 actEnterCity state ++
                 actEnterRuin state ++
-                actUseRuinToken state
+                actUseRuinToken state ++
+                actUseUpgrade state
      askInputs opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
@@ -85,6 +89,21 @@ actUseRuinToken state =
   where
   (playerId,player) = currentPlayer state
 
+
+actUseUpgrade :: Opts
+actUseUpgrade state =
+  [ ( playerId :-> AskUpgrade r
+    , "Trade in for " <> showText num <> " " <> showText r
+    , do update (ResetUpgrade playerId r)
+         replicateM_ num (doGainCube playerId r)
+         takeTurn
+    )
+  | (r,n) <- Map.toList (getField playerDevel player)
+  , n >= 4
+  , let num = if n > 5 then 2 else 1
+  ]
+  where
+  (playerId,player) = currentPlayer  state
 
 actPlaceCube :: Opts
 actPlaceCube state =

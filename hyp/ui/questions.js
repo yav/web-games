@@ -54,7 +54,7 @@ const uiQuestion = (q) => {
     AskSupply: (r) => gui.supply.ask(r,q),
     AskPlayerToken: () => gui.player[playerId].stats.askToken(q),
     AskButton: (txt) => {
-      const btn = div('button')
+      const btn = div('group button')
       btn.textContent = txt
       newQuestion(btn,q)
       gui.turn.dom.appendChild(btn)

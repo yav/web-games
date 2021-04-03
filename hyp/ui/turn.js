@@ -9,34 +9,41 @@ const uiTurn = (tu) => {
   const actKey = (a) => JSON.stringify(a)
 
   const draw = (t) => {
-    const undo = div('button question')
+    const undo = div('button question group')
     undo.innerHTML = '&#x2190;'
     undo.addEventListener('click', () => sendJSON({tag: 'undo'}))
     tooltip(undo,false,'Undo')
     dom.appendChild(undo)
 
-    dom.appendChild(span('Turn: '))
-    dom.appendChild(uiPlayerBadge(t.turnPlayer))
-    dom.appendChild(span(' '))
+    const lab = div('group')
+    lab.appendChild(span('Turn: '))
+    lab.appendChild(uiPlayerBadge(t.turnPlayer))
+    dom.appendChild(lab)
     basic = {}
     const ready = t._turnReady
     for (let i = 0; i < ready.length; ++i) {
       const an = ready[i]
       const r = actKey(an[0])
-      sReady[r] = uiBasicAction({tag:'Times',contents:ready[i]})
-      dom.appendChild(sReady[r])
+      const it = uiBasicAction({tag:'Times',contents:ready[i]})
+      sReady[r] = it
+      it.classList.add('group')
+      dom.appendChild(it)
     }
 
     const ifs = t._turnIfs
     for (let i = 0; i < ifs.length; ++i) {
-      sIfs[i] = uiAction({tag:'If',contents:ifs[i]})
-      dom.appendChild(sIfs[i].dom)
+      const it = uiAction({tag:'If',contents:ifs[i]})
+      sIfs[i] = it
+      it.dom.classList.add('group')
+      dom.appendChild(it.dom)
     }
 
     const ors = t._turnOrs
     for (let i = 0; i < ors.length; ++i) {
-      sOrs[i] = uiAction({tag:'Or',contents:ors[i]})
-      dom.appendChild(sOrs[i].dom)
+      const it = uiAction({tag:'Or',contents:ors[i]})
+      sOrs[i] = it
+      it.dom.classList.add('group')
+      dom.appendChild(it.dom)
     }
 
   }
