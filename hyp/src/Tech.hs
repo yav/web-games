@@ -150,7 +150,7 @@ deck2 =
 
   , defTech 1 "Sanctuaries"
     [ Exact Purple, Exact Yellow, Exact Orange ]
-  $ OneTime $ If RemoveWorker [ Gem, Develop Any `Times` 4 ]
+  $ OneTime $ If LooseWorker [ Gem, Develop Any `Times` 4 ]
 
   , defTech 1 "Military conquests"
     [ Exact Purple, Exact Yellow ]
@@ -182,11 +182,11 @@ deck2 =
 
   , defTech 1 "Temples"
     [ Exact Purple, Exact Yellow, AnyNormal ]
-  $ OneTime $ If RemoveWorker [ Gem `Times` 2 ]
+  $ OneTime $ If LooseWorker [ Gem `Times` 2 ]
 
   , defTech 1 "Monasteries"
     [ Exact Purple, Exact Orange, AnyNormal ]
-  $ OneTime $ If RemoveWorker [ GainResource AnyNormal, Develop Any `Times` 3 ]
+  $ OneTime $ If LooseWorker [ GainResource AnyNormal, Develop Any `Times` 3 ]
 
   , defTech 2 "Peace Treaties"
     [ Exact Purple ]
@@ -286,7 +286,7 @@ deck4 =
 
   , defTech 2 "Treachery"
     [ Exact Gray, Exact Gray, Exact Purple ]
-  $ OneTime $ If RemoveWorker [ Neighbours RemoveWorker ]
+  $ OneTime $ If LooseWorker [ Neighbours LooseWorker ]
 
   , defTech 1 "Corruption"
     [ Exact Gray, AnyNormal ]

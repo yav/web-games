@@ -306,7 +306,7 @@ actUseAction state =
     , performIfAction playerId n
     )
   | n <- zipWith const [ 0.. ] (getField turnIfs turn)
-  -- XXX: Only enabled
+  , isEnabled n
   ] ++
   [ ( playerId :-> AskOrActionLeft n
     , "Use action"
@@ -322,6 +322,14 @@ actUseAction state =
   (playerId,_) = currentPlayer state
   turn         = getField gameTurn state
   ors          = zipWith const [ 0.. ] (getField turnOrs turn)
+  isEnabled ba = True  -- XXX
+{-
+    case ba of
+      LooseResource r ->
+      LooseGem 
+      LooseDevelop
+      RemoveWorker ->
+-}
 
 
 performBasicAction :: PlayerId -> BasicAction -> Interact ()

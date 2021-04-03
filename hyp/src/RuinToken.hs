@@ -93,6 +93,6 @@ goldTokens =
     , Action [ Gem, PlaceWorker ]
     , Action [ GainResource AnyNormal ]
     , Action [ PlaceWorker, Develop Any `Times` 3 ]
-    , If RemoveWorker [ Gem `Times` 3 ]
+    , If LooseWorker [ Gem `Times` 3 ]
     ]
 

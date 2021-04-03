@@ -318,7 +318,7 @@ centralTiles =
       [ defRuin Gold ]
 
   , defTile 35 Mountain
-      [ defCity $ If RemoveWorker [ Gem `Times` 3 ] ]
+      [ defCity $ If LooseWorker [ Gem `Times` 3 ] ]
       []
 
   , defTile 36 Forest

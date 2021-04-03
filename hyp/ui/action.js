@@ -205,7 +205,7 @@ const f = function(t) {
         res = actionIcon('gem','Loose gem')
         addBadgeRight('x',res)
       }
-    , RemoveWorker: (n) => {
+    , LooseWorker: (n) => {
         res = actionIcon('deploy', 'Recall')
         addBadgeRight('x',res)
       }

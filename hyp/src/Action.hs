@@ -10,7 +10,7 @@ import Resource
 
 data BasicAction =
     Move | Fly
-  | PlaceWorker | CloneWorker | RemoveWorker
+  | PlaceWorker | CloneWorker
   | Attack      | RangedAttack
   | Fortify
   | Develop DevelopConstratint
@@ -24,6 +24,7 @@ data BasicAction =
   | LooseResource ResourceReq
   | LooseGem
   | LooseDevelop
+  | LooseWorker
   | Spy
 
   | Neighbours BasicAction
@@ -178,7 +179,7 @@ clickable ba =
     LooseResource {}  -> False
     LooseGem          -> False
     LooseDevelop      -> False
-    RemoveWorker      -> False
+    LooseWorker       -> False
     Neighbours {}     -> False
     Move              -> False
     Fly               -> False
@@ -197,7 +198,7 @@ autoExecute ba =
     LooseResource {}  -> True
     LooseGem          -> True
     LooseDevelop      -> True
-    RemoveWorker      -> True
+    LooseWorker       -> True
     Neighbours {}     -> True
 
     Move              -> False

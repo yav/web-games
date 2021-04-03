@@ -45,7 +45,7 @@ doBasicAction playerId ba =
     Gem                 -> doGainGem playerId
     LooseGem            -> update (ChangeGems playerId (-1))
     LooseDevelop        -> todo
-    RemoveWorker        -> todo
+    LooseWorker         -> todo
 
     Neighbours ba'      -> todo
 
