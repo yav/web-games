@@ -1,6 +1,9 @@
+{- # Language OverloadedStrings #-}
 module Common where
 
 import Control.Monad(when)
+import Data.Text(Text)
+import qualified Data.Map as Map
 
 import Common.Basics
 import Common.Field
@@ -57,18 +60,27 @@ doDrawCube playerId =
 
 data GeneralCubeLoc = InBag BagName | OnTech CubeLoc
 
+removeCubeOpts :: PlayerState -> Maybe ResourceReq -> [ (Input,Text) ]
+removeCubeOpts player mbLim = zip (discard ++ ready ++ fromTech) (repeat help)
+  where
+  bags        = getField playerBag player
+  resources b = filter ok $ map fst $ bagToList $ getField (mapAt b) bags
+  ready       = map AskReady (resources BagReady)
+  discard     = map AskDiscard (resources BagDiscard)
+  fromTech    = map AskCubeLoc (techSpots player)
+  (ok,techSpots,help) =
+    case mbLim of
+      Nothing -> (const True, returnSpots, "Return cube")
+      Just t  -> (matches t, removeSpots t, "Remove cube")
+
+
+
 doRemoveCube ::
   PlayerId -> Maybe ResourceReq ->
   (GeneralCubeLoc -> Resource -> Interact ()) -> Interact ()
 doRemoveCube playerId mbLim k =
   do player <- view (getField (playerState playerId))
-     let bags        = getField playerBag player
-         resources b = filter ok $ map fst $ bagToList $ getField (mapAt b) bags
-         ready       = map AskReady (resources BagReady)
-         discard     = map AskDiscard (resources BagDiscard)
-         fromTech    = map AskCubeLoc (techSpots player)
-         questions   = zip (discard ++ ready ++ fromTech) (repeat help)
-     mb <- chooseMaybe playerId questions
+     mb <- chooseMaybe playerId (removeCubeOpts player mbLim)
      case mb of
        Nothing -> pure ()
        Just act ->
@@ -87,10 +99,40 @@ doRemoveCube playerId mbLim k =
            ~(AskDiscard r) ->
              do update (ChangeBag playerId BagDiscard r (-1))
                 k (InBag BagDiscard) r
-  where
-  (ok,techSpots,help) =
-    case mbLim of
-      Nothing -> (const True, returnSpots, "Return cube")
-      Just t  -> (matches t, removeSpots t, "Remove cube")
 
+
+looseUpgradeOpts :: PlayerState -> [ (Input, Text) ]
+looseUpgradeOpts player =
+  [ (AskUpgrade r, "Loose upgrade point")
+  | (r,n) <- Map.toList (getField playerDevel player), n > 0
+  ]
+
+doLooseUpgrade :: PlayerId -> Interact ()
+doLooseUpgrade playerId =
+  do player <- view (getField (playerState playerId))
+     mb <- chooseMaybe playerId (looseUpgradeOpts player)
+     case mb of
+       Nothing -> pure ()
+       Just ~(AskUpgrade r) -> update (Upgrade playerId r (-1))
+
+
+looseWorkerOptions :: PlayerId -> Board -> [(Input,Text)]
+looseWorkerOptions playerId geo =
+  [ (AskUnit loc playerId, "Loose soldier")
+  | (loc,tile) <- Map.toList (getField boardMap geo)
+  , tileHasUnits playerId tile
+  ]
+
+doLooseWorker :: PlayerId -> Interact ()
+doLooseWorker playerId =
+  do board <- view (getField gameBoard)
+     mb <- chooseMaybe playerId (looseWorkerOptions playerId board)
+     case mb of
+       Nothing -> pure ()
+       Just ~(AskUnit loc _) ->
+         do let tile = getField (tileAt loc) board
+                ty   = if tileHasLocked playerId tile > 0 then LockedUnit
+                                                          else FreeUnit
+            update (ChangeUnit playerId ty loc (-1))
+            update (ChangeWorkers playerId 1)
 
