@@ -240,8 +240,8 @@ actMove state =
                              (if moveAsFly && movePts > 0
                                 then Move else Fly) turn))
              tileFrom <- view (getField (gameBoard .> tileAt from))
-             let unit = if tileHasLocked playerId tileFrom > 0 then LockedUnit
-                                                               else FreeUnit
+             let unit = if tileCountBlocked playerId tileFrom > 0
+                           then BlockedUnit else FreeUnit
              update (ChangeUnit playerId unit from (-1))
              update (ChangeUnit playerId FreeUnit to 1)
              b <- view (getField gameBoard)
@@ -252,7 +252,7 @@ actMove state =
               update (ChangeUnit playerId FreeUnit from (-1))
               tileTo <- view (getField (gameBoard .> tileAt to))
               let unit = if tileHasOpponents playerId tileTo
-                                                 then LockedUnit else FreeUnit
+                                                 then BlockedUnit else FreeUnit
               update (ChangeUnit playerId unit to 1)
               b <- view (getField gameBoard)
               sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
@@ -288,7 +288,7 @@ actEndTurn state =
   unblockUnits =
     do units <- view (blockedUnits playerId . getField gameBoard)
        forM_ units \(loc,num) ->
-         do update (ChangeUnit playerId LockedUnit loc (-num))
+         do update (ChangeUnit playerId BlockedUnit loc (-num))
             update (ChangeUnit playerId FreeUnit   loc num)
 
 

@@ -11,7 +11,6 @@ import Common.Basics(PlayerId)
 import Common.Utils(enumAll)
 import Common.Field
 
-import Bag(bagContains)
 import Resource
 import Terrain
 import Tile
@@ -103,7 +102,7 @@ blockedUnits :: PlayerId -> Board -> [(Loc,Int)]
 blockedUnits playerId board =
   [ (loc,n)
   | (loc,tile) <- Map.toList (getField boardMap board)
-  , let n = bagContains LockedUnit (getField (playerUnits playerId) tile)
+  , let n = tileCountBlocked playerId tile
   , n > 0
   ]
 

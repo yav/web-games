@@ -54,7 +54,7 @@ noUnits = PlayerUnits
   , _pHighlight = False
   }
 
-data UnitType = FreeUnit | LockedUnit | Fortification
+data UnitType = FreeUnit | BlockedUnit | Fortification
   deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
 
 instance ToJSONKey UnitType where
@@ -125,9 +125,9 @@ playerUnits p = Field
 -- | Pick a unit that can enter a city/ruin
 enterUnit :: PlayerId -> Tile -> [ UnitType ]
 enterUnit playerId tile
-  | bagContains LockedUnit units > 0 = [ LockedUnit ]
-  | bagContains FreeUnit   units > 0 = [ FreeUnit ]
-  | otherwise                        = []
+  | bagContains BlockedUnit units > 0 = [ BlockedUnit ]
+  | bagContains FreeUnit   units > 0  = [ FreeUnit ]
+  | otherwise                         = []
   where
   units = getField (playerUnits playerId) tile
 
@@ -166,11 +166,11 @@ tileCanFlyFrom = tileHasOutsideUnits
 --------------------------------------------------------------------------------
 -- What kind of units we have
 
--- | How many "locked" units are there.  These are units that can't move
+-- | How many "blocke" units are there.  These are units that can't move
 -- because they arrived this turn and there were eneimes.
-tileHasLocked :: PlayerId -> Tile -> Int
-tileHasLocked playerId =
-  bagContains LockedUnit . getField (playerUnits playerId)
+tileCountBlocked :: PlayerId -> Tile -> Int
+tileCountBlocked playerId = 
+  bagContains BlockedUnit . getField (playerUnits playerId)
 
 tileCountUnits :: PlayerId -> Tile -> Int
 tileCountUnits pid t = free + fromMap citySpot tileCities +
@@ -189,7 +189,7 @@ tileCountUnits pid t = free + fromMap citySpot tileCities +
 -- | Are there any units outside of cities/ruins
 tileHasOutsideUnits :: PlayerId -> Tile -> Bool
 tileHasOutsideUnits playerId tile =
-  bagContains LockedUnit units > 0 ||
+  bagContains BlockedUnit units > 0 ||
   bagContains FreeUnit   units > 0
   where
   units = getField (playerUnits playerId) tile
@@ -221,7 +221,7 @@ tileHasOpponents :: PlayerId -> Tile -> Bool
 tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
   where
   hasOpponent (pid',us) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
-                                          bagContains LockedUnit bag > 0)
+                                          bagContains BlockedUnit bag > 0)
     where bag = getField pUnits us
 
 

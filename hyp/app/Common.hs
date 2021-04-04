@@ -135,8 +135,8 @@ doLooseWorker playerId =
      case mb of
        Just (AskUnit loc _) ->
          do let tile = getField (tileAt loc) board
-                ty   = if tileHasLocked playerId tile > 0 then LockedUnit
-                                                          else FreeUnit
+                ty   = if tileCountBlocked playerId tile > 0 then BlockedUnit
+                                                             else FreeUnit
             update (ChangeUnit playerId ty loc (-1))
             update (ChangeWorkers playerId 1)
 

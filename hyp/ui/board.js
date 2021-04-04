@@ -214,7 +214,7 @@ const uiSoldier = (el,pos,p,info) => {
   const units = info._pUnits || {}
   let fort = units.Fortification || 0
   let free = units.FreeUnit || 0
-  let lock = units.LockedUnit || 0
+  let lock = units.BlockedUnit || 0
 
   const counterDom = badge('')
   counterDom.classList.add('top')
@@ -262,7 +262,7 @@ const uiSoldier = (el,pos,p,info) => {
     change: (ty,n) => {
       switch(ty) {
         case 'FreeUnit': free += n; break
-        case 'LockedUnit': lock += n; break
+        case 'BlockedUnit': lock += n; break
         case 'Fortification': fort +n; break
       }
       update()
