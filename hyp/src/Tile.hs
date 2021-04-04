@@ -3,6 +3,7 @@ module Tile where
 import Data.Text(Text)
 import Data.Map(Map)
 import qualified Data.Map as Map
+import Data.Maybe(mapMaybe)
 import GHC.Generics(Generic)
 
 import qualified Data.Aeson as JS
@@ -33,6 +34,8 @@ type RuinId = Int
 data Tile = Tile
   { tileNumber    :: TileName
   , tileTerrain   :: Terrain
+    -- XXX: probably would have been easier to just have buildings
+    -- with a special case in a building to distinguish cities/ruins
   , _tileCities   :: Map CityId City
   , _tileRuins    :: Map RuinId Ruin
   , _tileVisible  :: Bool
@@ -134,13 +137,33 @@ isStartTile t =
     TileNum _ -> False
     _         -> True
 
--- | Check for opponents opponents oustide city
+-- | Check for opponents opponents oustide city/ruin
 tileHasOpponents :: PlayerId -> Tile -> Bool
 tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
   where
   hasOpponent (pid',us) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
                                           bagContains LockedUnit bag > 0)
     where bag = getField pUnits us
+
+
+-- | Check for opponents opponents in city
+tileOpponentsInCities :: PlayerId -> Tile -> [CityId]
+tileOpponentsInCities pid = mapMaybe check . Map.toList . getField tileCities
+  where
+  check (cityId,city) = case getField citySpot city of
+                          Occupied p | p /= pid -> Just cityId
+                          _                     -> Nothing
+
+-- | Check for opponents opponents in city
+tileOpponentsInRuins :: PlayerId -> Tile -> [RuinId]
+tileOpponentsInRuins pid = mapMaybe check . Map.toList . getField tileRuins
+  where
+  check (ruinId,ruin) = case getField ruinSpot ruin of
+                          Occupied p | p /= pid -> Just ruinId
+                          _                     -> Nothing
+
+
+
 
 -- | Pick a unit that can enter a city/ruin
 enterUnit :: PlayerId -> Tile -> [ UnitType ]
@@ -180,10 +203,13 @@ tileCanFlyFrom playerId tile = bagContains LockedUnit units > 0 ||
   where
   units = getField (playerUnits playerId) tile
 
+-- | Are there any units that can't move because they arrived this
+-- turn and there were eneimes.
 tileHasLocked :: PlayerId -> Tile -> Int
 tileHasLocked playerId =
   bagContains LockedUnit . getField (playerUnits playerId)
 
+-- | Are there any units outside of cities/ruins
 tileHasOutsideUnits :: PlayerId -> Tile -> Bool
 tileHasOutsideUnits playerId tile =
   bagContains LockedUnit units > 0 ||
@@ -191,6 +217,7 @@ tileHasOutsideUnits playerId tile =
   where
   units = getField (playerUnits playerId) tile
 
+-- | Are there any units for this player anywhere
 tileHasUnits :: PlayerId -> Tile -> Bool
 tileHasUnits playerId tile =
   bagContains LockedUnit units > 0 ||
