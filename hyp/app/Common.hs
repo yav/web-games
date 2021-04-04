@@ -118,21 +118,39 @@ doLooseUpgrade playerId =
 
 looseWorkerOptions :: PlayerId -> Board -> [(Input,Text)]
 looseWorkerOptions playerId geo =
-  [ (AskUnit loc playerId, "Loose soldier")
-  | (loc,tile) <- Map.toList (getField boardMap geo)
-  , tileHasUnits playerId tile
+  [ (q, "Loose soldier")
+  | ent <- Map.toList (getField boardMap geo)
+  , q   <- question ent
   ]
+  where
+  question (loc,tile) =
+      [ AskUnit loc playerId | tileHasOutsideUnits      playerId tile] ++
+      [ AskCity loc cityId   | cityId <- tileUnitsInCities playerId tile ] ++
+      [ AskRuin loc ruinId   | ruinId <- tileUnitsInRuins  playerId tile ]
 
 doLooseWorker :: PlayerId -> Interact ()
 doLooseWorker playerId =
   do board <- view (getField gameBoard)
      mb <- chooseMaybe playerId (looseWorkerOptions playerId board)
      case mb of
-       Nothing -> pure ()
-       Just ~(AskUnit loc _) ->
+       Just (AskUnit loc _) ->
          do let tile = getField (tileAt loc) board
                 ty   = if tileHasLocked playerId tile > 0 then LockedUnit
                                                           else FreeUnit
             update (ChangeUnit playerId ty loc (-1))
             update (ChangeWorkers playerId 1)
+
+       Just (AskCity loc cityId) ->
+         do let tile = getField (tileAt loc) board
+                f    = cityAt cityId .> citySpot
+            update (ChangeTile loc (setField f Empty tile))
+            update (ChangeWorkers playerId 1)
+
+       Just (AskRuin loc ruinId) ->
+         do let tile = getField (tileAt loc) board
+                f    = ruinAt ruinId .> ruinSpot
+            update (ChangeTile loc (setField f Empty tile))
+            update (ChangeWorkers playerId 1)
+
+       _ -> pure ()
 

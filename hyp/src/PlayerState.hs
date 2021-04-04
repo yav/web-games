@@ -57,7 +57,9 @@ emptyPlayerState rng =
                                   ++ reverse (filter dbg (deck1 ++ deck2 ++ deck3 ++ deck4)))
   where
   dbg t = any dbgP (getField techAlts t)
-  dbgP = techAltHas (SwapResource AnyNormal AnyNormal)
+  dbgP a = case techBenefit a of
+             OneTime (If _ _) -> True
+             _ -> False
 
   s0 =
    PlayerState

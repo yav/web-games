@@ -160,7 +160,7 @@ const uiHex = (container,info) => {
     cities: cities,
     ruins: ruins,
 
-    askUnit: (pid,q) => units[pid].obj.ask(q),
+    askUnit: (pid,q) => { console.log("Player: " + pid); console.log(units); units[pid].obj.ask(q) },
 
     // assumes unit exits
     setUnitHighlight: (pid,yes) => units[pid].obj.setHighlight(yes),
@@ -268,7 +268,7 @@ const uiSoldier = (el,pos,p,info) => {
       update()
       return free + lock + fort > 0
     },
-    ask: (q) => { console.log('ask'); existingQuestion(dom,false,q) }
+    ask: (q) => existingQuestion(dom,false,q)
   }
 }
 

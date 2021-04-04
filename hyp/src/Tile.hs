@@ -184,6 +184,13 @@ tileHasLocked :: PlayerId -> Tile -> Int
 tileHasLocked playerId =
   bagContains LockedUnit . getField (playerUnits playerId)
 
+tileHasOutsideUnits :: PlayerId -> Tile -> Bool
+tileHasOutsideUnits playerId tile =
+  bagContains LockedUnit units > 0 ||
+  bagContains FreeUnit   units > 0
+  where
+  units = getField (playerUnits playerId) tile
+
 tileHasUnits :: PlayerId -> Tile -> Bool
 tileHasUnits playerId tile =
   bagContains LockedUnit units > 0 ||
