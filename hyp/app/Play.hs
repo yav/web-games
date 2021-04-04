@@ -251,7 +251,7 @@ actMove state =
            do update (SetTurn (turnRemoveReadyN cost Move turn))
               update (ChangeUnit playerId FreeUnit from (-1))
               tileTo <- view (getField (gameBoard .> tileAt to))
-              let unit = if tileHasOpponents playerId tileTo
+              let unit = if tileHasOutsideOpponents playerId tileTo
                                                  then BlockedUnit else FreeUnit
               update (ChangeUnit playerId unit to 1)
               b <- view (getField gameBoard)

@@ -4,6 +4,8 @@ import Data.Text(Text)
 import Data.Map(Map)
 import qualified Data.Map as Map
 import Data.Maybe(mapMaybe)
+import Data.Set(Set)
+import qualified Data.Set as Set
 import GHC.Generics(Generic)
 
 import qualified Data.Aeson as JS
@@ -172,6 +174,7 @@ tileCountBlocked :: PlayerId -> Tile -> Int
 tileCountBlocked playerId = 
   bagContains BlockedUnit . getField (playerUnits playerId)
 
+-- | How many total units we have on a tile
 tileCountUnits :: PlayerId -> Tile -> Int
 tileCountUnits pid t = free + fromMap citySpot tileCities +
                                   fromMap ruinSpot tileRuins
@@ -216,14 +219,31 @@ tileUnitsInRuins playerId tile =
 --------------------------------------------------------------------------------
 -- What units our opponnets have
 
+-- | Which opponents of the given player have presenece on this tile
+tilePresentOpponents :: PlayerId -> Tile -> Set PlayerId
+tilePresentOpponents playerId tile = Set.fromList (outside ++ cities ++ ruins)
+  where
+  outside = [ pid | (pid,what) <- Map.toList (tilePlayers tile)
+                  , pid /= playerId
+                  , let us = getField pUnits what
+                  , bagContains FreeUnit us + bagContains BlockedUnit us > 0
+                  ]
+  cities = [ pid | Occupied pid <- map (getField (citySpot))
+                                 $ Map.elems (getField tileCities tile)
+                 , pid /= playerId
+                 ]
+  ruins  = [ pid | Occupied pid <- map (getField ruinSpot)
+                                 $ Map.elems (getField tileRuins tile)
+                 , pid /= playerId ]
+
+
 -- | Check for opponents oustide city/ruin
-tileHasOpponents :: PlayerId -> Tile -> Bool
-tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
+tileHasOutsideOpponents :: PlayerId -> Tile -> Bool
+tileHasOutsideOpponents pid = any hasOpponent . Map.toList . tilePlayers
   where
   hasOpponent (pid',us) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
                                           bagContains BlockedUnit bag > 0)
     where bag = getField pUnits us
-
 
 -- | Check for opponents opponents in city
 tileOpponentsInCities :: PlayerId -> Tile -> [CityId]

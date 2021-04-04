@@ -3,6 +3,8 @@ module Geometry where
 import GHC.Generics(Generic)
 import Data.Map(Map)
 import qualified Data.Map as Map
+import Data.Set(Set)
+import qualified Data.Set as Set
 import Data.List(find)
 
 import Data.Aeson(ToJSON(..),FromJSON)
@@ -62,10 +64,10 @@ neighbours l b = [ loc
                  , onBoard loc b
                  ]
 
+--------------------------------------------------------------------------------
 countWorkers :: PlayerId -> Board -> Int
 countWorkers pid =
   sum . map (tileCountUnits pid) . Map.elems . getField boardMap
-
 
 enterCityLocs :: PlayerId -> Board -> [(Loc,CityId,UnitType)]
 enterCityLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
@@ -126,6 +128,18 @@ revealTiles l board =
   , let t = getField (tileAt x) board
   , not (getField tileVisible t)
   ]
+
+neighbourPlayers :: PlayerId -> Board -> Set PlayerId
+neighbourPlayers playerId board =
+  Set.unions
+    [ playersOf l
+    | (loc,tile) <- Map.toList (getField boardMap board)
+    , tileCountUnits playerId tile > 0
+    , l <- loc : neighbours loc board
+    ]
+  where 
+  playersOf loc = tilePresentOpponents playerId (getField (tileAt loc) board)
+
 
 --------------------------------------------------------------------------------
 emptyBoard :: Board
