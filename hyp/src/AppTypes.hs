@@ -160,7 +160,7 @@ doUpdate upd =
                        (bagChange n ty)
 
     SetUnithighlight loc p yes ->
-      Right . setField (gameBoard .> tileAt loc .> playerUnitsHiglight p) yes
+      Right . setField (gameBoard .> tileAt loc .> playerUnitsHighlight p) yes
 
     SetCity loc cityId val ->
       Right . setField (gameBoard .> tileAt loc

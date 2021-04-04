@@ -81,14 +81,18 @@ declareFields ''City
 declareFields ''Ruin
 declareFields ''PlayerUnits
 
+
+--------------------------------------------------------------------------------
+-- Computed fields
+
 cityAt :: CityId -> Field Tile City
 cityAt cityId = tileCities .> mapAt cityId
 
 ruinAt :: CityId -> Field Tile Ruin
 ruinAt ruinId = tileRuins .> mapAt ruinId
 
-playerUnitsHiglight :: PlayerId -> Field Tile Bool
-playerUnitsHiglight p = Field
+playerUnitsHighlight :: PlayerId -> Field Tile Bool
+playerUnitsHighlight p = Field
   { getField = getField pHighlight . Map.findWithDefault noUnits p . tilePlayers
   , setField = \b t ->
     t { tilePlayers =
@@ -113,57 +117,10 @@ playerUnits p = Field
         }
   }
 
-countWorkersOnTile :: PlayerId -> Tile -> Int
-countWorkersOnTile pid t = free + fromMap citySpot tileCities +
-                                  fromMap ruinSpot tileRuins
-  where
-  free = sum $ map snd $ bagToList $ getField (playerUnits pid) t
-
-  fromMap g f =
-    sum $ map (countTileSpot . getField g) $ Map.elems $ getField f t
-
-  countTileSpot s =
-    case s of
-      Occupied x | x == pid -> 1
-      _ -> 0
 
 
-setCapital :: Maybe PlayerId -> Tile -> Tile
-setCapital p = setField tileCapital p
-
-isStartTile :: Tile -> Bool
-isStartTile t =
-  case tileNumber t of
-    TileNum _ -> False
-    _         -> True
-
--- | Check for opponents opponents oustide city/ruin
-tileHasOpponents :: PlayerId -> Tile -> Bool
-tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
-  where
-  hasOpponent (pid',us) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
-                                          bagContains LockedUnit bag > 0)
-    where bag = getField pUnits us
-
-
--- | Check for opponents opponents in city
-tileOpponentsInCities :: PlayerId -> Tile -> [CityId]
-tileOpponentsInCities pid = mapMaybe check . Map.toList . getField tileCities
-  where
-  check (cityId,city) = case getField citySpot city of
-                          Occupied p | p /= pid -> Just cityId
-                          _                     -> Nothing
-
--- | Check for opponents opponents in city
-tileOpponentsInRuins :: PlayerId -> Tile -> [RuinId]
-tileOpponentsInRuins pid = mapMaybe check . Map.toList . getField tileRuins
-  where
-  check (ruinId,ruin) = case getField ruinSpot ruin of
-                          Occupied p | p /= pid -> Just ruinId
-                          _                     -> Nothing
-
-
-
+--------------------------------------------------------------------------------
+-- Entering building
 
 -- | Pick a unit that can enter a city/ruin
 enterUnit :: PlayerId -> Tile -> [ UnitType ]
@@ -192,22 +149,42 @@ tileEnterRuins playerId tile =
     , ty         <- enterUnit playerId tile
   ]
 
+
+--------------------------------------------------------------------------------
+-- Movement
+
 tileCanMoveFrom :: PlayerId -> Tile -> Bool
 tileCanMoveFrom playerId tile = bagContains FreeUnit units > 0
   where
   units = getField (playerUnits playerId) tile
 
 tileCanFlyFrom :: PlayerId -> Tile -> Bool
-tileCanFlyFrom playerId tile = bagContains LockedUnit units > 0 ||
-                               bagContains FreeUnit   units > 0
-  where
-  units = getField (playerUnits playerId) tile
+tileCanFlyFrom = tileHasOutsideUnits
 
--- | Are there any units that can't move because they arrived this
--- turn and there were eneimes.
+
+
+--------------------------------------------------------------------------------
+-- What kind of units we have
+
+-- | How many "locked" units are there.  These are units that can't move
+-- because they arrived this turn and there were eneimes.
 tileHasLocked :: PlayerId -> Tile -> Int
 tileHasLocked playerId =
   bagContains LockedUnit . getField (playerUnits playerId)
+
+tileCountUnits :: PlayerId -> Tile -> Int
+tileCountUnits pid t = free + fromMap citySpot tileCities +
+                                  fromMap ruinSpot tileRuins
+  where
+  free = sum $ map snd $ bagToList $ getField (playerUnits pid) t
+
+  fromMap g f =
+    sum $ map (countTileSpot . getField g) $ Map.elems $ getField f t
+
+  countTileSpot s =
+    case s of
+      Occupied x | x == pid -> 1
+      _ -> 0
 
 -- | Are there any units outside of cities/ruins
 tileHasOutsideUnits :: PlayerId -> Tile -> Bool
@@ -216,21 +193,6 @@ tileHasOutsideUnits playerId tile =
   bagContains FreeUnit   units > 0
   where
   units = getField (playerUnits playerId) tile
-
--- | Are there any units for this player anywhere
-tileHasUnits :: PlayerId -> Tile -> Bool
-tileHasUnits playerId tile =
-  bagContains LockedUnit units > 0 ||
-  bagContains FreeUnit   units > 0 ||
-  any (isPresent . getField citySpot) cities ||
-  any (isPresent . getField ruinSpot) ruins
-  where
-  units  = getField (playerUnits playerId) tile
-  cities = getField tileCities tile
-  ruins  = getField tileRuins tile
-  isPresent r = case r of
-                  Occupied p -> p == playerId
-                  _          -> False
 
 tileUnitsInCities :: PlayerId -> Tile -> [CityId]
 tileUnitsInCities playerId tile =
@@ -252,7 +214,47 @@ tileUnitsInRuins playerId tile =
 
 
 --------------------------------------------------------------------------------
+-- What units our opponnets have
+
+-- | Check for opponents oustide city/ruin
+tileHasOpponents :: PlayerId -> Tile -> Bool
+tileHasOpponents pid = any hasOpponent . Map.toList . tilePlayers
+  where
+  hasOpponent (pid',us) = pid /= pid' && (bagContains FreeUnit   bag > 0 ||
+                                          bagContains LockedUnit bag > 0)
+    where bag = getField pUnits us
+
+
+-- | Check for opponents opponents in city
+tileOpponentsInCities :: PlayerId -> Tile -> [CityId]
+tileOpponentsInCities pid = mapMaybe check . Map.toList . getField tileCities
+  where
+  check (cityId,city) = case getField citySpot city of
+                          Occupied p | p /= pid -> Just cityId
+                          _                     -> Nothing
+
+-- | Check for opponents opponents in city
+tileOpponentsInRuins :: PlayerId -> Tile -> [RuinId]
+tileOpponentsInRuins pid = mapMaybe check . Map.toList . getField tileRuins
+  where
+  check (ruinId,ruin) = case getField ruinSpot ruin of
+                          Occupied p | p /= pid -> Just ruinId
+                          _                     -> Nothing
+
+
+
+
+--------------------------------------------------------------------------------
 -- Setup
+
+setCapital :: Maybe PlayerId -> Tile -> Tile
+setCapital p = setField tileCapital p
+
+isStartTile :: Tile -> Bool
+isStartTile t =
+  case tileNumber t of
+    TileNum _ -> False
+    _         -> True
 
 
 type SetupM = StateT RuinTokens Id

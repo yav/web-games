@@ -65,7 +65,7 @@ neighbours l b = [ loc
 
 countWorkers :: PlayerId -> Board -> Int
 countWorkers pid =
-  sum . map (countWorkersOnTile pid) . Map.elems . getField boardMap
+  sum . map (tileCountUnits pid) . Map.elems . getField boardMap
 
 
 enterCityLocs :: PlayerId -> Board -> [(Loc,CityId,UnitType)]
@@ -81,7 +81,7 @@ enterRuinLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
 cloneLocs :: PlayerId -> Board -> [Loc]
 cloneLocs playerId board =
   [ l | (l,t) <- Map.toList (getField boardMap board)
-      , tileHasUnits playerId t
+      , tileCountUnits playerId t > 0
   ]
 
 moveLocs :: PlayerId -> Int -> Board -> [(Loc,[(Int,Loc)])]
