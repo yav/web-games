@@ -33,7 +33,8 @@ import Data.Aeson (ToJSON(..), FromJSON(..), (.=), (.:?))
 import qualified Data.Aeson as JS
 
 import Common.Basics
-import AppTypes(State,Finished,Input,Update,doUpdate,playerView)
+import AppTypes(State,Finished,Input,Update,doUpdate,
+                                  playerView,playerUpdateView)
 
 
 
@@ -183,7 +184,7 @@ interaction how s = (s1,msgs)
 
   (s1,os) = m (\_ -> (,)) s []
   msgs    = [ p :-> o | p <- iPlayers s1
-                      , o <- map GameUpdate os ]
+                      , o <- map (GameUpdate . playerUpdateView p) os ]
 
 interaction_ :: Either (Interact ()) (WithPlayer Input) ->
                InteractState -> InteractState

@@ -23,13 +23,13 @@ import Common
 doBasicAction :: PlayerId -> BasicAction -> Interact ()
 doBasicAction playerId ba =
   case ba of
-    Move   -> pure ()
-    Fly    -> pure ()
-    Attack -> pure ()
+    Move                -> pure ()
+    Fly                 -> pure ()
+    Attack              -> pure ()
+    RangedAttack        -> pure ()
 
     CloneWorker         -> doSimple ba $ doCloneWorker playerId
     PlaceWorker         -> doSimple ba $ doPlaceWorker playerId
-    RangedAttack        -> todo
     Fortify             -> todo
     Develop ctr         -> doSimple ba $ doUpgrade playerId ctr
 
