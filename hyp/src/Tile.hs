@@ -164,6 +164,22 @@ tileCanFlyFrom :: PlayerId -> Tile -> Bool
 tileCanFlyFrom = tileHasOutsideUnits
 
 
+shouldUnblock :: Tile -> Maybe (PlayerId,Int)
+shouldUnblock tile =
+  case present of
+    [ (pid,blocked,_) ] | blocked > 0 -> Just (pid,blocked)
+    _                                 -> Nothing
+  where
+  present =
+    [ (pid,blocked,free)
+    | (pid,info) <- Map.toList (tilePlayers tile)
+    , let units   = getField pUnits info
+          blocked = bagContains BlockedUnit units
+          free    = bagContains FreeUnit units
+    , blocked + free > 0
+    ]
+
+
 
 --------------------------------------------------------------------------------
 -- What kind of units we have
@@ -245,6 +261,15 @@ tileHasOutsideOpponents pid = any hasOpponent . Map.toList . tilePlayers
                                           bagContains BlockedUnit bag > 0)
     where bag = getField pUnits us
 
+-- | Opponents outside a city, for attacking
+tileOutsideOpponents :: PlayerId -> Tile -> [PlayerId]
+tileOutsideOpponents pid = mapMaybe checkPresent . Map.toList . tilePlayers
+  where
+  checkPresent (pid',pinfo)
+    | pid == pid' || bagIsEmpty (getField pUnits pinfo)  = Nothing
+    | otherwise                                          = Just pid'
+
+
 -- | Check for opponents opponents in city
 tileOpponentsInCities :: PlayerId -> Tile -> [CityId]
 tileOpponentsInCities pid = mapMaybe check . Map.toList . getField tileCities
@@ -253,6 +278,7 @@ tileOpponentsInCities pid = mapMaybe check . Map.toList . getField tileCities
                           Occupied p | p /= pid -> Just cityId
                           _                     -> Nothing
 
+
 -- | Check for opponents opponents in city
 tileOpponentsInRuins :: PlayerId -> Tile -> [RuinId]
 tileOpponentsInRuins pid = mapMaybe check . Map.toList . getField tileRuins
@@ -260,6 +286,22 @@ tileOpponentsInRuins pid = mapMaybe check . Map.toList . getField tileRuins
   check (ruinId,ruin) = case getField ruinSpot ruin of
                           Occupied p | p /= pid -> Just ruinId
                           _                     -> Nothing
+
+
+tileGhostInCities :: Tile -> [CityId]
+tileGhostInCities = mapMaybe check . Map.toList .getField tileCities
+  where
+  check (cityId,city) = case getField citySpot city of
+                          Ghost -> Just cityId
+                          _     -> Nothing
+
+tileGhostInRuins :: Tile -> [RuinId]
+tileGhostInRuins = mapMaybe check . Map.toList .getField tileRuins
+  where
+  check (ruinId,ruin) = case getField ruinSpot ruin of
+                          Ghost -> Just ruinId
+                          _     -> Nothing
+
 
 
 

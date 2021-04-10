@@ -6,6 +6,7 @@ import qualified Data.Map as Map
 import Data.Set(Set)
 import qualified Data.Set as Set
 import Data.List(find)
+import Control.Monad(guard)
 
 import Data.Aeson(ToJSON(..),FromJSON)
 
@@ -139,6 +140,41 @@ neighbourPlayers playerId board =
     ]
   where 
   playersOf loc = tilePresentOpponents playerId (getField (tileAt loc) board)
+
+
+attackTargets ::
+  PlayerId -> Board -> [(Loc,[PlayerId],[CityId],[RuinId])]
+attackTargets playerId board =
+  [ ans
+  | (loc,tile) <- Map.toList (getField boardMap board)
+  , tileHasOutsideUnits playerId tile
+  , ans <- tileTargets playerId loc tile
+  ]
+
+
+rangedAttackTargets ::
+  PlayerId -> Board -> [(Loc,[PlayerId],[CityId],[RuinId])]
+rangedAttackTargets playerId board =
+  [ ans
+  | (loc,tile) <- Map.toList (getField boardMap board)
+  , tileHasOutsideUnits playerId tile
+  , ans <- tileTargets playerId loc tile ++
+           [ a | n <- neighbours loc board
+               , a <- tileTargets playerId n (getField (tileAt n) board)
+           ]
+  ]
+
+tileTargets :: PlayerId -> Loc -> Tile -> [(Loc,[PlayerId],[CityId],[RuinId])]
+tileTargets playerId loc tile =
+  do let out    = tileOutsideOpponents playerId tile
+         cities = tileOpponentsInCities playerId tile ++
+                  tileGhostInCities tile
+         ruins  = tileOpponentsInRuins playerId tile ++
+                  tileGhostInRuins tile
+     guard (not (null out && null cities && null ruins))
+     pure (loc,out,cities,ruins)
+
+
 
 
 --------------------------------------------------------------------------------

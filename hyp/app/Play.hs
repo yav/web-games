@@ -1,8 +1,9 @@
 module Play where
 
 import Data.Text(Text)
-import Control.Monad(forM_,replicateM_,unless)
+import Control.Monad(forM_,replicateM_,unless,when)
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import Data.Maybe(isJust,listToMaybe)
 
 import Common.Basics
@@ -71,6 +72,7 @@ takeTurn =
                 actEnterCity state ++
                 actEnterRuin state ++
                 actUseRuinToken state ++
+                actAttack state ++
                 actUseUpgrade state
      askInputs opts
 
@@ -138,7 +140,7 @@ actEnterCity state =
   [ ( playerId :-> AskCity loc cityId
     , "Enter city"
     , do let city = getField (tileAt loc .> cityAt cityId) board
-         update (ChangeUnit playerId unit loc (-1))
+         doRemoveUnit playerId unit loc
          update (SetCity loc cityId (Occupied playerId))
          doGainBenefit playerId (cityActions city)
          takeTurn
@@ -152,7 +154,7 @@ actEnterRuin :: Opts
 actEnterRuin state =
   [ ( playerId :-> AskRuin loc ruinId
     , "Enter ruin"
-    , do update (ChangeUnit playerId unit loc (-1))
+    , do doRemoveUnit playerId unit loc
          update (SetRuin loc ruinId (Occupied playerId))
          tryGetToken loc ruinId
          takeTurn
@@ -242,14 +244,14 @@ actMove state =
              tileFrom <- view (getField (gameBoard .> tileAt from))
              let unit = if tileCountBlocked playerId tileFrom > 0
                            then BlockedUnit else FreeUnit
-             update (ChangeUnit playerId unit from (-1))
+             doRemoveUnit playerId unit from
              update (ChangeUnit playerId FreeUnit to 1)
              b <- view (getField gameBoard)
              sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
 
          ~(AskMap to (Times Move cost)) ->
            do update (SetTurn (turnRemoveReadyN cost Move turn))
-              update (ChangeUnit playerId FreeUnit from (-1))
+              doRemoveUnit playerId FreeUnit from
               tileTo <- view (getField (gameBoard .> tileAt to))
               let unit = if tileHasOutsideOpponents playerId tileTo
                                                  then BlockedUnit else FreeUnit
@@ -258,6 +260,122 @@ actMove state =
               sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
 
        takeTurn
+
+
+
+actAttack :: Opts
+actAttack state
+  | attackPts > 0  && rattackPts == 0 =
+    concatMap (askAttack (Just Attack)) aTargets
+
+  | attackPts == 0 && rattackPts > 0 =
+    concatMap (askAttack (Just RangedAttack)) rTargets
+
+  | attackPts > 0  && rattackPts > 0 =
+    concatMap (askAttack Nothing)  aTargets ++
+    concatMap (askAttack (Just RangedAttack)) onlyRanged
+
+  | otherwise = []
+  where
+  (playerId,player) = currentPlayer state
+  ready             = getField (gameTurn .> turnReady) state
+  attackPts         = bagContains Attack ready
+  rattackPts        = bagContains RangedAttack ready
+
+  board             = getField gameBoard state
+  aTargets          = attackTargets playerId board
+  rTargets          = rangedAttackTargets playerId board
+  onlyRanged        = [ r | r <- rTargets, not (r `elem` aTargets) ]
+
+  askAttack how (loc,opponents,cities,ruins) =
+    let ahelp = case how of
+                  Just RangedAttack -> "Ranged attack"
+                  Just Attack       -> "Attack"
+                  _                 -> "Attack / Ranged attack"
+    in
+    [ ( playerId :-> AskUnit loc p
+      , ahelp <> " player"
+      , doAttack how (rmPlayer loc p)
+      ) | p <- opponents
+    ] ++
+    [ ( playerId :-> AskCity loc cityId
+      , ahelp <> " city"
+      , doAttack how (rmCity loc cityId)
+      ) | cityId <- cities
+    ] ++
+    [ ( playerId :-> AskRuin loc ruinId
+      , ahelp <> " ruin"
+      , doAttack how (rmRuin loc ruinId)
+      ) | ruinId <- ruins
+    ]
+
+  askAttackType how =
+    case how of
+      Just a -> pure a
+      Nothing ->
+        do ~(AskReadyAction a) <-
+                choose playerId
+                    [ (AskReadyAction Attack, "Use normal attack")
+                    , (AskReadyAction RangedAttack, "Use ranged attack")
+                    ]
+           pure a
+
+  payCost how =
+    do ty <- askAttackType how
+       tu <- view (getField gameTurn)
+       update $ SetTurn $ turnRemoveReady ty tu
+       pure ty
+
+  returnUnitTo otherPlayer = update (ChangeWorkers otherPlayer 1)
+
+  gainTrophy ty x =
+    do case x of
+         Nothing    -> pure ()
+         Just Ghost -> update (ChangeGhosts playerId 1)
+         Just ~(Occupied pid) ->
+          let captured = getField playerCaptured player
+              hasAll = Set.delete playerId (Set.fromList (gameTurnOrder state))
+                          == captured
+          in case ty of
+               RangedAttack -> returnUnitTo pid
+               _ ->
+                 if pid `Set.member` captured
+                   then do returnUnitTo pid
+                           when hasAll (update (ChangeGems playerId 1))
+                   else update (Capture playerId pid)
+
+       takeTurn
+
+  doAttack how rm =
+    do ty     <- payCost how
+       trophy <- rm
+       gainTrophy ty trophy
+
+  rmPlayer loc p =
+    do let units = getField (tileAt loc .> playerUnits p) board
+       case () of
+         _ | bagContains Fortification units > 0 ->
+              do doRemoveUnit p Fortification loc
+                 pure Nothing
+           | bagContains FreeUnit units > 0 ->
+              do doRemoveUnit p FreeUnit loc
+                 pure (Just (Occupied p))
+           | bagContains BlockedUnit units > 0 ->
+              do doRemoveUnit p BlockedUnit loc
+                 pure (Just (Occupied p))
+           | otherwise -> pure Nothing -- shouldn't happen
+
+  rmCity loc cityId =
+    do let u = getField (tileAt loc .> cityAt cityId .> citySpot) board
+       update (SetCity loc cityId Empty)
+       pure (Just u)
+
+  rmRuin loc ruinId =
+    do let u = getField (tileAt loc .> ruinAt ruinId .> ruinSpot) board
+       update (SetRuin loc ruinId Empty)
+       pure (Just u)
+
+
 
 
 actEndTurn :: Opts

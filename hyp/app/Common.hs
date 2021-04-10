@@ -137,7 +137,7 @@ doLooseWorker playerId =
          do let tile = getField (tileAt loc) board
                 ty   = if tileCountBlocked playerId tile > 0 then BlockedUnit
                                                              else FreeUnit
-            update (ChangeUnit playerId ty loc (-1))
+            doRemoveUnit playerId ty loc
             update (ChangeWorkers playerId 1)
 
        Just (AskCity loc cityId) ->
@@ -153,4 +153,15 @@ doLooseWorker playerId =
             update (ChangeWorkers playerId 1)
 
        _ -> pure ()
+
+
+doRemoveUnit :: PlayerId -> UnitType -> Loc -> Interact ()
+doRemoveUnit pid ty loc =
+  do update (ChangeUnit pid ty loc (-1))
+     mb <- view (shouldUnblock . getField (gameBoard .> tileAt loc))
+     case mb of
+       Nothing -> pure ()
+       Just (pid',n) ->
+         do update (ChangeUnit pid' BlockedUnit loc (-n))
+            update (ChangeUnit pid' FreeUnit    loc   n)
 

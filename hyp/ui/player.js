@@ -159,7 +159,7 @@ const uiPlayerStats = (player,p) => {
     },
     changeGhosts: (n) => {
       ghosts += n
-      ghostBagde.textContent = ghosts
+      ghostBadge.textContent = ghosts
     },
     changeWorkers: (n) => {
       workers += n
