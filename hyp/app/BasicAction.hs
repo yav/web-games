@@ -3,6 +3,7 @@ module BasicAction where
 import Control.Monad(replicateM_,void,unless)
 import Data.List(delete)
 import qualified Data.Map as Map
+import Data.Foldable(traverse_)
 
 import Common.Basics
 import Common.Field
@@ -20,24 +21,24 @@ import Tech
 
 import Common
 
-doBasicAction :: PlayerId -> BasicAction -> Interact ()
-doBasicAction playerId ba =
+doBasicAction :: PlayerId -> Bool -> BasicAction -> Interact ()
+doBasicAction playerId isFree ba =
   case ba of
     Move                -> pure ()
     Fly                 -> pure ()
     Attack              -> pure ()
     RangedAttack        -> pure ()
 
-    CloneWorker         -> doSimple ba $ doCloneWorker playerId
-    PlaceWorker         -> doSimple ba $ doPlaceWorker playerId
+    CloneWorker         -> doSimple isFree ba $ doCloneWorker playerId
+    PlaceWorker         -> doSimple isFree ba $ doPlaceWorker playerId
     Fortify             -> todo
-    Develop ctr         -> doSimple ba $ doUpgrade playerId ctr
+    Develop ctr         -> doSimple isFree ba $ doUpgrade playerId ctr
 
-    GainTech            -> doSimple ba $ doGainTech playerId True
-    DrawResource        -> doSimple ba $ void $ doDrawCube playerId
-    ReturnResource      -> doSimple ba $ doReturnResource playerId
-    SwapResource r1 r2  -> doSimple ba $ doSwapResource playerId r1 r2
-    GainResource r      -> doSimple ba $ doGainResource playerId r
+    GainTech            -> doSimple isFree ba $ doGainTech playerId True
+    DrawResource        -> doSimple isFree ba $ void $ doDrawCube playerId
+    ReturnResource      -> doSimple isFree ba $ doReturnResource playerId
+    SwapResource r1 r2  -> doSimple isFree ba $ doSwapResource playerId r1 r2
+    GainResource r      -> doSimple isFree ba $ doGainResource playerId r
     Spy                 -> todo
 
     -- these are auto activated so no need to remove
@@ -47,19 +48,20 @@ doBasicAction playerId ba =
     LooseDevelop        -> doLooseUpgrade playerId
     LooseWorker         -> doLooseWorker playerId
 
-    Neighbours ba'      -> todo
+    Neighbours ba'      -> doNeighbours playerId ba'
 
-    Times ba' n -> replicateM_ n (doBasicAction playerId ba') -- hm
+    Times ba' n -> replicateM_ n (doBasicAction playerId isFree ba') -- hm
 
   where
   todo = pure ()
 
 
-doSimple :: BasicAction -> Interact () -> Interact ()
-doSimple ba m =
+doSimple :: Bool -> BasicAction -> Interact () -> Interact ()
+doSimple isFree ba m =
   do m
-     t <- view (getField gameTurn)
-     update (SetTurn (turnRemoveReady ba t))
+     unless isFree
+        do t <- view (getField gameTurn)
+           update (SetTurn (turnRemoveReady ba t))
 
 
 doCloneWorker :: PlayerId -> Interact ()
@@ -187,4 +189,9 @@ doGainTech playerId withReset =
                 update (ChangeBag playerId BagDiscard Gray 1)
                 update (SetMarket d m2)
            Nothing -> pure ()
+
+doNeighbours :: PlayerId -> BasicAction -> Interact ()
+doNeighbours playerId act =
+  do ps <- view (neighbourPlayers playerId . getField gameBoard)
+     traverse_ (\p -> doBasicAction p True act) ps
 

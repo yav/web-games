@@ -30,7 +30,7 @@ setup =
      forM_ (gameTurnOrder state) \p ->
        do replicateM_ 3 (doPlaceWorkerOnCapital p)
           sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Red, Green] ] -- XXX: test
+              c `elem` [ Red, Green, Orange] ] -- XXX: test
 
           -- XXX 
           sequence_ [ update (Upgrade p r 3) | r <- enumAll, r /= Gray ]
@@ -453,7 +453,7 @@ actUseAction state =
 
 performBasicAction :: PlayerId -> BasicAction -> Interact ()
 performBasicAction playerId b =
-  do doBasicAction playerId b
+  do doBasicAction playerId False b
      takeTurn
 
 performIfAction :: PlayerId -> Int -> Interact ()
@@ -549,6 +549,6 @@ doGainBenefit playerId a =
          a'     = foldr contModifyAction a (continuousBenefits player)
          (now,t1) = turnAutoExecute $ turnAddAction a' $ getField gameTurn state
      update (SetTurn t1)
-     mapM_ (doBasicAction playerId) now
+     mapM_ (doBasicAction playerId True) now
                         -- here we assume the order does not matter
 
