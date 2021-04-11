@@ -551,13 +551,4 @@ checkGainBenefit playerId lastCube =
            doGainBenefit playerId a
        _ -> pure ()
 
-doGainBenefit :: PlayerId -> Action -> Interact ()
-doGainBenefit playerId a =
-  do state <- getState
-     let player = getField (playerState playerId) state
-         a'     = foldr contModifyAction a (continuousBenefits player)
-         (now,t1) = turnAutoExecute $ turnAddAction a' $ getField gameTurn state
-     update (SetTurn t1)
-     mapM_ (doBasicAction playerId True) now
-                        -- here we assume the order does not matter
 

@@ -40,7 +40,7 @@ doBasicAction playerId isFree ba =
     ReturnResource      -> doSimple isFree ba $ doReturnResource playerId
     SwapResource r1 r2  -> doSimple isFree ba $ doSwapResource playerId r1 r2
     GainResource r      -> doSimple isFree ba $ doGainResource playerId r
-    Spy                 -> todo
+    Spy                 -> doSimple isFree ba $ doSpy playerId
 
     -- these are auto activated so no need to remove
     LooseResource r     -> doRemoveResource playerId r
@@ -53,8 +53,6 @@ doBasicAction playerId isFree ba =
 
     Times ba' n -> replicateM_ n (doBasicAction playerId isFree ba') -- hm
 
-  where
-  todo = pure ()
 
 
 doSimple :: Bool -> BasicAction -> Interact () -> Interact ()
@@ -204,5 +202,36 @@ doFortify playerId =
      case mb of
        Nothing -> pure ()
        Just ~(AskMap l _) -> update (ChangeUnit playerId Fortification l 1)
+
+
+doSpy :: PlayerId -> Interact ()
+doSpy playerId =
+  do ps <- view (Map.toList . getField gamePlayers)
+     mb <- chooseMaybe playerId
+              [ (AskPlayerTech p techId, "Copy benefit")
+              | (p,player) <- ps
+              , p /= playerId
+              , techId <- spyOptions player
+              ]
+     case mb of
+       Nothing -> pure ()
+       Just ~(AskPlayerTech pid techId) ->
+         do ~[alt] <- view (getField (playerState pid
+                                     .> playerTech
+                                     .> mapAt techId .> techAlts))
+            case techBenefit alt of
+              OneTime a -> doGainBenefit playerId a
+              Continuous {} -> pure ()
+
+doGainBenefit :: PlayerId -> Action -> Interact ()
+doGainBenefit playerId a =
+  do state <- getState
+     let player = getField (playerState playerId) state
+         a'     = foldr contModifyAction a (continuousBenefits player)
+         (now,t1) = turnAutoExecute $ turnAddAction a' $ getField gameTurn state
+     update (SetTurn t1)
+     mapM_ (doBasicAction playerId True) now
+                        -- here we assume the order does not matter
+
 
 

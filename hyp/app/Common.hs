@@ -165,3 +165,4 @@ doRemoveUnit pid ty loc =
          do update (ChangeUnit pid' BlockedUnit loc (-n))
             update (ChangeUnit pid' FreeUnit    loc   n)
 
+

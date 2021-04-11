@@ -57,10 +57,10 @@ emptyPlayerState rng =
                                   ++ reverse (filter dbg (deck1 ++ deck2 ++ deck3 ++ deck4)))
   where
   dbg t = any dbgP (getField techAlts t)
-  dbgP a = case techBenefit a of
+  dbgP a = True {-case techBenefit a of
              Continuous {} -> True
              -- OneTime (If _ _) -> True
-             _ -> False
+             _ -> False-}
 
   s0 =
    PlayerState
@@ -160,3 +160,14 @@ continuousBenefits player =
 
 hideTokens :: PlayerState -> PlayerState
 hideTokens = updField playerToken (fmap hideToken)
+
+spyOptions :: PlayerState -> [TechId]
+spyOptions player =
+  [ techId
+  | (techId,tech) <- Map.toList (getField playerTech player)
+  , techIsAdvanced tech
+  , not (techHas Spy tech)
+  , not (techIsContinuous tech) -- XXX: maybe this should be OK?
+  ]
+  
+  

@@ -79,9 +79,18 @@ data TechBenefit =
 declareFields ''Tech
 declareFields ''TechAlt
 
+techIsAdvanced :: Tech -> Bool
+techIsAdvanced tech =
+  case getField techAlts tech of
+    [_] -> True
+    _   -> False
+
 techHasCubes :: Tech -> Bool
 techHasCubes = any altHasCubes . getField techAlts
   where altHasCubes = not . null . costFullSpots . getField techCost
+
+techIsContinuous :: Tech -> Bool
+techIsContinuous = any (isContinuous . techBenefit) . getField techAlts
 
 isContinuous :: TechBenefit -> Bool
 isContinuous b =
