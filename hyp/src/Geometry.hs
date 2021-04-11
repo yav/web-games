@@ -17,6 +17,7 @@ import Common.Field
 import Resource
 import Terrain
 import Tile
+import Bag
 
 data Board = Board
   { _boardMap     :: Map Loc Tile
@@ -176,6 +177,14 @@ tileTargets playerId loc tile =
      guard (not (null out && null cities && null ruins))
      pure (loc,out,cities,ruins)
 
+tilesWithFortifications :: PlayerId -> Board -> [(Loc,Int)]
+tilesWithFortifications playerId board =
+  [ (loc,n)
+  | (loc,tile) <- Map.toList (getField boardMap board)
+  , let us = getField (playerUnits playerId) tile
+        n  = bagContains Fortification us
+  , n > 0
+  ]
 
 
 

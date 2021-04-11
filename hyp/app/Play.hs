@@ -30,7 +30,7 @@ setup =
      forM_ (gameTurnOrder state) \p ->
        do replicateM_ 3 (doPlaceWorkerOnCapital p)
           sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Red, Green, Purple ] ] -- XXX: test
+              c `elem` [ Gray, Blue, Orange, Red ] ] -- XXX: test
 
           -- XXX 
           sequence_ [ update (Upgrade p r 3) | r <- enumAll, r /= Gray ]
@@ -40,11 +40,21 @@ setup =
 
 startTurn :: Interact ()
 startTurn =
-  do -- XXX: start of turn actions + remove fortify
-     state <- getState
+  do state <- getState
      let playerId = turnPlayer (getField gameTurn state)
+
+     let rmFort (l,f) = update (ChangeUnit playerId Fortification l (-f))
+     mapM_ rmFort (tilesWithFortifications playerId (getField gameBoard state))
+
      let n = countWorkers playerId (getField gameBoard state)
      replicateM_ (3 - n) (doPlaceWorkerOnCapital playerId)
+
+     sequence_
+       [ doGainBenefit playerId (Action [a])
+       | On StartTurn a <-
+          continuousBenefits (getField (playerState playerId) state)
+       ]
+
      takeTurn
 
 endGame :: Interact ()
@@ -441,7 +451,6 @@ actUseAction state =
   turn         = getField gameTurn state
   ors          = zipWith const [ 0.. ] (getField turnOrs turn)
   isEnabled ba =
-    -- XXX
     case ba of
       LooseResource r -> not $ null $ removeCubeOpts player (Just r)
       LooseGem        -> getField playerGems player > 0

@@ -58,7 +58,8 @@ emptyPlayerState rng =
   where
   dbg t = any dbgP (getField techAlts t)
   dbgP a = case techBenefit a of
-             OneTime (If _ _) -> True
+             Continuous {} -> True
+             -- OneTime (If _ _) -> True
              _ -> False
 
   s0 =
