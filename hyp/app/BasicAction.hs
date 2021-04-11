@@ -15,6 +15,7 @@ import Resource
 import Geometry
 import Action
 import Turn
+import Tile
 import PlayerState
 import AppTypes
 import Tech
@@ -31,7 +32,7 @@ doBasicAction playerId isFree ba =
 
     CloneWorker         -> doSimple isFree ba $ doCloneWorker playerId
     PlaceWorker         -> doSimple isFree ba $ doPlaceWorker playerId
-    Fortify             -> todo
+    Fortify             -> doSimple isFree ba $ doFortify playerId
     Develop ctr         -> doSimple isFree ba $ doUpgrade playerId ctr
 
     GainTech            -> doSimple isFree ba $ doGainTech playerId True
@@ -194,4 +195,14 @@ doNeighbours :: PlayerId -> BasicAction -> Interact ()
 doNeighbours playerId act =
   do ps <- view (neighbourPlayers playerId . getField gameBoard)
      traverse_ (\p -> doBasicAction p True act) ps
+
+doFortify :: PlayerId -> Interact ()
+doFortify playerId =
+  do locs <- view (cloneLocs playerId . getField gameBoard)
+     mb <- chooseMaybe playerId
+            [ (AskMap l Fortify, "Add fortification") | l <- locs ]
+     case mb of
+       Nothing -> pure ()
+       Just ~(AskMap l _) -> update (ChangeUnit playerId Fortification l 1)
+
 

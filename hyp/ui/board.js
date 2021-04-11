@@ -263,7 +263,7 @@ const uiSoldier = (el,pos,p,info) => {
       switch(ty) {
         case 'FreeUnit': free += n; break
         case 'BlockedUnit': lock += n; break
-        case 'Fortification': fort +n; break
+        case 'Fortification': fort += n; break
       }
       update()
       return free + lock + fort > 0

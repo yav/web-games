@@ -80,11 +80,13 @@ enterRuinLocs p b = [ (l,s,u) | (l,t) <- Map.toList (getField boardMap b)
                               , (s,u) <- tileEnterRuins p t
                     ]
 
+-- | also used for firtify locs
 cloneLocs :: PlayerId -> Board -> [Loc]
 cloneLocs playerId board =
   [ l | (l,t) <- Map.toList (getField boardMap board)
       , tileCountUnits playerId t > 0
   ]
+
 
 moveLocs :: PlayerId -> Int -> Board -> [(Loc,[(Int,Loc)])]
 moveLocs playerId movePts board =
