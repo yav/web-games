@@ -33,10 +33,14 @@ data PlayerState = PlayerState
   , _playerToken     :: [Token]
   , _playerDevel     :: Map Resource Int
   , _playerTech      :: Map TechId Tech
+  , _playerAchievements :: Set Achievement
   , _playerRNG       :: RNG
   } deriving (Generic,ToJSON)
 
 data BagName = BagSource | BagReady | BagDiscard
+  deriving (Eq,Ord,Enum,Bounded,Generic,ToJSON)
+
+data Achievement = ManyStars | ManyTroops | ManyTechs
   deriving (Eq,Ord,Enum,Bounded,Generic,ToJSON)
 
 data CubeLoc = CubeLoc
@@ -57,7 +61,7 @@ emptyPlayerState rng =
                                   ++ reverse (filter dbg (deck1 ++ deck2 ++ deck3 ++ deck4)))
   where
   dbg t = any dbgP (getField techAlts t)
-  dbgP a = True {-case techBenefit a of
+  dbgP a = False {-case techBenefit a of
              Continuous {} -> True
              -- OneTime (If _ _) -> True
              _ -> False-}
@@ -72,6 +76,8 @@ emptyPlayerState rng =
       , _playerToken     = take 1 bronzeTokens -- XXX: Nothing
       , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll, r /= Gray ]
       , _playerTech      = Map.empty
+      , _playerAchievements = Set.empty
+          --- XXXX
       , _playerRNG       = rng
       }
 

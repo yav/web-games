@@ -186,6 +186,7 @@ doGainTech playerId withReset =
                 player <- view (getField (playerState playerId))
                 update (AddTech playerId (playerNextTechId player) t)
                 update (ChangeBag playerId BagDiscard Gray 1)
+                checkAchievement playerId
                 update (SetMarket d m2)
            Nothing -> pure ()
 

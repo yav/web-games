@@ -1,9 +1,10 @@
 {- # Language OverloadedStrings #-}
 module Common where
 
-import Control.Monad(when)
+import Control.Monad(when,unless)
 import Data.Text(Text)
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 import Common.Basics
 import Common.Field
@@ -15,22 +16,42 @@ import Tile
 import Turn
 import Geometry
 import PlayerState
+import Action
 import AppTypes
+
+
+checkAchievement :: PlayerId -> Interact ()
+checkAchievement pid =
+  do player <- view (getField (playerState pid))
+     let achieve x =
+           unless (x `Set.member` getField playerAchievements player)
+                  (update (GainAchievement pid x))
+
+     when (getField playerWorkers player == 0) (achieve ManyTroops)
+     when (getField playerGems player >= 12) (achieve ManyStars)
+     when (Map.size (Map.filter techIsAdvanced (getField playerTech player))
+              >= 5) (achieve ManyTechs)
+
+
+
 
 doPlaceWorkerOnCapital :: PlayerId -> Interact ()
 doPlaceWorkerOnCapital pid =
   do loc <- view (getField (gameBoard .> boardCapital .> mapAt pid))
      doPlaceWorkerOn pid loc
 
--- XXX: check for achievement
 doPlaceWorkerOn :: PlayerId -> Loc -> Interact ()
 doPlaceWorkerOn pid loc =
   do update (ChangeWorkers pid (-1))
      update (ChangeUnit pid FreeUnit loc 1)
+     checkAchievement pid
 
--- XXX: check for achievement
 doGainGem :: PlayerId -> Interact ()
-doGainGem playerId = update (ChangeGems playerId 1)
+doGainGem playerId =
+  do update (ChangeGems playerId 1)
+     checkAchievement playerId
+
+
 
 haveInSupply :: Resource -> Interact Bool
 haveInSupply r = view ((> 0) . bagContains r . getField gameSupply)

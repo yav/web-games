@@ -37,6 +37,7 @@ data Update =
   | ChangeWorkers PlayerId Int
   | Capture PlayerId PlayerId   -- captured is 2nd
   | SetRuinToken PlayerId [Token]
+  | GainAchievement PlayerId Achievement
 
   | Upgrade           PlayerId Resource Int
   | ResetUpgrade      PlayerId Resource
@@ -145,6 +146,10 @@ doUpdate upd =
 
     SetRuinToken playerId mb ->
       Right . setField (playerState playerId .> playerToken) mb
+
+    GainAchievement playerId a ->
+      Right . updField (playerState playerId .> playerAchievements)
+                       (Set.insert a)
 
     SetTurn t ->
       Right . setField gameTurn t

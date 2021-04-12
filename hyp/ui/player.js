@@ -145,7 +145,35 @@ const uiPlayerStats = (player,p) => {
       dom.appendChild(tokens[i])
     }
   }
+
   setToken(p._playerToken)
+
+  const addAchievement = (a) => {
+    console.log(a)
+    const cDom = div('icon achievement')
+    setDim(cDom,iconSize,iconSize)
+    const cl = cDom.classList
+    switch (a) {
+      case 'ManyStars':
+        cl.add('many-stars')
+        tooltip(cDom,false,'Achievement: gain 12 gems')
+        break
+      case 'ManyTroops':
+        cl.add('many-troops')
+        tooltip(cDom,false,'Achievement: place all troops')
+        break
+      case 'ManyTechs':
+        cl.add('many-techs')
+        tooltip(cDom,false,'Achievement: obtain 5 technologies')
+        break
+    }
+    dom.appendChild(cDom)
+  }
+
+  const ach = p._playerAchievements
+  for (let i = 0; i < ach.length; ++i) {
+    addAchievement(ach[i])
+  }
 
   const badge = uiPlayerBadge(player)
   badge.style.float = 'right'
@@ -167,7 +195,8 @@ const uiPlayerStats = (player,p) => {
     },
     capture: addCaptured,
     setToken: setToken,
-    askToken: (q) => existingQuestion(tokens[0],true,q)
+    askToken: (q) => existingQuestion(tokens[0],true,q),
+    addAchievement: addAchievement
   }
 }
 

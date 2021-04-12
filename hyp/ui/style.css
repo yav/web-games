@@ -276,6 +276,18 @@ svg.gray {
   display: inline-block;
 }
 
+.many-troops {
+  background-image: url("img/achieve-troops.svg");
+}
+
+.many-stars {
+  background-image: url("img/achieve-stars.svg");
+}
+
+.many-techs {
+  background-image: url("img/achieve-techs.svg");
+}
+
 .Neighbours .icon {
   transform: scale(0.9);
 }
@@ -515,6 +527,10 @@ svg.gray {
   border: 0.1em solid #636;
   border-radius: 100%;
   margin-left: 1em;
+}
+
+.achievement {
+  margin-left: 0.5em;
 }
 
 /* ----------------------------------------------------------------------- */

@@ -107,4 +107,5 @@ const uiUpdate = hsUpdate (
   , AddTech: (pid,tid,t)        => gui.player[pid].techs.add(tid,t)
   , ChangeSupply: (r,n)         => gui.supply.change(r,n)
   , SetRuinToken: (pid,mb)      => gui.player[pid].stats.setToken(mb)
+  , GainAchievement: (pid,a)    => gui.player[pid].stats.addAchievement(a)
   })
