@@ -5,6 +5,8 @@ import Control.Monad(forM_,replicateM_,unless,when)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Data.Maybe(isJust,listToMaybe)
+import Data.List(sortBy)
+import Data.Function(on)
 
 import Common.Basics
 import Common.Utils(enumAll,showText)
@@ -20,6 +22,7 @@ import Resource
 import Geometry
 import Tile
 import RuinToken
+import FinalScore
 
 import BasicAction
 import Common
@@ -57,8 +60,33 @@ startTurn =
 
      takeTurn
 
+
 endGame :: Interact ()
-endGame = pure ()
+endGame =
+  do state <- getState
+     let ctrl = pointFromControl (getField gameBoard state)
+         ctrlPoints p = Map.findWithDefault (0,0) p ctrl
+         pnum = length (gameTurnOrder state)
+         turnOrder p = length $ fst $ break (== p) $ gameTurnOrder state
+         scoreFor p =
+           let p1 = pointsFromPlayer (getField (playerState p) state)
+               p2 = Map.insert "Area" (fst (ctrlPoints p)) p1
+           in FinalScore
+                { fsPlayer = p
+                , fsPoints = p2
+                , fsScore  = ( sum (Map.elems p2)
+                             , snd (ctrlPoints p)
+                             , Map.findWithDefault 0 "Cubes" p2
+                             , turnOrder p
+                             )
+                , fsRank = 0
+                }
+         ranks = sortBy (compare `on` fsScore)
+                        (map scoreFor (gameTurnOrder state))
+         ranked = zipWith (\p r -> p { fsRank = r }) ranks (reverse [1..pnum])
+
+     update (EndGame ranked)
+
 
 endTurn :: Interact ()
 endTurn =
@@ -69,8 +97,14 @@ endTurn =
                   _     -> head (gameTurnOrder state)
      case getField gameEndOn state of
        Just p | p == newP -> endGame
-       _ -> update (SetTurn (newTurn newP))
+       _ -> do let n = Set.size
+                     $ Set.unions
+                     $ map (getField playerAchievements)
+                     $ Map.elems $ getField gamePlayers state
+               when (n >= gameEnd state) $ update $ SetEndOn curP
+               update (SetTurn (newTurn newP))
      startTurn
+
 
 takeTurn :: Interact ()
 takeTurn =

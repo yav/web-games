@@ -43,7 +43,7 @@ const uiRedraw = (state) => {
   gui = {}
   gui.questions = []
 
-  const game = state.game
+  const game = state.game || state.finished
   const body = document.getElementById('main')
   body.innerHTML = ""
 
@@ -53,13 +53,17 @@ const uiRedraw = (state) => {
   const topBar = div('top-bar')
   mainPanel.appendChild(topBar)
 
-  gui.turn = uiTurn(game._gameTurn)
-  topBar.appendChild(gui.turn.dom)
+  if (game._gameFinished)
+    topBar.appendChild(uiFinished(game._gameFinished))
+  else {
+    gui.turn = uiTurn(game._gameTurn,game._gameEndOn)
+    topBar.appendChild(gui.turn.dom)
+  }
 
   gui.supply = uiBag('Supply', game._gameSupply)
   topBar.appendChild(gui.supply.dom)
 
-  gui.board = uiBoard(state.game._gameBoard)
+  gui.board = uiBoard(game._gameBoard)
   mainPanel.appendChild(gui.board.dom)
 
   const ps = uiPlayers(game.gameTurnOrder, game._gamePlayers)
@@ -108,4 +112,6 @@ const uiUpdate = hsUpdate (
   , ChangeSupply: (r,n)         => gui.supply.change(r,n)
   , SetRuinToken: (pid,mb)      => gui.player[pid].stats.setToken(mb)
   , GainAchievement: (pid,a)    => gui.player[pid].stats.addAchievement(a)
+  , SetEndOn: (pid)             => {}
+  , EndGame: (fin)              => gui.turn.dom.replaceWith(uiFinished(fin))
   })

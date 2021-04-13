@@ -29,6 +29,7 @@ pointsFromPlayer player =
                      | otherwise -> 3 + n)
     , ("Captured", Set.size (getField playerCaptured player))
     , ("Cubes", countCubes)
+    , ("Achievements", 2 * Set.size (getField playerAchievements player))
     , ("Technologies",
         sum [ techVP t | t <- Map.elems (getField playerTech player) ])
     ]
@@ -42,14 +43,20 @@ pointsFromPlayer player =
                        ]
 
 
-pointFromControl :: Board -> Map PlayerId Int
+pointFromControl :: Board -> Map PlayerId (Int,Int) -- points, how many
 pointFromControl board =
-  Map.fromListWith (+)
-    [ (p, case tileNumber tile of
+  Map.fromListWith add
+    [ ( p
+      , ( case tileNumber tile of
             TileNum _ -> if loc == origin then 3 else 2
-            _ -> 1)
+            _ -> 1
+        , 1
+        )
+      )
     | (loc,tile) <- Map.toList (getField boardMap board)
     , Just p <- [tileControl tile]
     ]
+  where
+  add (x,y) (a,b) = (x+a,y+b)
 
 

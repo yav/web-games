@@ -1,5 +1,6 @@
 module AppTypes (module AppTypes, Input) where
 
+import Data.Text(Text)
 import Data.Map(Map)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -54,8 +55,18 @@ data Update =
   | ChangeTile Loc Tile
 
   | SetMarket DeckName Market
+  | SetEndOn PlayerId
+  | EndGame [FinalScore]
 
   deriving (Generic,ToJSON)
+
+data FinalScore = FinalScore
+  { fsPlayer :: PlayerId
+  , fsPoints :: Map Text Int
+  , fsScore  :: (Int,Int,Int,Int)
+  , fsRank   :: Int
+  } deriving (Generic,ToJSON)
+
 
 
 
@@ -63,11 +74,12 @@ data State = State
   { _gamePlayers  :: Map PlayerId PlayerState
   , _gameTurn     :: Turn
   , gameTurnOrder :: [PlayerId]
+  , gameEnd       :: Int
   , _gameEndOn    :: Maybe PlayerId
   , _gameBoard    :: Board
   , _gameSupply   :: Bag Resource
   , _gameMarkets  :: Map DeckName Market
-
+  , _gameFinished :: Maybe [FinalScore]
   } deriving (Generic,ToJSON)
 
 declareFields ''State
@@ -75,15 +87,17 @@ declareFields ''State
 type Finished = State
 
 
-initialState :: RNG -> Bool -> [PlayerId] -> State
-initialState rng useFog ps = State
+initialState :: RNG -> Bool -> Int -> [PlayerId] -> State
+initialState rng useFog len ps = State
   { gameTurnOrder = ps
+  , gameEnd = len
   , _gameEndOn = Nothing
   , _gamePlayers  = Map.fromList pstates
   , _gameBoard = brd
   , _gameTurn = newTurn (head ps)
   , _gameSupply = bagFromNumList [ (r,24) | r <- enumAll, r /= Gray ]
   , _gameMarkets = markets
+  , _gameFinished = Nothing
   }
   where
   mkP r p = let (r1,r2) = splitRNG r
@@ -195,3 +209,8 @@ doUpdate upd =
       Right . updField (playerState playerId .> playerTech)
                        (Map.insert techId tech)
 
+    SetEndOn playerId ->
+      Right . setField gameEndOn (Just playerId)
+
+    EndGame fs ->
+      Left . setField gameFinished (Just fs)

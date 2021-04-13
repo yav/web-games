@@ -1,5 +1,5 @@
 
-const uiTurn = (tu) => {
+const uiTurn = (tu,isLast) => {
   const dom = div('turn')
 
   let sReady = {}
@@ -18,6 +18,7 @@ const uiTurn = (tu) => {
     const lab = div('group')
     lab.appendChild(span('Turn: '))
     lab.appendChild(uiPlayerBadge(t.turnPlayer))
+    lab.appendChild(span(' (last turn)'))
     dom.appendChild(lab)
     basic = {}
     const ready = t._turnReady
@@ -61,4 +62,48 @@ const uiTurn = (tu) => {
     askOrLeft: (n,q) => { existingQuestion(sOrs[n].left,true,q) },
     askOrRight: (n,q) => { existingQuestion(sOrs[n].right,true,q) }
   }
+}
+
+const uiFinished = (fin) => {
+  const dom = div('finished')
+  const tab = div('table')
+
+  const stats = [ "Gems", "Ghosts", "Captured", "Cubes", "Achievements",
+                  "Technologies", "Area" ]
+
+  const first = div('column')
+  const firstH = div('heading')
+  firstH.textContent = 'Player'
+  first.appendChild(firstH)
+  for (i = 0; i < stats.length; ++i) {
+    const stat = div('label')
+    stat.textContent = stats[i]
+    first.appendChild(stat)
+  }
+  const totLab = div('label')
+  totLab.textContent = 'Total'
+  first.appendChild(totLab)
+  tab.appendChild(first)
+
+  for (let i = 0; i < fin.length; ++i) {
+    const it = fin[i]
+    const col = div('column')
+    const head = div('heading')
+    head.appendChild(uiPlayerBadge(it.fsPlayer))
+    const rank = div('rank')
+    rank.textContent = it.fsRank
+    head.appendChild(rank)
+    col.appendChild(head)
+    for (let j = 0; j < stats.length; ++j) {
+      const stat = div('stat')
+      stat.textContent = it.fsPoints[stats[j]]
+      col.appendChild(stat)
+    }
+    const tot = div('total')
+    tot.textContent = it.fsScore[0]
+    col.appendChild(tot)
+    tab.appendChild(col)
+  }
+  dom.appendChild(tab)
+  return dom
 }

@@ -9,6 +9,7 @@ import Data.Map(Map)
 import qualified Data.Map as Map
 import System.Console.GetOpt
 import qualified Data.Aeson as JS
+import Control.Monad(when)
 
 import Common.Basics
 import Common.RNG
@@ -23,7 +24,8 @@ import Play
 main :: IO ()
 main =
   newServer options \opts ->
-    do seed <- newRNG
+    do when (gameLen opts == 0) $ fail "Need a game length."
+       seed <- newRNG
        let ps = pcolor (makePlayers (players opts))
        pure
          ( jsColors ps
@@ -31,7 +33,8 @@ main =
                                  , ''BasicAction ])
          , startGame GameInfo
                  { gPlayers = Map.keysSet ps
-                 , gState   = initialState seed (useFog opts) (Map.keys ps)
+                 , gState   = initialState seed (useFog opts) (gameLen opts)
+                                                              (Map.keys ps)
                  , gInit    = setup
                  , gSave    = \_m -> ""
                  }
@@ -92,15 +95,17 @@ jsColors mp = BS8.unlines
 data Options = Options
   { players :: [(String,Maybe String)]
   , useFog  :: Bool
+  , gameLen :: Int
   }
 
 instance Semigroup Options where
   a <> b = Options { players = players a ++ players b
                    , useFog  = useFog a && useFog b
+                   , gameLen = max (gameLen a) (gameLen b)
                    }
 
 instance Monoid Options where
-  mempty = Options { players = [], useFog = True }
+  mempty = Options { players = [], useFog = True, gameLen = 0 }
 
 
 options :: [ OptDescr Options ]
@@ -111,6 +116,15 @@ options =
   , Option [] ["no-fog"]
     (NoArg mempty { useFog = False })
     "No fog of war"
+  , Option [] ["short"]
+    (NoArg mempty { gameLen = 1 })
+    "Short game"
+  , Option [] ["regular"]
+    (NoArg mempty { gameLen = 2 })
+    "Regular game"
+  , Option [] ["long"]
+    (NoArg mempty { gameLen = 3 })
+    "Long game"
   ]
 
 playerOpt :: String -> Options
