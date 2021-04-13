@@ -7,6 +7,8 @@ import Data.Maybe(mapMaybe)
 import Data.Set(Set)
 import qualified Data.Set as Set
 import GHC.Generics(Generic)
+import Data.List(sortBy)
+import Data.Function(on)
 
 import qualified Data.Aeson as JS
 import Data.Aeson (ToJSON(..), FromJSON, (.=), ToJSONKey,
@@ -303,8 +305,42 @@ tileGhostInRuins = mapMaybe check . Map.toList .getField tileRuins
                           _     -> Nothing
 
 
+tileControl :: Tile -> Maybe PlayerId
+tileControl tile =
+  case totals of
+    [(mb,n)] | n > 0 -> mb
+    (mb,x) : (_,y) : _ | x > y -> mb
+    _ -> Nothing
+  where
+  totals = sortBy (flip compare `on` snd)
+         $ Map.toList
+         $ Map.unionsWith (+) [ inCities, inRuins, outside ]
 
+  add x = Map.insertWith (+) x 1
 
+  checkSpot s =
+    case s of
+      Empty -> id
+      Ghost -> add Nothing
+      Occupied p -> add (Just p)
+
+  inCities :: Map (Maybe PlayerId) Int
+  inCities  = foldr (checkSpot . getField citySpot) Map.empty
+                    (Map.elems (getField tileCities tile))
+
+  inRuins :: Map (Maybe PlayerId) Int
+  inRuins   = foldr (checkSpot . getField ruinSpot) Map.empty
+                    (Map.elems (getField tileRuins tile))
+  outside :: Map (Maybe PlayerId) Int
+  outside   = Map.fromList
+              [ (Just p, n)
+              | (p,u) <- Map.toList (tilePlayers tile)
+              , let n = checkUnits u
+              , n > 0
+              ]
+
+  checkUnits u = bagContains BlockedUnit b + bagContains FreeUnit b
+    where b = getField pUnits u
 
 --------------------------------------------------------------------------------
 -- Setup

@@ -28,7 +28,9 @@ checkAchievement pid =
                   (update (GainAchievement pid x))
 
      when (getField playerWorkers player == 0) (achieve ManyTroops)
-     when (getField playerGems player >= 12) (achieve ManyStars)
+     pnum <- view (length . gameTurnOrder)
+     let gemLimit = if pnum > 2 then 12 else 15
+     when (getField playerGems player >= gemLimit) (achieve ManyStars)
      when (Map.size (Map.filter techIsAdvanced (getField playerTech player))
               >= 5) (achieve ManyTechs)
 

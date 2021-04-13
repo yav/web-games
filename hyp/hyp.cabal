@@ -30,7 +30,8 @@ library
     Layout,
     Turn,
     AppTypes,
-    Properties
+    Properties,
+    FinalScore
 
   build-depends:
     base, containers, text,
