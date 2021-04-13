@@ -15,7 +15,7 @@ import Resource
 import Action
 
 data DeckName = Deck1 | Deck2 | Deck3 | Deck4
-  deriving (Eq,Ord,Show,Enum,Bounded,Generic,FromJSON,ToJSON)
+  deriving (Eq,Ord,Show,Read,Enum,Bounded,Generic,FromJSON,ToJSON)
 
 data Market = Market
   { _marketDeck  :: [Tech]

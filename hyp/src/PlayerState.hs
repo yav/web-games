@@ -47,7 +47,7 @@ data CubeLoc = CubeLoc
   { cubeTech :: TechId
   , cubeAlt  :: Int
   , cubeSpot :: Int
-  } deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+  } deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
 
 instance ToJSONKey BagName where
   toJSONKey = genericToJSONKey defaultJSONKeyOptions

@@ -8,13 +8,13 @@ import Data.Aeson(FromJSON,ToJSON,ToJSONKey(..),
 import Common.Field
 
 data Resource = Blue | Yellow | Orange | Purple | Red | Green | Gray
-  deriving (Eq,Ord,Show,Enum,Bounded,Generic,FromJSON,ToJSON)
+  deriving (Eq,Ord,Show,Read,Enum,Bounded,Generic,FromJSON,ToJSON)
 
 instance ToJSONKey Resource where
   toJSONKey = genericToJSONKey defaultJSONKeyOptions
 
 data ResourceReq = Exact Resource | AnyNormal
-  deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+  deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
 
 isNormal :: Resource -> Bool
 isNormal r =

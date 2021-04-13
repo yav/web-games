@@ -29,11 +29,11 @@ data BasicAction =
 
   | Neighbours BasicAction
   | Times BasicAction Int
-    deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON,ToJSONKey)
+    deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON,ToJSONKey)
 
 
 data DevelopConstratint = Same Int | Different Int | Any
-    deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+    deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
 
 
 data Action =

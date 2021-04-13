@@ -2,6 +2,7 @@ module Main where
 
 import Data.Text(Text)
 import qualified Data.Text as Text
+import Data.ByteString(ByteString)
 import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString.Lazy.Char8 as BS8 (toStrict)
 import Data.List(foldl')
@@ -24,22 +25,38 @@ import Play
 main :: IO ()
 main =
   newServer options \opts ->
-    do when (gameLen opts == 0) $ fail "Need a game length."
-       seed <- newRNG
-       let ps = pcolor (makePlayers (players opts))
-       pure
-         ( jsColors ps
-            <> BS8.pack $(jsHandlers [ ''OutMsg, ''Update, ''Input
-                                 , ''BasicAction ])
-         , startGame GameInfo
-                 { gPlayers = Map.keysSet ps
-                 , gState   = initialState seed (useFog opts) (gameLen opts)
-                                                              (Map.keys ps)
-                 , gInit    = setup
-                 , gSave    = \_m -> ""
-                 }
-                 []
-         )
+    begin =<< if not (null (load opts))
+                 then read <$> readFile (load opts)
+                 else do seed <- newRNGSeed
+                         pure Save { seed = seed, moves = [], opts = opts }
+
+begin :: Save -> IO (ByteString, InteractState)
+begin Save { .. } =
+  do when (gameLen opts == 0) $ fail "Need a game length."
+     let ps  = pcolor (makePlayers (players opts))
+         rng = seedRNG seed
+     pure
+       ( jsColors ps
+          <> BS8.pack $(jsHandlers [ ''OutMsg, ''Update, ''Input
+                               , ''BasicAction ])
+       , startGame GameInfo
+               { gPlayers = Map.keysSet ps
+               , gState   = initialState rng (useFog opts) (gameLen opts)
+                                                            (Map.keys ps)
+               , gInit    = setup
+               , gSave    = \m -> show Save { moves = m
+                                            , opts = opts { load = "" }
+                                            , .. }
+               }
+               moves
+       )
+
+--------------------------------------------------------------------------------
+data Save = Save
+  { seed  :: Seed
+  , moves :: [WithPlayer Input]
+  , opts  :: Options
+  } deriving (Read,Show)
 
 --------------------------------------------------------------------------------
 type Color = Text
@@ -96,16 +113,18 @@ data Options = Options
   { players :: [(String,Maybe String)]
   , useFog  :: Bool
   , gameLen :: Int
-  }
+  , load    :: FilePath
+  } deriving (Read,Show)
 
 instance Semigroup Options where
   a <> b = Options { players = players a ++ players b
                    , useFog  = useFog a && useFog b
                    , gameLen = max (gameLen a) (gameLen b)
+                   , load    = load a ++ load b
                    }
 
 instance Monoid Options where
-  mempty = Options { players = [], useFog = True, gameLen = 0 }
+  mempty = Options { players = [], useFog = True, gameLen = 0, load = "" }
 
 
 options :: [ OptDescr Options ]
@@ -125,6 +144,9 @@ options =
   , Option [] ["long"]
     (NoArg mempty { gameLen = 3 })
     "Long game"
+  , Option [] ["load"]
+    (ReqArg (\x -> mempty { load =  x}) "FILE")
+    "Load save game"
   ]
 
 playerOpt :: String -> Options

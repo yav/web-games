@@ -49,7 +49,7 @@ data Input = AskCubeLoc CubeLoc                 -- ^ Cube on a t tech
 
            | AskMarketDeck DeckName
            | AskMarketItem DeckName Int
-  deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+  deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
 
 
 declareFields ''Turn

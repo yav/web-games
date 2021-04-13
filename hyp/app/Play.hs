@@ -108,7 +108,8 @@ endTurn =
 
 takeTurn :: Interact ()
 takeTurn =
-  do state <- getState
+  do save
+     state <- getState
      let opts = actEndTurn   state ++
                 actPlaceCube state ++
                 actUseAction state ++

@@ -25,7 +25,7 @@ data Board = Board
   }
 
 data Loc      = Loc { locX, locY :: Int }
-  deriving (Eq,Ord,Show,Generic,ToJSON,FromJSON)
+  deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
 
 declareFields ''Board
 
