@@ -72,12 +72,11 @@ emptyPlayerState rng =
       , _playerGems      = 0
       , _playerGhosts    = 0
       , _playerCaptured  = Set.empty
-      , _playerWorkers   = 3 -- XXX:
-      , _playerToken     = take 1 bronzeTokens -- XXX: Nothing
+      , _playerWorkers   = 10
+      , _playerToken     = []
       , _playerDevel     = Map.fromList [ (r,0) | r <- enumAll, r /= Gray ]
       , _playerTech      = Map.empty
       , _playerAchievements = Set.empty
-          --- XXXX
       , _playerRNG       = rng
       }
 

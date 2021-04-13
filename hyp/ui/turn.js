@@ -18,7 +18,7 @@ const uiTurn = (tu,isLast) => {
     const lab = div('group')
     lab.appendChild(span('Turn: '))
     lab.appendChild(uiPlayerBadge(t.turnPlayer))
-    lab.appendChild(span(' (last turn)'))
+    if (isLast) lab.appendChild(span(' (last turn)'))
     dom.appendChild(lab)
     basic = {}
     const ready = t._turnReady

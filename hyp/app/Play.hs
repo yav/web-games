@@ -30,14 +30,21 @@ import Common
 setup :: Interact ()
 setup =
   do state <- getState
+     let resources = filter (/= Gray) enumAll
      forM_ (gameTurnOrder state) \p ->
-       do replicateM_ 3 (doPlaceWorkerOnCapital p)
-          sequence_ [ replicateM_ 3 (doGainCube p c) | c <- enumAll,
-              c `elem` [ Gray, Blue, Orange, Red ] ] -- XXX: test
-
-          -- XXX 
-          sequence_ [ update (Upgrade p r 3) | r <- enumAll, r /= Gray ]
+       do update $ SetTurn $ newTurn p
+          replicateM_ 3 (doPlaceWorkerOnCapital p)
+          sequence_ [ doGainCube p c | c <- resources ]
+          ~(AskSupply extra) <- choose p
+                            [ (AskSupply r, "Gain a cube") | r <- resources ]
+          doGainCube p extra
+          forM_ [ 1 .. 3 ] \n ->
+            do ~(AskUpgrade r) <- choose p
+                    [ (AskUpgrade r, "Upgrade to level " <> showText n)
+                    | r <- resources ]
+               update $ Upgrade p r n
           replicateM_ 3 (doDrawCube p)
+     update $ SetTurn $ newTurn $ head $ gameTurnOrder state
      startTurn
 
 
