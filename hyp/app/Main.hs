@@ -11,6 +11,7 @@ import qualified Data.Map as Map
 import System.Console.GetOpt
 import qualified Data.Aeson as JS
 import Control.Monad(when)
+import Data.Char(toLower)
 
 import Common.Basics
 import Common.RNG
@@ -98,7 +99,7 @@ makePlayers = foldl' mkPlayer noColors
   mkPlayer c (p,mb) =
     let pid = PlayerId (Text.pack p)
     in case mb of
-         Just co | let co' = Text.pack co
+         Just co | let co' = Text.pack (map toLower co)
                  , co' `elem` colors -> setColor pid co' c
          _ -> pickColor pid c
 
