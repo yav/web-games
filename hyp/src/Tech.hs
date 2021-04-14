@@ -160,7 +160,7 @@ deck2 =
     [ Exact Yellow, Exact Yellow, AnyNormal ]
   $ OneTime $ Action [ Gem `Times` 2 ]
 
-  , defTech 0 "Outpusts"
+  , defTech 0 "Outposts"
     [ Exact Purple, AnyNormal ]
   $ OneTime $ Action [ CloneWorker ]
 

@@ -190,7 +190,7 @@ const f = function(t) {
     , Attack: () => res = actionIcon('attack','Attack')
     , Gem: () => res = actionIcon('gem','Gem')
     , PlaceWorker: () => res = actionIcon('deploy','Deploy')
-    , CloneWorker: () => res = actionIcon('clone','Reinforcments')
+    , CloneWorker: () => res = actionIcon('clone','Reinforcements')
     , GainResource:(r) => {
         res = actionIcon('','Gain resource')
         res.appendChild(cube(r))

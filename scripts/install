@@ -2,3 +2,4 @@
 
 ./scripts/install-component controller install
 ./scripts/install-component ht-hs install/ht-hs
+./scripts/install-component hyp install/hyp
