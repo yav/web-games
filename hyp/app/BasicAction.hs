@@ -19,6 +19,7 @@ import Tile
 import PlayerState
 import AppTypes
 import Tech
+import Log
 
 import Common
 
@@ -55,6 +56,7 @@ doBasicAction playerId isFree ba =
 
 
 
+
 doSimple :: Bool -> BasicAction -> Interact () -> Interact ()
 doSimple isFree ba m =
   do m
@@ -76,7 +78,7 @@ doCloneWorker playerId =
     do l <- case locs of
               [l] -> pure l
               _   -> do ~(AskMap l _) <- choose playerId
-                            [ (AskMap l CloneWorker,"Place unite") | l <- locs ]
+                            [ (AskMap l CloneWorker,"Place unit") | l <- locs ]
                         pure l
        doPlaceWorkerOn playerId l
 
@@ -103,6 +105,7 @@ doUpgrade playerId ctr =
        have <- view (getField (playerState playerId .> playerDevel .> mapAt r))
        let n' = min (6 - have) n
        update (Upgrade playerId r n')
+       doLogPlayer playerId [ LogUpgrade r n' ]
        pure r
 
   upgradeDiff opts n
@@ -128,13 +131,15 @@ doGainResource playerId req =
 
 doReturnResource :: PlayerId -> Interact ()
 doReturnResource playerId =
-  doRemoveCube playerId Nothing
-  \_ r -> update (ChangeBag playerId BagSource r 1)
+  do doRemoveCube playerId Nothing
+       \_ r -> do update (ChangeBag playerId BagSource r 1)
+                  doLogPlayer playerId [ "Returned", LogCube r ]
 
 doRemoveResource :: PlayerId -> ResourceReq -> Interact ()
 doRemoveResource playerId req =
   doRemoveCube playerId (Just req)
-  \_ r -> update (ChangeSupply r 1)
+  \_ r -> do update (ChangeSupply r 1)
+             doLogPlayer playerId [ "-", LogCube r ]
 
 doSwapResource :: PlayerId -> ResourceReq -> ResourceReq -> Interact ()
 doSwapResource playerId inT outT =
@@ -155,7 +160,7 @@ doSwapResource playerId inT outT =
                         Just ~(AskSupply r) ->
                            do update (ChangeSupply r (-1))
                               pure r
-
+       doLogPlayer playerId [ LogCube rIn, "->", LogCube rOut ]
        case gloc of
          OnTech loc -> update (PlaceCube playerId loc rOut)
          InBag b    -> update (ChangeBag playerId b rOut 1)
@@ -177,6 +182,7 @@ doGainTech playerId withReset =
        AskMarketDeck d ->
          case Map.lookup d market of
            Just m1 -> do update (SetMarket d (resetMarket m1))
+                         doLogPlayer playerId ["Reset market"]
                          doGainTech playerId False
            Nothing -> pure ()
        ~(AskMarketItem d n) ->
@@ -186,6 +192,7 @@ doGainTech playerId withReset =
                 player <- view (getField (playerState playerId))
                 update (AddTech playerId (playerNextTechId player) t)
                 update (ChangeBag playerId BagDiscard Gray 1)
+                doLogPlayer playerId ["Gained", LogText (techName t)]
                 checkAchievement playerId
                 update (SetMarket d m2)
            Nothing -> pure ()
@@ -202,7 +209,9 @@ doFortify playerId =
             [ (AskMap l Fortify, "Add fortification") | l <- locs ]
      case mb of
        Nothing -> pure ()
-       Just ~(AskMap l _) -> update (ChangeUnit playerId Fortification l 1)
+       Just ~(AskMap l _) ->
+         do update (ChangeUnit playerId Fortification l 1)
+            doLogPlayer playerId [ "Fortified", LogHex l ]
 
 
 doSpy :: PlayerId -> Interact ()
@@ -217,9 +226,10 @@ doSpy playerId =
      case mb of
        Nothing -> pure ()
        Just ~(AskPlayerTech pid techId) ->
-         do ~[alt] <- view (getField (playerState pid
-                                     .> playerTech
-                                     .> mapAt techId .> techAlts))
+         do tech <- view (getField (playerState pid .>
+                                            playerTech .> mapAt techId))
+            let ~[alt] = getField techAlts tech
+            doLogPlayer playerId [ "Spied", LogText (techName tech) ]
             case techBenefit alt of
               OneTime a -> doGainBenefit playerId a
               Continuous {} -> pure ()

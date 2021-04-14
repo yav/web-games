@@ -49,7 +49,13 @@ const uiBoard = (b) => {
     changeTile: (loc,t) => {
       getHex(loc).remove()
       board[loc.locX][loc.locY] = uiHex(dom,[loc,t])
-    }
+    },
+    hi:     (loc)    => getHex(loc).hi(),
+    lo:     (loc)    => getHex(loc).lo(),
+    hiCity: (loc,id) => getHex(loc).cities[id].hi(),
+    loCity: (loc,id) => getHex(loc).cities[id].lo(),
+    hiRuin: (loc,id) => getHex(loc).ruins[id].hi(),
+    loRuin: (loc,id) => getHex(loc).ruins[id].lo()
   }
 }
 
@@ -159,6 +165,9 @@ const uiHex = (container,info) => {
   return {
     cities: cities,
     ruins: ruins,
+
+    hi: () => bord.classList.add('hi'),
+    lo: () => bord.classList.remove('hi'),
 
     askUnit: (pid,q) => { console.log("Player: " + pid); console.log(units); units[pid].obj.ask(q) },
 
@@ -343,7 +352,9 @@ const uiCity = (el,pos,cityId, city) => {
 
   return {
     set: setOcc,
-    ask: (q) => existingQuestion(dom,false,q)
+    ask: (q) => existingQuestion(dom,false,q),
+    hi: () => dom.classList.add('hi'),
+    lo: () => dom.classList.remove('hi')
   }
 }
 
@@ -372,6 +383,8 @@ const uiRuin = (el, pos, ruinId, ruin) => {
   return {
     set: setOcc,
     ask: (q) => existingQuestion(dom,false,q),
+    hi: () => dom.classList.add('hi'),
+    lo: () => dom.classList.remove('hi'),
     changeCount: (n) => {
       tokens = tokens + n
       tokenDom.textContent = tokens

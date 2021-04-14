@@ -23,6 +23,7 @@ import Geometry
 import Tile
 import RuinToken
 import FinalScore
+import Log
 
 import BasicAction
 import Common
@@ -33,6 +34,7 @@ setup =
      let resources = filter (/= Gray) enumAll
      forM_ (gameTurnOrder state) \p ->
        do update $ SetTurn $ newTurn p
+          doLog [ LogNewTurn (Just p), "Setup" ]
           replicateM_ 3 (doPlaceWorkerOnCapital p)
           sequence_ [ doGainCube p c | c <- resources ]
           ~(AskSupply extra) <- choose p
@@ -42,6 +44,7 @@ setup =
             do ~(AskUpgrade r) <- choose p
                     [ (AskUpgrade r, "Upgrade to level " <> showText n)
                     | r <- resources ]
+               doLog [ LogUpgrade r n ]
                update $ Upgrade p r n
           replicateM_ 3 (doDrawCube p)
      update $ SetTurn $ newTurn $ head $ gameTurnOrder state
@@ -65,12 +68,15 @@ startTurn =
           continuousBenefits (getField (playerState playerId) state)
        ]
 
+     doLog [LogNewTurn (Just (fst (currentPlayer state)))]
      takeTurn
 
 
 endGame :: Interact ()
 endGame =
   do state <- getState
+     doLog [ LogNewTurn Nothing ]
+     doLog [ "Game finished." ]
      let ctrl = pointFromControl (getField gameBoard state)
          ctrlPoints p = Map.findWithDefault (0,0) p ctrl
          pnum = length (gameTurnOrder state)
@@ -137,6 +143,7 @@ actUseRuinToken state =
     , "Use token"
     , do update (SetRuinToken playerId [])
          doGainBenefit playerId (tokenAction t)
+         doLog [ "Used ruin token" ]
          takeTurn
     )
   | t <- getField playerToken player
@@ -167,6 +174,10 @@ actPlaceCube state =
     , do r <- askResouce spot
          update (ChangeBag playerId BagReady r (-1))
          update (PlaceCube playerId spot r)
+         doLog [ LogCube r, "on"
+               , LogText (techName (getField (playerTech .>
+                                              mapAt (cubeTech spot)) player))
+               ]
          checkGainBenefit playerId spot
          takeTurn
     ) | spot <- placeSpots player
@@ -195,6 +206,7 @@ actEnterCity state =
     , do let city = getField (tileAt loc .> cityAt cityId) board
          doRemoveUnit playerId unit loc
          update (SetCity loc cityId (Occupied playerId))
+         doLog [ "Entered", LogCity loc cityId ]
          doGainBenefit playerId (cityActions city)
          takeTurn
     ) | (loc,cityId,unit) <- enterCityLocs playerId board
@@ -209,6 +221,7 @@ actEnterRuin state =
     , "Enter ruin"
     , do doRemoveUnit playerId unit loc
          update (SetRuin loc ruinId (Occupied playerId))
+         doLog [ "Entered", LogRuin loc ruinId ]
          tryGetToken loc ruinId
          takeTurn
     ) | (loc,ruinId,unit) <- enterRuinLocs playerId board
@@ -299,6 +312,7 @@ actMove state =
                            then BlockedUnit else FreeUnit
              doRemoveUnit playerId unit from
              update (ChangeUnit playerId FreeUnit to 1)
+             doLog [ "Flew from", LogHex from, "to", LogHex to ]
              b <- view (getField gameBoard)
              sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
 
@@ -308,6 +322,7 @@ actMove state =
               tileTo <- view (getField (gameBoard .> tileAt to))
               let unit = if tileHasOutsideOpponents playerId tileTo
                                                  then BlockedUnit else FreeUnit
+              doLog [ "Moved from", LogHex from, "to", LogHex to ]
               update (ChangeUnit playerId unit to 1)
               b <- view (getField gameBoard)
               sequence_ [ update (ChangeTile l t) | (l,t) <- revealTiles to b ]
@@ -348,17 +363,17 @@ actAttack state
     in
     [ ( playerId :-> AskUnit loc p
       , ahelp <> " player"
-      , doAttack how (rmPlayer loc p)
+      , doAttack [ LogPlayer p, "on", LogHex loc ] how (rmPlayer loc p)
       ) | p <- opponents
     ] ++
     [ ( playerId :-> AskCity loc cityId
       , ahelp <> " city"
-      , doAttack how (rmCity loc cityId)
+      , doAttack [ LogCity loc cityId ] how (rmCity loc cityId)
       ) | cityId <- cities
     ] ++
     [ ( playerId :-> AskRuin loc ruinId
       , ahelp <> " ruin"
-      , doAttack how (rmRuin loc ruinId)
+      , doAttack [ LogRuin loc ruinId ] how (rmRuin loc ruinId)
       ) | ruinId <- ruins
     ]
 
@@ -399,9 +414,10 @@ actAttack state
 
        takeTurn
 
-  doAttack how rm =
+  doAttack msg how rm =
     do ty     <- payCost how
        trophy <- rm
+       doLog ("Attacked" : msg)
        gainTrophy ty trophy
 
   rmPlayer loc p =
@@ -560,6 +576,8 @@ doReset playerId =
      resetCont
 
      replicateM_ 3 (doDrawCube playerId)
+
+     doLog [ "Reset" ]
 
   where
   resetCont =

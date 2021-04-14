@@ -18,6 +18,7 @@ import Geometry
 import PlayerState
 import Action
 import AppTypes
+import Log
 
 
 checkAchievement :: PlayerId -> Interact ()
@@ -25,7 +26,8 @@ checkAchievement pid =
   do player <- view (getField (playerState pid))
      let achieve x =
            unless (x `Set.member` getField playerAchievements player)
-                  (update (GainAchievement pid x))
+              do update (GainAchievement pid x)
+                 doLog [ LogText "Achived", LogAchievement x ]
 
      when (getField playerWorkers player == 0) (achieve ManyTroops)
      pnum <- view (length . gameTurnOrder)
@@ -46,11 +48,13 @@ doPlaceWorkerOn :: PlayerId -> Loc -> Interact ()
 doPlaceWorkerOn pid loc =
   do update (ChangeWorkers pid (-1))
      update (ChangeUnit pid FreeUnit loc 1)
+     doLogPlayer pid [ LogText "New troop", LogHex loc ]
      checkAchievement pid
 
 doGainGem :: PlayerId -> Interact ()
 doGainGem playerId =
   do update (ChangeGems playerId 1)
+     doLogPlayer playerId [ LogText "Gained gem" ]
      checkAchievement playerId
 
 
@@ -66,6 +70,7 @@ doGainCube pid r
      when have
        do update (ChangeSupply r (-1))
           update (ChangeBag pid BagSource r 1)
+          doLogPlayer pid [ LogText "+", LogCube r ]
 
 doDrawCube :: PlayerId -> Interact Bool
 doDrawCube playerId =
@@ -162,18 +167,24 @@ doLooseWorker playerId =
                                                              else FreeUnit
             doRemoveUnit playerId ty loc
             update (ChangeWorkers playerId 1)
+            doLogPlayer playerId
+              [ LogText "Removed troop from", LogHex loc ]
 
        Just (AskCity loc cityId) ->
          do let tile = getField (tileAt loc) board
                 f    = cityAt cityId .> citySpot
             update (ChangeTile loc (setField f Empty tile))
             update (ChangeWorkers playerId 1)
+            doLogPlayer playerId
+              [ LogText "Removed troop from", LogCity loc cityId ]
 
        Just (AskRuin loc ruinId) ->
          do let tile = getField (tileAt loc) board
                 f    = ruinAt ruinId .> ruinSpot
             update (ChangeTile loc (setField f Empty tile))
             update (ChangeWorkers playerId 1)
+            doLogPlayer playerId
+              [ LogText "Removed troop from", LogRuin loc ruinId ]
 
        _ -> pure ()
 
@@ -188,4 +199,12 @@ doRemoveUnit pid ty loc =
          do update (ChangeUnit pid' BlockedUnit loc (-n))
             update (ChangeUnit pid' FreeUnit    loc   n)
 
+
+doLog :: LogEvent -> Interact ()
+doLog ev = update (AddLog ev)
+
+doLogPlayer :: PlayerId -> LogEvent -> Interact ()
+doLogPlayer p ev =
+  do p' <- view (fst . currentPlayer)
+     if p == p' then doLog ev else doLog (LogPlayer p : ev)
 

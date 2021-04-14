@@ -48,7 +48,9 @@ const uiRedraw = (state) => {
   body.innerHTML = ""
 
   const mainPanel = div('mainPanel')
+  const rightPanel = div('mainPanel')
   body.appendChild(mainPanel)
+  body.appendChild(rightPanel)
 
   const topBar = div('top-bar')
   mainPanel.appendChild(topBar)
@@ -66,12 +68,16 @@ const uiRedraw = (state) => {
   gui.board = uiBoard(game._gameBoard)
   mainPanel.appendChild(gui.board.dom)
 
+
   const ps = uiPlayers(game.gameTurnOrder, game._gamePlayers)
   gui.player = ps.players
-  body.appendChild(ps.dom)
+  rightPanel.appendChild(ps.dom)
 
   gui.markets = uiMarkets(game._gameMarkets)
   mainPanel.appendChild(gui.markets.dom)
+
+  gui.log = uiLog(game._gameLog)
+  rightPanel.appendChild(gui.log.dom)
 
   uiQuestions(state.questions)
 }
@@ -114,4 +120,5 @@ const uiUpdate = hsUpdate (
   , GainAchievement: (pid,a)    => gui.player[pid].stats.addAchievement(a)
   , SetEndOn: (pid)             => {}
   , EndGame: (fin)              => gui.turn.dom.replaceWith(uiFinished(fin))
+  , AddLog: (ev)                => gui.log.logEvent(ev)
   })

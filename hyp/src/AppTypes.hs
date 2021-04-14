@@ -24,6 +24,7 @@ import Turn
 import Tech
 import Action
 import RuinToken
+import Log
 
 
 data Update =
@@ -58,6 +59,8 @@ data Update =
   | SetEndOn PlayerId
   | EndGame [FinalScore]
 
+  | AddLog LogEvent
+
   deriving (Generic,ToJSON)
 
 data FinalScore = FinalScore
@@ -80,6 +83,7 @@ data State = State
   , _gameSupply   :: Bag Resource
   , _gameMarkets  :: Map DeckName Market
   , _gameFinished :: Maybe [FinalScore]
+  , _gameLog      :: [LogEvent]
   } deriving (Generic,ToJSON)
 
 declareFields ''State
@@ -98,6 +102,7 @@ initialState rng useFog len ps = State
   , _gameSupply = bagFromNumList [ (r,24) | r <- enumAll, r /= Gray ]
   , _gameMarkets = markets
   , _gameFinished = Nothing
+  , _gameLog = []
   }
   where
   mkP r p = let (r1,r2) = splitRNG r
@@ -128,7 +133,6 @@ playerUpdateView pid upd =
   case upd of
     SetRuinToken pid' ts | pid /= pid' -> SetRuinToken pid' (map hideToken ts)
     _ -> upd
-
 
 doUpdate :: Update -> State -> Either Finished State
 doUpdate upd =
@@ -211,6 +215,9 @@ doUpdate upd =
 
     SetEndOn playerId ->
       Right . setField gameEndOn (Just playerId)
+
+    AddLog ev ->
+      Right . updField gameLog (ev:)
 
     EndGame fs ->
       Left . setField gameFinished (Just fs)

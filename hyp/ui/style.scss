@@ -2,6 +2,7 @@ $page-bg:       #102;
 $page-border:   #636; /* #ecf; */
 $board-bg:      #203;
 $thing-bg:      #c9c;
+$hi-color:      red;
 
 $red    : #c00;
 $green  : #090;
@@ -244,6 +245,10 @@ svg.gray     { fill: $gray; }
   z-index: 0;
 }
 
+.hex.hi.border {
+  background-color: $hi-color !important;
+}
+
 .hex .bg {
   width: 100%;
   height: 100%;
@@ -272,6 +277,10 @@ svg.gray     { fill: $gray; }
   position: absolute;
   left: 0;
   top: 0;
+}
+
+.hi.icon {
+  border: 0.2em solid $hi-color !important;
 }
 
 .board .icon {
@@ -509,4 +518,41 @@ svg.gray     { fill: $gray; }
   text-align: center;
   font-weight: bold;
   border-top: 0.1em solid black;
+}
+
+/* ------------------------- */
+
+.log {
+  font-size: smaller;
+  background-color: $board-bg;
+  border-radius: 0.5em;
+  border: 0.2em solid $page-border;
+  overflow: auto;
+  padding: 1em;
+  margin: 0.5em;
+}
+
+.mainPanel {
+  flex-shrink: 1;
+}
+
+.log-box {
+  background-color: white;
+  border: 0.2em solid $thing-bg;
+  border-radius: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.log-hover {
+  font-style: italic;
+  text-decoration: underline;
+}
+
+.log-entry {
+  display: inline-block;
+  background-color: #fef;
+  border-radius: 0.2em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  margin-bottom: 0.2em;
 }

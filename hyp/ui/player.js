@@ -103,6 +103,28 @@ const uiRuinToken = (t) => {
   }
 }
 
+
+const uiAchievement = (a) => {
+  const cDom = div('icon achievement')
+  setDim(cDom,iconSize,iconSize)
+  const cl = cDom.classList
+  switch (a) {
+    case 'ManyStars':
+      cl.add('many-stars')
+      tooltip(cDom,false,'Achievement: gain 12 gems')
+      break
+    case 'ManyTroops':
+      cl.add('many-troops')
+      tooltip(cDom,false,'Achievement: place all troops')
+      break
+    case 'ManyTechs':
+      cl.add('many-techs')
+      tooltip(cDom,false,'Achievement: obtain 5 technologies')
+      break
+  }
+  return cDom
+}
+
 const uiPlayerStats = (player,p) => {
   const dom = div('stats')
 
@@ -148,27 +170,7 @@ const uiPlayerStats = (player,p) => {
 
   setToken(p._playerToken)
 
-  const addAchievement = (a) => {
-    console.log(a)
-    const cDom = div('icon achievement')
-    setDim(cDom,iconSize,iconSize)
-    const cl = cDom.classList
-    switch (a) {
-      case 'ManyStars':
-        cl.add('many-stars')
-        tooltip(cDom,false,'Achievement: gain 12 gems')
-        break
-      case 'ManyTroops':
-        cl.add('many-troops')
-        tooltip(cDom,false,'Achievement: place all troops')
-        break
-      case 'ManyTechs':
-        cl.add('many-techs')
-        tooltip(cDom,false,'Achievement: obtain 5 technologies')
-        break
-    }
-    dom.appendChild(cDom)
-  }
+  const addAchievement = (a) => dom.appendChild(uiAchievement(a))
 
   const ach = p._playerAchievements
   for (let i = 0; i < ach.length; ++i) {
@@ -270,6 +272,20 @@ const uiBag = (name,bag) => {
 
 
 
+const uiUpgradeIcon = (color) => {
+  const r = div('icon')
+  const size = 0.75 * iconSize
+  setDim(r,size,size)
+  setSize(r,'margin', (iconSize - size) /2)
+
+  const c = svg('img/upgrade.svg#upgrade')
+  setDim(c,size,size)
+  c.classList.add('inner')
+  c.classList.add(color)
+  r.appendChild(c)
+  return r
+}
+
 
 const uiUpgrade = (bag) => {
   const dom = div('bag')
@@ -279,16 +295,7 @@ const uiUpgrade = (bag) => {
 
   for (const color in bag) {
     const n = bag[color]
-    const r = div('icon')
-    const size = 0.75 * iconSize
-    setDim(r,size,size)
-    setSize(r,'margin', (iconSize - size) /2)
-
-    const c = svg('img/upgrade.svg#upgrade')
-    setDim(c,size,size)
-    c.classList.add('inner')
-    c.classList.add(color)
-    r.appendChild(c)
+    const r = uiUpgradeIcon(color)
 
     const ba = addBadge(n,r,true)
     number[color] = { dom: r, ba: ba, number: n }
