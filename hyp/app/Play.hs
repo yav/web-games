@@ -104,12 +104,13 @@ endTurn =
                   _     -> head (gameTurnOrder state)
      case getField gameEndOn state of
        Just p | p == newP -> endGame
-       _ -> do let n = Set.size
-                     $ Set.unions
-                     $ map (getField playerAchievements)
-                     $ Map.elems $ getField gamePlayers state
-               when (n >= gameEnd state) $ update $ SetEndOn curP
-               update (SetTurn (newTurn newP))
+              | otherwise -> update (SetTurn (newTurn newP))
+       Nothing -> do let n = Set.size
+                           $ Set.unions
+                           $ map (getField playerAchievements)
+                           $ Map.elems $ getField gamePlayers state
+                     when (n >= gameEnd state) $ update $ SetEndOn curP
+                     update (SetTurn (newTurn newP))
      startTurn
 
 
