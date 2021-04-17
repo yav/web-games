@@ -15,7 +15,8 @@ library
     Common.Field,
     Common.CallJS,
     Common.RNG,
-    Common.SaveLoad
+    Common.SaveLoad,
+    Common.Bag
   build-depends:
     base >=4.13, containers, text, tf-random, aeson, vector, template-haskell,
     bytestring, zlib, base64-bytestring

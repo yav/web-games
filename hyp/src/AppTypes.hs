@@ -13,8 +13,8 @@ import Common.Basics
 import Common.Utils(enumAll)
 import Common.Field
 import Common.RNG
+import Common.Bag
 
-import Bag
 import Resource
 import Geometry
 import Tile

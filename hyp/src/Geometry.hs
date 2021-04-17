@@ -13,11 +13,11 @@ import Data.Aeson(ToJSON(..),FromJSON)
 import Common.Basics(PlayerId)
 import Common.Utils(enumAll)
 import Common.Field
+import Common.Bag
 
 import Resource
 import Terrain
 import Tile
-import Bag
 
 data Board = Board
   { _boardMap     :: Map Loc Tile

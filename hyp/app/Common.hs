@@ -9,8 +9,8 @@ import qualified Data.Set as Set
 import Common.Basics
 import Common.Field
 import Common.Interact
+import Common.Bag
 
-import Bag
 import Resource
 import Tile
 import Turn

@@ -12,8 +12,8 @@ import Common.Basics
 import Common.Utils(enumAll,showText)
 import Common.Field
 import Common.Interact
+import Common.Bag
 
-import Bag
 import Turn
 import AppTypes
 import Action

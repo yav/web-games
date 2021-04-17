@@ -13,10 +13,10 @@ import Common.Basics
 import Common.Utils(enumAll)
 import Common.Field
 import Common.RNG
+import Common.Bag
 
 import Resource
 import Action
-import Bag
 import BoardActions
 import Tech
 import RuinToken

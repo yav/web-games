@@ -7,9 +7,9 @@ import qualified Data.Set as Set
 
 import Common.Field
 import Common.Basics
+import Common.Bag
 
 import PlayerState
-import Bag
 import Action
 import Resource
 import Geometry

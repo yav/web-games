@@ -1,4 +1,4 @@
-module Bag where
+module Common.Bag where
 
 import Data.Maybe(fromMaybe)
 import Data.Map(Map)

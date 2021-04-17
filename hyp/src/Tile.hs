@@ -17,12 +17,12 @@ import MonadLib
 
 import Common.Basics
 import Common.Field
+import Common.Bag
 
 import Terrain
 import Action
 import RuinToken
 import Resource
-import Bag
 
 
 data TileName =

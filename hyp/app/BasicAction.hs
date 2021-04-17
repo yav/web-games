@@ -9,8 +9,8 @@ import Common.Basics
 import Common.Field
 import Common.Utils
 import Common.Interact
+import Common.Bag
 
-import Bag
 import Resource
 import Geometry
 import Action

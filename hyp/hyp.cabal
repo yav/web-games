@@ -24,7 +24,6 @@ library
     Tile,
     Tech,
     BoardActions,
-    Bag,
     PlayerState,
     Geometry,
     Layout,

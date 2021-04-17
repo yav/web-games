@@ -7,7 +7,7 @@ import Data.Aeson(FromJSON,ToJSON)
 
 import Common.Basics
 import Common.Field
-import Bag
+import Common.Bag
 
 import Resource
 import Tile
