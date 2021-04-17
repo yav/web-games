@@ -17,7 +17,8 @@ library
     Common.CallJS,
     Common.RNG,
     Common.SaveLoad,
-    Common.ColorPicker
+    Common.ColorPicker,
+    Common.Options
   build-depends:
     base >=4.13, containers, text, tf-random, aeson, vector, template-haskell,
     bytestring, zlib, base64-bytestring

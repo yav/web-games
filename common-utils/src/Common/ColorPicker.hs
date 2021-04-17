@@ -1,6 +1,5 @@
 module Common.ColorPicker
   ( Color
-  , PColors(..)
   , makePlayers
   , jsColors
   ) where
@@ -46,8 +45,8 @@ setColor p c cs =
         Nothing -> doSetColor p c (pickColor p1 cs)
         Just c1 -> doSetColor p c (doSetColor p1 c1 cs)
 
-makePlayers :: [Color] -> [(String,Maybe String)] -> PColors
-makePlayers colors = foldl' mkPlayer noColors
+makePlayers :: [Color] -> [(String,Maybe String)] -> Map PlayerId Color
+makePlayers colors = pcolor . foldl' mkPlayer noColors
   where
   noColors = PColors { usedBy = Map.empty, pcolor = Map.empty, free = colors }
   mkPlayer c (p,mb) =
