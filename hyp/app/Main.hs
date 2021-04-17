@@ -1,23 +1,17 @@
 module Main where
 
-import Data.Text(Text)
-import qualified Data.Text as Text
 import Data.ByteString(ByteString)
 import qualified Data.ByteString.Char8 as BS8
-import qualified Data.ByteString.Lazy.Char8 as BS8 (toStrict)
-import Data.List(foldl')
-import Data.Map(Map)
 import qualified Data.Map as Map
 import System.Console.GetOpt
-import qualified Data.Aeson as JS
 import Control.Monad(when)
-import Data.Char(toLower)
 
 import Common.Basics
 import Common.RNG
 import Common.Server
 import Common.CallJS
 import Common.Interact
+import Common.ColorPicker
 
 import AppTypes
 import Action
@@ -34,7 +28,7 @@ main =
 begin :: Save -> IO (ByteString, InteractState)
 begin Save { .. } =
   do when (gameLen opts == 0) $ fail "Need a game length."
-     let ps  = pcolor (makePlayers (players opts))
+     let ps  = pcolor (makePlayers colors (players opts))
          rng = seedRNG seed
      pure
        ( jsColors ps
@@ -60,54 +54,9 @@ data Save = Save
   } deriving (Read,Show)
 
 --------------------------------------------------------------------------------
-type Color = Text
-
 -- | default color order
 colors :: [Color]
 colors = [ "red", "yellow", "blue", "orange", "purple", "green" ]
-
-data PColors = PColors
-  { usedBy :: Map Color PlayerId
-  , pcolor :: Map PlayerId Color
-  , free   :: [Color]
-  }
-
-doSetColor :: PlayerId -> Color -> PColors -> PColors
-doSetColor p c cs = cs { usedBy = Map.insert c p (usedBy cs)
-                       , pcolor = Map.insert p c (pcolor cs)
-                       }
-
-pickColor :: PlayerId -> PColors -> PColors
-pickColor p cs =
-  case free cs of
-    c : more -> doSetColor p c cs { free = more }
-    []       -> doSetColor p "gray" cs -- shouldn't happen
-
-setColor :: PlayerId -> Color -> PColors -> PColors
-setColor p c cs =
-  case Map.lookup c (usedBy cs) of
-    Nothing -> doSetColor p c cs
-    Just p1 ->
-      case Map.lookup p (pcolor cs) of
-        Nothing -> doSetColor p c (pickColor p1 cs)
-        Just c1 -> doSetColor p c (doSetColor p1 c1 cs)
-
-makePlayers :: [(String,Maybe String)] -> PColors
-makePlayers = foldl' mkPlayer noColors
-  where
-  noColors = PColors { usedBy = Map.empty, pcolor = Map.empty, free = colors }
-  mkPlayer c (p,mb) =
-    let pid = PlayerId (Text.pack p)
-    in case mb of
-         Just co | let co' = Text.pack (map toLower co)
-                 , co' `elem` colors -> setColor pid co' c
-         _ -> pickColor pid c
-
-jsColors :: Map PlayerId Color -> BS8.ByteString
-jsColors mp = BS8.unlines
-  [ "const playerColors ="
-  , BS8.toStrict (JS.encode mp)
-  ]
 
 --------------------------------------------------------------------------------
 data Options = Options

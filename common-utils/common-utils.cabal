@@ -13,10 +13,11 @@ library
     Common.Basics,
     Common.Utils,
     Common.Field,
+    Common.Bag,
     Common.CallJS,
     Common.RNG,
     Common.SaveLoad,
-    Common.Bag
+    Common.ColorPicker
   build-depends:
     base >=4.13, containers, text, tf-random, aeson, vector, template-haskell,
     bytestring, zlib, base64-bytestring
