@@ -129,7 +129,7 @@ normalMovePieces playerId limit stopEarly canPickUp canPutDown =
       do board <- view (getField gameBoard)
          case allPickupOpts board n of
            []   -> putDown
-           opts -> askInputs opts
+           opts -> askInputs "Choose worker to pick up" opts
 
   doPickUp n edgeId spot w =
     do update (RemoveWorkerFromEdge edgeId spot)
@@ -146,7 +146,7 @@ normalMovePieces playerId limit stopEarly canPickUp canPutDown =
        case mb of
          Nothing -> pure ()
          Just (fromProv,w) ->
-           askInputs
+           askInputs "Choose location to put down worker"
              [ (playerId :-> ch, "New worker location", doPutDown w edgeId spot)
              | ch@(ChEdgeEmpty edgeId spot _) <-
                          freeSpots board (canPutDown fromProv) (shape w)

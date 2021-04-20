@@ -190,20 +190,20 @@ interaction_ :: Either (Interact ()) (WithPlayer Input) ->
                InteractState -> InteractState
 interaction_ how = fst . interaction how
 
-choose :: PlayerId -> [(Input,Text)] -> Interact Input
-choose playerId opts =
-  askInputs [ (playerId :-> ch, help, pure ch) | (ch,help) <- opts ]
+choose :: PlayerId -> Text -> [(Input,Text)] -> Interact Input
+choose playerId q opts =
+  askInputs q [ (playerId :-> ch, help, pure ch) | (ch,help) <- opts ]
 
 -- | Ask a question only if there is a choice
-chooseMaybe :: PlayerId -> [(Input,Text)] -> Interact (Maybe Input)
-chooseMaybe playerId opts =
+chooseMaybe :: PlayerId -> Text -> [(Input,Text)] -> Interact (Maybe Input)
+chooseMaybe playerId q opts =
   case opts of
     []  -> pure Nothing
     [t] -> pure (Just (fst t))
-    _   -> Just <$> choose playerId opts
+    _   -> Just <$> choose playerId q opts
 
-askInputs :: [ (WithPlayer Input, Text, Interact a) ] -> Interact a
-askInputs opts =
+askInputs :: Text -> [ (WithPlayer Input, Text, Interact a) ] -> Interact a
+askInputs _q opts =
   Interact $
   \curK ->
   \curS os ->

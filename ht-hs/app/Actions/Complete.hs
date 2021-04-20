@@ -56,7 +56,8 @@ resolveAmbig = Map.elems . fmap resolve . Map.fromListWith (++) . map toMap
       [(q,h,_,a)] -> (q,h,a)
       _ ->
          let (q,h,_,_) = head opts
-         in (q, h, askInputs [ ( playerAnnot q :-> ChEdge e
+         in (q, h, askInputs "Choose route to complete"
+                               [ ( playerAnnot q :-> ChEdge e
                                , "Complete this route"
                                , a
                                ) | (_,_,e,a) <- opts ])

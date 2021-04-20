@@ -108,7 +108,8 @@ doRemoveCube ::
   (GeneralCubeLoc -> Resource -> Interact ()) -> Interact ()
 doRemoveCube playerId mbLim k =
   do player <- view (getField (playerState playerId))
-     mb <- chooseMaybe playerId (removeCubeOpts player mbLim)
+     mb <- chooseMaybe playerId "Choose cube to remove"
+                              (removeCubeOpts player mbLim)
      case mb of
        Nothing -> pure ()
        Just act ->
@@ -138,7 +139,8 @@ looseUpgradeOpts player =
 doLooseUpgrade :: PlayerId -> Interact ()
 doLooseUpgrade playerId =
   do player <- view (getField (playerState playerId))
-     mb <- chooseMaybe playerId (looseUpgradeOpts player)
+     mb <- chooseMaybe playerId "Choose upgrade to decrease"
+                          (looseUpgradeOpts player)
      case mb of
        Nothing -> pure ()
        Just ~(AskUpgrade r) -> update (Upgrade playerId r (-1))
@@ -159,7 +161,8 @@ looseWorkerOptions playerId geo =
 doLooseWorker :: PlayerId -> Interact ()
 doLooseWorker playerId =
   do board <- view (getField gameBoard)
-     mb <- chooseMaybe playerId (looseWorkerOptions playerId board)
+     mb <- chooseMaybe playerId "Choose unit to loose"
+                                    (looseWorkerOptions playerId board)
      case mb of
        Just (AskUnit loc _) ->
          do let tile = getField (tileAt loc) board

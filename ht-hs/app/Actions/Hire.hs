@@ -58,7 +58,8 @@ tryHire state0 =
             | otherwise ->
               do let lab = mconcat ["Hire ", showText hiring, "/",
                                                               showText limit ]
-                 x <- choose playerId [ (ChPassiveWorker t, lab) | t <- enumAll]
+                 x <- choose playerId "Hire what type of worker?"
+                                  [ (ChPassiveWorker t, lab) | t <- enumAll]
                  let ChPassiveWorker ch = x
                  hire 1 ch
                  doHire (1+hiring) limit

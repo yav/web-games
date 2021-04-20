@@ -37,7 +37,8 @@ nextAction =
         else do let normalOpts = tryPlace state ++ tryMove state ++
                                  tryHire state ++ tryCompleteEdge state ++
                                   [ a | b <- enumAll, a <- bonusAction b state ]
-                askInputs (tryEndTurn (null normalOpts) state ++ normalOpts)
+                askInputs "Choose action"
+                            (tryEndTurn (null normalOpts) state ++ normalOpts)
                 nextAction
 
 nextTurn :: Interact ()
@@ -62,6 +63,7 @@ tryEndTurn forceEnd state =
               do replaceTokens
                  nextTurn)
 
+-- XXX: handle case when there is no place for binus token
 replaceTokens :: Interact ()
 replaceTokens =
   do n <- view (getField gameTokenRemaining)
@@ -71,7 +73,8 @@ replaceTokens =
           spots <- view (tokenSpots . getField gameBoard)
           let t = head ts
           update (PlacingBonus (Just t))
-          ~(ChEdge edgeId) <- choose p [ (spot,"Place token here")
+          ~(ChEdge edgeId) <- choose p "Place a new bonus token"
+                                        [ (spot,"Place token here")
                                                               | spot <- spots ]
           update (PlacingBonus Nothing)
           update (EdgeSetBonus edgeId t)

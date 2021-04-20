@@ -98,7 +98,7 @@ tryPlace state =
                  disable discs Disc
             | otherwise ->
               do ~(ChActiveWorker ch) <-
-                     choose playerId
+                     choose playerId "Choose a worker to retire"
                        [ ( ChActiveWorker t
                          , "Replace cost " <> showText doing <> "/"
                                            <> showText total
@@ -120,6 +120,7 @@ tryPlace state =
     do tgts <- placeOpts edgeId (shape worker)
        ~(ChEdgeEmpty tgtEdgeId spot _) <-
             choose (owner worker)
+              "Choose location for the displaced worker"
               [ (ch, "Move replaced worker") | ch <- tgts ]
        update RemoveWorkerFromHand
        update (PlaceWorkerOnEdge tgtEdgeId spot worker)
@@ -147,7 +148,9 @@ tryPlace state =
          case (opts,home) of
            ([],Passive) -> placeExtra Active playerId edgeId placing total
            ([],Active)  -> pure () -- XXX: allow to move
-           _ -> do ch <- choose playerId allOpts
+           _ -> do ch <- choose playerId
+                                      "Displacement consolation worker location"
+                                      allOpts
                    case ch of
                      ChDone _ -> pure ()
 

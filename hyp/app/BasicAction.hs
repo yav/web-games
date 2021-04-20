@@ -78,6 +78,7 @@ doCloneWorker playerId =
     do l <- case locs of
               [l] -> pure l
               _   -> do ~(AskMap l _) <- choose playerId
+                            "Choose location for new unit"
                             [ (AskMap l CloneWorker,"Place unit") | l <- locs ]
                         pure l
        doPlaceWorkerOn playerId l
@@ -101,7 +102,8 @@ doUpgrade playerId ctr =
 
   upgrade1 opts n =
     do ~(AskUpgrade r) <-
-          choose playerId [ (AskUpgrade r, "Upgrade resource") | r <- opts ]
+          choose playerId "Choose track to upgrade"
+                              [ (AskUpgrade r, "Upgrade resource") | r <- opts ]
        have <- view (getField (playerState playerId .> playerDevel .> mapAt r))
        let n' = min (6 - have) n
        update (Upgrade playerId r n')
@@ -126,7 +128,8 @@ doGainResource playerId req =
           [r] -> doGainCube playerId r
           rs  ->
              do ~(AskSupply r) <-
-                    choose playerId [ (AskSupply r, "Gain cube") | r <- rs ]
+                    choose playerId "Choose resource to gain"
+                                [ (AskSupply r, "Gain cube") | r <- rs ]
                 doGainCube playerId r
 
 doReturnResource :: PlayerId -> Interact ()
@@ -154,7 +157,8 @@ doSwapResource playerId inT outT =
                    do let opt r  = (AskSupply r, "Replace with this")
                       opts <- view (map (opt . fst) . bagToList
                                                     . getField gameSupply)
-                      mb <- chooseMaybe playerId opts
+                      mb <- chooseMaybe playerId
+                                        "Choose replacement resource" opts
                       case mb of
                         Nothing             -> pure rIn
                         Just ~(AskSupply r) ->
@@ -177,7 +181,10 @@ doGainTech playerId withReset =
            | (n,_) <- zip [ 0 .. ] (getField marketOffer m)
            ]
 
-     ch <- choose playerId (concatMap optsFor (Map.toList market))
+         q = "Choose a technology" <>
+             (if withReset then " / reset a row" else "")
+
+     ch <- choose playerId q (concatMap optsFor (Map.toList market))
      case ch of
        AskMarketDeck d ->
          case Map.lookup d market of
@@ -205,7 +212,7 @@ doNeighbours playerId act =
 doFortify :: PlayerId -> Interact ()
 doFortify playerId =
   do locs <- view (cloneLocs playerId . getField gameBoard)
-     mb <- chooseMaybe playerId
+     mb <- chooseMaybe playerId "Choose location for fortification"
             [ (AskMap l Fortify, "Add fortification") | l <- locs ]
      case mb of
        Nothing -> pure ()
@@ -218,6 +225,7 @@ doSpy :: PlayerId -> Interact ()
 doSpy playerId =
   do ps <- view (Map.toList . getField gamePlayers)
      mb <- chooseMaybe playerId
+              "Choose technology to copy"
               [ (AskPlayerTech p techId, "Copy benefit")
               | (p,player) <- ps
               , p /= playerId

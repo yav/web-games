@@ -38,7 +38,8 @@ bonusAction b state =
        BonusUpgrade ->
          do let stats = [ s | s <- enumAll, getLevel s player < maxStat s ]
             guard (not (null stats))
-            pure $ opt $ askInputs [ ( playerId :-> ChUpgrade stat
+            pure $ opt $ askInputs "Choose what to upgrade"
+                                     [ ( playerId :-> ChUpgrade stat
                                      , "Upgrade " <> jsKey stat
                                      , doUpgrade playerId player stat
                                      ) | stat <- stats
@@ -67,7 +68,8 @@ bonusAction b state =
              do board <- view (getField gameBoard)
                 let spots = moveFromSpots board (/= playerId)
                 unless (null spots) $
-                  askInputs [ ( playerId :-> q
+                  askInputs "Choose workers to move"
+                              [ ( playerId :-> q
                               , "Pick up " <> showText n <> "/" <> showText l
                               , doPickup n l q
                               ) | q <- spots ]
@@ -80,7 +82,8 @@ bonusAction b state =
               evLog [ "Picked-up ", EvWorker worker, " from "
                     , EvEdge edgeId (Just spot) ]
               let spots = freeSpots board (== prov) (shape worker)
-              askInputs [ ( playerId :-> q
+              askInputs "Choose workers to move"
+                          [ ( playerId :-> q
                           , "Put down " <> showText n <> "/" <> showText l
                           , doPutDown n l worker q
                           ) | q <- spots ]

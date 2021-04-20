@@ -37,11 +37,12 @@ setup =
           doLog [ LogNewTurn (Just p), "Setup" ]
           replicateM_ 3 (doPlaceWorkerOnCapital p)
           sequence_ [ doGainCube p c | c <- resources ]
-          ~(AskSupply extra) <- choose p
+          ~(AskSupply extra) <- choose p "Choose a resource to gain"
                             [ (AskSupply r, "Gain a cube") | r <- resources ]
           doGainCube p extra
           forM_ [ 1 .. 3 ] \n ->
             do ~(AskUpgrade r) <- choose p
+                              ("Choose a track to upgrade to " <> showText n)
                     [ (AskUpgrade r, "Upgrade to level " <> showText n)
                     | r <- resources ]
                doLog [ LogUpgrade r n ]
@@ -133,7 +134,7 @@ takeTurn =
                 actUseRuinToken state ++
                 actAttack state ++
                 actUseUpgrade state
-     askInputs opts
+     askInputs "Choose next action" opts
 
 type Opts = State -> [ (WithPlayer Input, Text, Interact ()) ]
 
@@ -192,6 +193,7 @@ actPlaceCube state =
          case opts of
            [r] -> pure r
            _   -> do ~(AskReady r) <- choose playerId
+                                        "Which cube to place on wild spot?"
                                 [ (AskReady r, "Place on wild") | r <- opts ]
                      pure r
          where
@@ -240,6 +242,7 @@ actEnterRuin state =
                update (SetRuinToken playerId (t:ts))
                unless (null ts)
                  do ~(AskButton ch) <- choose playerId
+                       "Reduce to single ruin token"
                        [ ( AskButton "Play New"
                          , "Play new token, keep the old one"
                          )
@@ -297,7 +300,8 @@ actMove state =
     do ch <- case opts of
                [a] -> pure a
                _ -> do update (SetUnithighlight from playerId True)
-                       a <- choose playerId [ (o,"Move here") | o <- opts ]
+                       a <- choose playerId "Choose where to move to"
+                                            [ (o,"Move here") | o <- opts ]
                        update (SetUnithighlight from playerId False)
                        pure a
 
@@ -383,6 +387,7 @@ actAttack state
       Nothing ->
         do ~(AskReadyAction a) <-
                 choose playerId
+                    "Choose type of attack to use"
                     [ (AskReadyAction Attack, "Use normal attack")
                     , (AskReadyAction RangedAttack, "Use ranged attack")
                     ]
@@ -588,7 +593,7 @@ doReset playerId =
        case Map.keys withCubes of
          [] -> pure ()
          ts ->
-          do ch <- choose playerId
+          do ch <- choose playerId "Remove cubes from continuous technology?"
                   $ (AskButton "End Reset", "Do not reset the rest")
                   : [ (AskPlayerTech playerId t, "Remove all cubes") | t <- ts ]
              case ch of

@@ -40,7 +40,7 @@ doPlaceInProvince playerId placing limit
                    : changePref player ambig ++ opts
        case opts of
          [] -> pure ()
-         _  -> do ch <- choose playerId allOpts
+         _  -> do ch <- choose playerId "Choose worker location" allOpts
                   case ch of
                     ChDone {} -> pure()
                     ChSetPreference t ->
@@ -57,7 +57,8 @@ doPlaceInProvince playerId placing limit
 
 bonusMove2 :: PlayerId -> Interact ()
 bonusMove2 playerId =
-  askInputs . normalMovePieces playerId 2 True (const True) (==) =<< getState
+  askInputs "Choose workers to move" .
+                normalMovePieces playerId 2 True (const True) (==) =<< getState
 
 
 bonusGainPrivilage :: PlayerId -> Interact ()
@@ -86,6 +87,7 @@ bonusReuse2 playerId edgeId = pickingUp 1
                      update (AddWorkerToHand prov w)
                      board <- view (getField gameBoard)
                      loc <- choose playerId
+                              "Choose where to move worker"
                               [ (ch,"New worker location")
                               | ch <- freeSpots board (== prov) (shape w)
                               ]
@@ -94,7 +96,7 @@ bonusReuse2 playerId edgeId = pickingUp 1
                      update (PlaceWorkerOnEdge tgtEdge tgtSpot w)
                      pickingUp (n+1)
                 )
-         askInputs (giveUp : map mkOpt ws)
+         askInputs "Choose workers to reuse" (giveUp : map mkOpt ws)
 
 bonusBuildInGreen :: PlayerId -> Interact ()
 bonusBuildInGreen playerId =
@@ -103,7 +105,8 @@ bonusBuildInGreen playerId =
      case placeSpots Active player "Place bonus worker" (greenCities board) of
        ([],_) -> pure ()
        (opts,ambig) ->
-          do ch <- choose playerId $ (ChDone "Done", "Don't use bonus")
+          do ch <- choose playerId "Choose new office location"
+                                 $ (ChDone "Done", "Don't use bonus")
                                    : changePref player ambig ++ opts
              case ch of
                ChDone {} -> pure ()
