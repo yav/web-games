@@ -48,6 +48,7 @@ startGame ginfo moves = foldl' step state0 moves
                          , iName    = 0
                          , iGame    = Right (gState ginfo)
                          , iAsk     = Map.empty
+                         , iQuestion = ""
                          , iShouldSave = False
                          }
   step state i = interaction_ (Right i) state
@@ -62,7 +63,7 @@ data GameInfo = GameInfo
 
 data OutMsg =
     CurGameState CurState
-  | AskQuestions [ChoiceHelp]
+  | AskQuestions (Text, [ChoiceHelp])
   | GameUpdate Update
     deriving Generic
 
@@ -102,7 +103,7 @@ handleMessage (p :-> req) =
   askQuestions (s,os) =
     ( s { iShouldSave = False }
     , reverse os ++
-      [ q :-> AskQuestions qs
+      [ q :-> AskQuestions (iQuestion s, qs)
       | (q,qs) <- Map.toList
                 $ Map.fromListWith (++)
                   [ (q,[ChoiceHelp { chChoice = ch
@@ -123,12 +124,14 @@ reload s p =
   p :-> CurGameState
         CurState { cGame = fmap (playerView p) (iGame s)
                  , cQuestions =
-                      [ ChoiceHelp { chChoice = q
-                                   , chHelp = help
-                                   , chStateName = iName s
-                                   }
-                      | (p' :-> q,(help,_)) <- Map.toList (iAsk s)
-                      , p' == p ]
+                      ( iQuestion s
+                      , [ ChoiceHelp { chChoice = q
+                                     , chHelp = help
+                                     , chStateName = iName s
+                                     }
+                        | (p' :-> q,(help,_)) <- Map.toList (iAsk s)
+                        , p' == p ]
+                      )
                  }
 
 
@@ -148,6 +151,8 @@ data InteractState =
 
     , iAsk     :: Map (WithPlayer Input) (Text, R)
       -- ^ Choices avialable to the players.
+
+    , iQuestion :: Text
 
     , iShouldSave :: Bool
     }
@@ -203,12 +208,13 @@ chooseMaybe playerId q opts =
     _   -> Just <$> choose playerId q opts
 
 askInputs :: Text -> [ (WithPlayer Input, Text, Interact a) ] -> Interact a
-askInputs _q opts =
+askInputs q opts =
   Interact $
   \curK ->
   \curS os ->
   let cont (ch,help,Interact m) = (ch, (help, m curK))
-  in (curS { iAsk = Map.union (Map.fromList (map cont opts)) (iAsk curS) }, os)
+  in (curS { iQuestion = q
+           , iAsk = Map.union (Map.fromList (map cont opts)) (iAsk curS) }, os)
 
 
 
@@ -266,7 +272,7 @@ save = Interact $ \k s os -> k () s { iShouldSave = True } os
 
 data CurState = CurState
   { cGame       :: Either Finished State
-  , cQuestions  :: [ChoiceHelp]
+  , cQuestions  :: (Text, [ChoiceHelp])
   }
 
 

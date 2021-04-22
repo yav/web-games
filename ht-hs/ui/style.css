@@ -435,6 +435,18 @@ color: #fff;
   top: 0px;
 }
 
+.turn .question-status {
+  background-color: white;
+  color: black;
+  font-size: smaller;
+  border-radius: 0.2em;
+  border: 0.2em solid #09f;
+  border-top: 0;
+  padding-left: 1em;
+  padding-right: 1em;
+  display: none;
+}
+
 .turn-group {
   margin-top: 0.2em;
   margin-bottom: 0.2em;

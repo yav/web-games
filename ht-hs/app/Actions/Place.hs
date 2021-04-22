@@ -149,7 +149,7 @@ tryPlace state =
            ([],Passive) -> placeExtra Active playerId edgeId placing total
            ([],Active)  -> pure () -- XXX: allow to move
            _ -> do ch <- choose playerId
-                                      "Displacement consolation worker location"
+                                      "Bonus worker placement"
                                       allOpts
                    case ch of
                      ChDone _ -> pure ()

@@ -99,13 +99,29 @@ function drawTurn(turn) {
   }
   const pickedGroup = group(picked)
 
+  const question = document.createElement('div')
+  question.classList.add('question-status')
+  question.textContent = 'Question?'
+  question.style.position = 'absolute'
+  question.style.bottom = '-1.3em'
+  dom.appendChild(question)
+
   gui.board.appendChild(dom)
 
 
   // exported
   return {
 
-    changeDone:
+    setQuestion: (q) => {
+      question.textContent = q
+      question.style.display = 'inline-block'
+    }
+
+    , hideQuestion: () => {
+        question.style.display = 'none'
+      }
+
+    , changeDone:
       function(n) {
         done = done + n
         elDone.textContent = done

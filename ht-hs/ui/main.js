@@ -20,6 +20,7 @@ function newGUI(ws,container) {
     for (let i = 0; i < questionsExtra.length; ++i) questionsExtra[i].remove()
     for (let i = 0; i < questionsElems.length; ++i) questionsElems[i].rm()
     gui.playerUI().hideActionIndicator()
+    gui.turn.hideQuestion()
   }
 
   ui.highlightQuestions = function() {
@@ -226,7 +227,10 @@ function uiRedraw(ws,state) {
 }
 
 
-function uiQuestions(qs) {
+function uiQuestions(q_qs) {
+  const qs = q_qs[1]
+  gui.turn.setQuestion(q_qs[0])
+
   for (let i = 0; i < qs.length; ++i) {
     const q = qs[i]
     const ui = {}

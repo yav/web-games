@@ -115,7 +115,7 @@ function drawLog() {
       box.classList.add('log-item')
       if (handler(msg)) {
         const el = actionBox ? actionBox
-                 : (turnBox   ? turnBox : dom)
+                 : (turnBox ? turnBox : dom)
         el.appendChild(box)
       }
     }

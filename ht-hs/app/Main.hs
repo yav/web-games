@@ -43,7 +43,8 @@ data Options = Options
   } deriving Show
 
 instance Semigroup Options where
-  oNew <> oOld = oNew { players = players oNew ++ players oOld }
+  oNew <> oOld = oNew { players = players oNew ++ players oOld
+                      , board  = board oNew ++ board oOld }
 
 instance Monoid Options where
   mempty = Options { load = "", board = "", players = [] }
@@ -92,7 +93,7 @@ begin Save { .. } =
                                 , gSave = \m -> show Save { moves = m, .. }
                                 } moves
                   )
-        Nothing -> fail $ unlines $ "unknown board"
+        Nothing -> fail $ unlines $ ("unknown board: " ++ show b)
                                   : map Text.unpack (Map.keys boards)
 
     _ -> fail "usage: board_name player1_name player2_name ..."
