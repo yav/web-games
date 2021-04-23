@@ -1,10 +1,11 @@
 <html>
 <head>
+<script src="widgets.js"></script>
 <script>
-
 const main = () => {
   const body = document.getElementById('body')
-  const ps = settings( ['red','green','blue','orange','purple','yellow']
+  const ps = settings( 'Test'
+                     , ['red','green','blue','orange','purple','yellow']
                      , [ [ 'Length', [ 'short', 'medium', 'long' ], 'short' ]
                        , [ 'Length', [ 'short', 'medium', 'long' ], 'short' ]
                        , [ 'Length', [ 'short', 'medium', 'long' ], 'short' ]
@@ -12,161 +13,9 @@ const main = () => {
                        ]
                      )
 
-  body.appendChild(ps.dom)
-}
-
-const settings = (ps,opts) => {
-  const dom = document.createElement('div')
-  dom.style.display = 'flex'
-  dom.style.flexWrap = 'wrap'
-  dom.style.alignItems = 'flex-start'
-  const p = players(ps)
-  dom.appendChild(p.dom)
-
-  const sets = []
-  for (let i = 0; i < opts.length; ++i) {
-    const os = opts[i]
-    sets[i] = choices(os[0],os[1],os[2])
-    dom.appendChild(sets[i].dom)
-  }
-
-  return {
-    dom: dom
-  }
-}
-
-const labelBox = (x) => {
-  const dom = document.createElement('div')
-  dom.style.backgroundColor = 'white'
-  dom.style.display = 'inline-block'
-  dom.style.position = 'relative'
-  dom.style.border   = '0.1em #ccc solid'
-  dom.style.borderRadius = '0.5em'
-  dom.style.margin   = '0.5em'
-  dom.style.padding = '0.2em'
-
-  const lab = document.createElement('div')
-  lab.style.backgroundColor = 'white'
-  lab.style.paddingLeft = '0.2em'
-  lab.style.paddingRight = '0.2em'
-  lab.style.marginBottom = '0.5em'
-  lab.style.borderRadius = '0.5em'
-  dom.appendChild(lab)
-  lab.textContent = x
-  return dom
-}
-
-const players = (cs) => {
-  const boxes = []
-  const dom = document.createElement('table')
-  for (let i = 0; i < cs.length; ++i) {
-    const row = document.createElement('tr')
-    dom.appendChild(row)
-
-    const td1 = document.createElement('td')
-    row.appendChild(td1)
-    const col = document.createElement('div')
-    td1.appendChild(col)
-    col.style.width = '1em'
-    col.style.height = '1em'
-    col.style.backgroundColor = cs[i]
-    col.style.borderRadius = '0.2em'
-    col.style.border       = '0.2em solid black'
-
-    const td2 = document.createElement('td')
-    row.appendChild(td2)
-    const box = document.createElement('input')
-    td2.appendChild(box)
-    boxes[i] = box
-  }
-
-  const lab = labelBox('Players')
-  lab.appendChild(dom)
-  return {
-    dom: lab,
-
-    getPlayers: () => {
-      const ps = []
-      let next = 0
-      for (let i = 0; i < boxes.length; ++i) {
-        const val = el.value.trim()
-        if (val.length > 0) {
-          ps[next++] = val + ':' + cs[i]    // XXX: filter :?
-        }
-      }
-      return ps
-    }
-
-  }
-}
-
-const choices = (q,cs,def) => {
-  const dom = labelBox(q)
-  for (let i = 0; i < cs.length; ++i) {
-    const entry = document.createElement('div')
-    const it = document.createElement('input')
-    it.setAttribute('type','radio')
-    it.setAttribute('name',q)
-    it.setAttribute('value',cs[i])
-    it.setAttribute('id',cs[i])
-    if (cs[i] === def) it.setAttribute('checked',true)
-
-    const lab = document.createElement('label')
-    lab.setAttribute('for',cs[i])
-    lab.textContent = cs[i]
-
-    entry.appendChild(it)
-    entry.appendChild(lab)
-    dom.appendChild(entry)
-  }
-
-  return {
-    dom: dom
-  }
-}
-
-
-function create() {
-  const b = document.getElementById('board')
-  const ps = []
-  let next = 0
-  for (let i = 0; i < 5; ++i) {
-    const el = document.getElementById('player' + (i+1))
-    const val = el.value.trim()
-    if (val.length > 0) {
-      ps[next++] = val
-    }
-  }
-  let map = b.value
-  switch (map) {
-    case 'ht':        map = map + (ps.length < 4 ? '_23' : '_45'); break
-    case 'britannia': map = map + (ps.length < 4 ? '_23' : '_45'); break
-  }
-  let url = '/new/ht/' + map
-  let sep = '?'
-  for (let i = 0; i < ps.length; ++i) {
-    url = url + sep + 'player=' + ps[i]
-    sep = '&'
-  }
-  window.location.replace(url)
+  body.appendChild(ps)
 }
 </script>
 </head>
 <body id="body" onload="main()"></body></html>
 
-<!--table>
-<tr><td>Map</td>
-<td><select id="board" name="board">
-  <option value="ht">Basic Map</option>
-  <option value="east">East Expnasion</option>
-  <option value="britannia">Britannia</option>
-</select></td></tr>
-<tr><td>Player 1:</td><td><input id="player1"></input></td></tr>
-<tr><td>Player 2:</td><td><input id="player2"></input></td></tr>
-<tr><td>Player 3:</td><td><input id="player3"></input></td></tr>
-<tr><td>Player 4:</td><td><input id="player4"></input></td></tr>
-<tr><td>Player 5:</td><td><input id="player5"></input></td></tr>
-</table>
-<button type="button" onclick="create()">Create</button>
-</body>
-</html-->
