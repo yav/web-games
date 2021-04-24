@@ -35,19 +35,17 @@ type Component = Map ByteString [ByteString] -> Either ByteString CreateSession
 
 components :: [ (ByteString, Component) ]
 components =
-  [ ("ht/:board/"
-    , \params ->
-      do b <- case getParam "board" params of
-                [b] | b `elem` allMaps -> pure ("--board=" ++ BS8.unpack b)
-                _ -> Left "Invalid board"
-         ps <- case getParam "player" params of
-                 ps@(_ : _) -> pure [ "--player=" ++ BS8.unpack p | p <- ps ]
-                 _ -> Left "Need at least 1 player"
-         pure CreateSession { component = "ht-hs", arguments = b:ps }
-     )
+  [ ("ht-hs", simple "ht-hs")
+  , ("hyp", simple "hyp")
   ]
   where
-  allMaps = [ "britannia_23", "britannia_45", "east", "ht_23", "ht_45" ]
+  simple c = \params -> pure CreateSession
+                          { component = c
+                          , arguments = [ BS8.unpack ("--" <> x <> "=" <> y)
+                                        | (x,ys) <- Map.toList params
+                                        , y      <- ys
+                                        ]
+                          }
 
 
 data State = State

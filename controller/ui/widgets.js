@@ -1,6 +1,6 @@
 
 // Settings for a game
-const settings = (name,ps,opts) => {
+const settings = (name,comp,ps,opts) => {
 
   const outer = document.createElement('div')
   outer.style.display = 'flex'
@@ -37,12 +37,17 @@ const settings = (name,ps,opts) => {
   btn.style.fontWeight = 'bold'
   btn.style.cursor = 'pointer'
   btn.addEventListener('click', () => {
-    const result = {}
-    result.players = p.getPlayers()
-    for (let i = 0; i < opts.length; ++i) {
-      result[opts[i][0]] = sets[i].getChoice()
+    const url = new URL('/new/' + comp, document.URL)
+    const params = url.searchParams
+    const ps = p.getPlayers()
+    for (let i = 0; i < ps.length; ++i) {
+      params.append('player',ps[i])
     }
-    console.log(result)
+
+    for (let i = 0; i < opts.length; ++i) {
+      params.append(opts[i][0], sets[i].getChoice())
+    }
+    window.location.replace(url)
   })
 
   return outer

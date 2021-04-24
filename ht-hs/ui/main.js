@@ -112,10 +112,9 @@ function uiRedraw(ws,state) {
 
   { // Colors
     gui.colors = {}
-    const colorIx = [ 'red', 'green', 'yellow', 'purple', 'blue' ] // XXX
     for (let i = 0; i < game.turnOrder.length; ++i) {
       const pid = game.turnOrder[i]
-      gui.colors[pid] = colorIx[i]
+      gui.colors[pid] = playerColors[pid]
     }
   }
 

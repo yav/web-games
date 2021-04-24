@@ -1,5 +1,6 @@
 module Main(main) where
 
+import Data.Text(Text)
 import Data.ByteString(ByteString)
 import qualified Data.ByteString.Char8 as BS8
 import qualified Data.Text as Text
@@ -9,6 +10,7 @@ import qualified Data.Set as Set
 import Common.CallJS
 import Common.Server
 import Common.RNG
+import Common.Options
 
 import Actions(nextAction)
 import Basics
@@ -19,81 +21,70 @@ import Event(Event,EventElement)
 import Question(Choice)
 import Common.Interact
 
-import System.Console.GetOpt
-
 main :: IO ()
 main =
-  newServer options \opts ->
-    if not (null (load opts)) then
-      do txt <- readFile (load opts)
-         case reads txt of
-           [(s,"")] -> begin s
-           _ -> fail "Failed to load save"
-    else
-      do seed <- newRNGSeed
-         let moves = []
-             args = board opts : players opts
-         begin Save { .. }
+  newServer (optionsGetOpt options) \opts ->
+    begin =<< case getOptLoad opts of
+                Nothing ->
+                  do seed <- newRNGSeed
+                     pure Save { moves = [], .. }
+                Just file ->
+                  do txt <- readFile file
+                     case reads txt of
+                       [(s,"")] -> pure s
+                       _ -> fail "Failed to load save"
 
 
-data Options = Options
-  { load     :: FilePath
-  , board    :: String
-  , players  :: [String]
-  } deriving Show
+options :: [Option]
+options = [ oBoard ]
 
-instance Semigroup Options where
-  oNew <> oOld = oNew { players = players oNew ++ players oOld
-                      , board  = board oNew ++ board oOld }
+oBoard :: Option
+getBoard :: Options -> Board
+(oBoard,getBoard) = option "board" (Just Base) "Board for the game"
 
-instance Monoid Options where
-  mempty = Options { load = "", board = "", players = [] }
+data Board = Base | East | Britannia
+  deriving (Show,Read,Eq,Ord,Enum,Bounded)
 
-options :: [ OptDescr Options ]
-options =
-  [ Option [] ["board"]
-    (ReqArg (\b -> mempty { board = b }) "BOARD")
-    "Use this board"
-
-  , Option [] ["player"]
-    (ReqArg (\b -> mempty { players = [b] }) "NAME")
-    "Add a player"
-
-  , Option [] ["load"]
-    (ReqArg (\s -> mempty { load = s }) "FILE")
-    "Load the given save game"
-  ]
-
+colors :: [Text]
+colors = [ "red", "yellow", "blue", "purple", "green" ]
 
 
 
 data Save = Save
   { seed  :: Seed
-  , args  :: [String]
+  , opts  :: Options
   , moves :: [WithPlayer Choice]
   } deriving (Read,Show)
 
 begin :: Save -> IO (ByteString, InteractState)
 begin Save { .. } =
-  case args of
-    b : ps ->
-      case Map.lookup (Text.pack b) boards of
-        Just board ->
-          do let rng = seedRNG seed
-                 mkP = PlayerId . Text.pack
-                 players = Set.fromList (map mkP ps)
-                 str = $(jsHandlers [ ''EventElement,
-                                      ''OutMsg,
-                                      ''GameUpdate, ''Choice, ''Event])
-             pure ( BS8.pack str
-                  , startGame GameInfo
-                                { gPlayers = players
-                                , gState = initialGame rng board players
-                                , gInit = nextAction
-                                , gSave = \m -> show Save { moves = m, .. }
-                                } moves
-                  )
-        Nothing -> fail $ unlines $ ("unknown board: " ++ show b)
-                                  : map Text.unpack (Map.keys boards)
+  case Map.lookup boardName boards of
+    Just board
+      | pnum > 0 ->
+        do let str = $(jsHandlers [ ''EventElement,
+                                    ''OutMsg,
+                                    ''GameUpdate, ''Choice, ''Event])
+           pure ( cols <> BS8.pack str
+                , startGame GameInfo
+                              { gPlayers = plays
+                              , gState = initialGame rng board plays
+                              , gInit = nextAction
+                              , gSave = \m -> show Save { moves = m, .. }
+                              } moves
+                )
+        | otherwise -> fail "need at least 1 player"
+    Nothing -> fail "invalid board"
 
-    _ -> fail "usage: board_name player1_name player2_name ..."
+  where
+  (ps,cols)  = getOptPlayers colors opts
+  plays      = Set.fromList ps
+  pnum       = length ps
+  rng        = seedRNG seed
+
+  boardName =
+    Text.pack
+    case getBoard opts of
+      Base      -> if pnum < 4 then "ht_23" else "ht_45"
+      East      -> "east"
+      Britannia -> if pnum < 4 then "britannia_23" else "britannia_45"
+
