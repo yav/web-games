@@ -8,6 +8,10 @@ const settings = (name,comp,ps,opts) => {
   outer.style.flexDirection = 'column'
   outer.style.justifyContent = 'center'
   outer.style.alignItems     = 'center'
+  outer.style.backgroundColor = '#eff'
+  outer.style.paddingBottom = '1em'
+  outer.style.marginBottom= '1em'
+  outer.style.border = '0.2em solid #cff'
 
   const dom = document.createElement('div')
   outer.appendChild(dom)
