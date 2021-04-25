@@ -2,7 +2,7 @@ module Main(main) where
 
 import Data.List(isPrefixOf)
 import Text.Read(readMaybe)
-import Control.Monad(when,forM_)
+import Control.Monad(when,unless,forM_)
 import System.IO(openFile,IOMode(..))
 import Control.Exception(catch,SomeException(..))
 import Control.Concurrent(forkIO)
@@ -39,7 +39,11 @@ components =
   , ("hyp", simple "hyp")
   ]
   where
-  simple c = \params -> pure CreateSession
+  validP p = p `elem` [ "player", "board", "fog", "length" ]
+  simple c = \params ->
+               do unless (all validP (Map.keys params))
+                    $ Left "Invliad parameter"
+                  pure CreateSession
                           { component = c
                           , arguments = [ BS8.unpack ("--" <> x <> "=" <> y)
                                         | (x,ys) <- Map.toList params
