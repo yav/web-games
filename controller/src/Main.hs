@@ -1,6 +1,7 @@
 module Main(main) where
 
 import Data.List(isPrefixOf)
+import Data.Maybe(mapMaybe)
 import Text.Read(readMaybe)
 import Control.Monad(when,unless,forM_)
 import System.IO(openFile,IOMode(..))
@@ -59,7 +60,7 @@ data State = State
 
 
 data Session =
-    Running Int (IO ())   -- ^ pause
+    Running [String] Int (IO ())   -- ^ pause
   | Paused
 
 
@@ -98,12 +99,24 @@ getStatus :: IORef State -> Snap.Snap ()
 getStatus ref =
   do (name,status) <- getSession ref
      Snap.writeBS "<html><body>"
-     let link a msg =
-            Snap.writeBS ("<a href=\"/" <> a <> "/" <> name <> "\">"
-                            <> msg <> "</a>")
+     let link a msg = link' ("/" <> a <> "/" <> name) msg
+         link' a msg =
+            Snap.writeBS ("<a href=\"" <> a <> "\">" <> msg <> "</a>")
      case status of
-       Running port _ ->
+       Running ps port _ ->
          do Snap.writeBS ("Running on port " <> BS8.pack (show port) <> " ")
+            host <- Snap.rqHostName <$> Snap.getRequest
+            let noPort = fst (BS8.break (== ':') host)
+            let player p = "http://" <> noPort <> ":" <> BS8.pack (show port) <>
+                           "/?player=" <> p
+                                    -- XXX: escape player name...
+            Snap.writeBS "<p><b>Players:</b><br>"
+            forM_ ps \p ->
+              do let bs = BS8.pack p
+                     url = player bs
+                 link' url bs
+                 Snap.writeBS "<br>"
+            Snap.writeBS "</p>"
             link "stop" "Stop"
        Paused ->
          do Snap.writeBS "Paused "
@@ -126,7 +139,7 @@ stopSession ref =
   do (name,status) <- getSession ref
      case status of
        Paused -> pure ()
-       Running _ stop -> liftIO stop
+       Running _ _ stop -> liftIO stop
      Snap.redirect ("/status/" <> name)
 
 
@@ -175,6 +188,13 @@ data CreateSession = CreateSession
   { component   :: String
   , arguments   :: [String]
   } deriving (Read,Show)
+
+getPlayerArgs :: [String] -> [String]
+getPlayerArgs =
+  mapMaybe \arg ->
+  case break (== '=') arg of
+    ("--player",_:xs) -> Just (fst (break (== ':') xs))
+    _ -> Nothing
 
 
 createSession :: IORef State -> CreateSession -> IO (Maybe ByteString)
@@ -277,6 +297,7 @@ animateSession ref port session =
                                                           (sessions state) }
      modifyIORef' ref \state ->
         state { sessions = Map.insert session
-                                (Running port (terminateProcess pid))
+                                (Running (getPlayerArgs arguments)
+                                                  port (terminateProcess pid))
                                 (sessions state) }
 
