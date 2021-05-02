@@ -36,7 +36,7 @@ begin Save { .. } =
   , startGame GameInfo
           { gPlayers = Set.fromList ps
           , gState   = initialState rng (getFog opts)
-                                        (fromEnum (getLen opts)) ps
+                                        (fromEnum (getLen opts) + 1) ps
           , gInit    = setup
           , gSave    = \m -> show Save { moves = m, .. }
           }
