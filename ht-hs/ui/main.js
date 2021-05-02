@@ -1,11 +1,76 @@
 let playerId
 let gui
 let boardSize = 800
+let sendJSON
 
-function main() { srvConnect() }
+const uiUpdate = hsGameUpdate(
+  {
+    // Edges
+    PlaceWorkerOnEdge:    function(...as) { gui.board.placeWorkerOnEdge(...as) }
+  , RemoveWorkerFromEdge: function(...as) { gui.board.removeWorkerFromEdge(...as)
+    }
+  , EdgeRemoveBonus:      function(...as) { gui.board.removeBonus(...as) }
+  , EdgeSetBonus:         function(...as) { gui.board.placeBonus(...as) }
+
+    // Nodes
+  , PlaceWorkerInOffice:  function(...as) { gui.board.placeWorkerInOffice(...as) }
+  , PlaceWorkerInAnnex:   function(...as) { gui.board.placeWorkerInAnnex(...as) }
+  , SwapWorkers:          function(...as) { gui.board.swapWorkers(...as) }
+  , SetEndVPAt:           function(...as) { gui.board.placeWorkerOnVP(...as) }
+
+    // misc
+  , SetFull: function(...as) { gui.board.setFull(...as) }
+
+    // player
+  , SetWorkerPreference: function (w) {
+      gui.playerUI(w.owner).setPreference(w.shape)
+    }
+  , ChangeAvailble: function(w,n) {
+      gui.playerUI(w.owner).changeWorkers('available',w.shape,n)
+    }
+  , ChangeUnavailable: function(w,n) {
+      gui.playerUI(w.owner).changeWorkers('unavailable',w.shape,n)
+    }
+  , UseGateway: function(g) {}
+  , ChangeVP: function(player,n) { gui.playerUI(player).changeVP(n) }
+  , Upgrade: function(player,stat) { gui.playerUI(player).upgrade(stat) }
+  , GainBonusToken: function(player,token) { gui.playerUI(player).addBonus(token) }
+  , UseBonusToken: function(player,bonus) {
+      const ui = gui.playerUI(player)
+      ui.removeBonus(bonus)
+      ui.addSpentBonus()
+    }
 
 
-function newGUI(ws,container) {
+    // turn
+  , NewTurn: function(t) { gui.turn.remove(); gui.turn = drawTurn(t) }
+  , ChangeDoneActions: function(...as) { gui.turn.changeDone(...as) }
+  , ChangeActionLimit: function(...as) { gui.turn.changeLimit(...as) }
+  , AddWorkerToHand:   function(...as) { gui.turn.addWorkerToHand(...as) }
+  , RemoveWorkerFromHand: function(...as) { gui.turn.removeWorkerFromHand(...as) }
+  , DrawBonusToken: function() { gui.changeTokenCount(-1) }
+  , PlacingBonus: function(...as) { gui.setPlacing(...as) }
+  , AchieveBonusRoute: function() {}
+
+  // log
+  , Log: function(...as) { gui.log.addLog(...as) }
+
+  , EndGame: function() { gui.reload() }
+  }
+)
+
+
+
+
+function main() {
+  const conn = srvConnect()
+  playerId = conn.playerId
+  if (conn.size) boardSize = conn.size
+  sendJSON = conn.sendJSON
+}
+
+
+function newGUI(container) {
   container.innerHTML = ''
 
   const questionsExtra = []
@@ -66,7 +131,7 @@ function newGUI(ws,container) {
       removeQuestions()
       console.log('sending:')
       console.log(val)
-      ws.send(JSON.stringify(val))
+      sendJSON(val)
     }
     el.addEventListener('click',funClick)
     return { dom: el, rm: function() {
@@ -96,17 +161,17 @@ function newGUI(ws,container) {
     const msg = { tag: 'undo' }
     console.log('sending:')
     console.log(msg)
-    ws.send(JSON.stringify(msg))
+    sendJSON(msg)
   }
 
-  ui.reload = function () { sendJSON(ws,{ tag: 'reload' }) }
+  ui.reload = function () { sendJSON({ tag: 'reload' }) }
 
   return ui
 }
 
 
-function uiRedraw(ws,state) {
-  gui = newGUI(ws, document.getElementById('main'))
+function uiRedraw(state) {
+  gui = newGUI(document.getElementById('main'))
 
   const game = state.game ? state.game : state.finished
 

@@ -3,6 +3,10 @@
 <link rel="stylesheet" href="style.css">
 <script src="dynamic.js"></script>
 <script src="html.js"></script>
+<script>
+let sendJSON = null
+let playerId = null
+</script>
 <script src="main.js"></script>
 <script src="tech.js"></script>
 <script src="turn.js"></script>
@@ -12,7 +16,14 @@
 <script src="market.js"></script>
 <script src="log.js"></script>
 <script src="questions.js"></script>
-<script src="sock.js"></script>   <!-- should be late -->
+<script src="common-js/connect.js"></script>
+<script>
+const main = () => {
+  const conn = srvConnect()
+  playerId = conn.playerId
+  sendJSON = conn.sendJSON
+}
+</script>
 </head>
-<body id="main" onload="srvConnect()"></body></html>
+<body id="main" onload="main()"></body></html>
 </html>
