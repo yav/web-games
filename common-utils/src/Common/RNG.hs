@@ -39,6 +39,10 @@ pickWeighted xs (RNG rng) = (head $ drop i $ concatMap expand xs, RNG rng1)
   tot = sum (map snd xs)
   expand (a,n) = replicate n a
 
+rollD :: Int -> RNG -> (Int,RNG)
+rollD n (RNG r) = (a, RNG r1)
+  where (a,r1) = randomR (1,n) r
+
 shuffle :: [a] -> RNG -> ([a],RNG)
 shuffle xs (RNG g0)
   | null xs = ([],RNG g0)
