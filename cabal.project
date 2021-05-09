@@ -2,5 +2,7 @@ packages:
   controller/
   common-utils/
   common-interact/
+  import-svg/
   ht-hs/
   hyp/
+  terra/
