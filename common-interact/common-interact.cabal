@@ -13,7 +13,8 @@ library
     AppTypes
   exposed-modules:
     Common.Interact,
-    Common.Server
+    Common.Server,
+    Common.Main
   build-depends:
     base >=4.13,
     common-utils,

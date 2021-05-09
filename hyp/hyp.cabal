@@ -57,14 +57,11 @@ executable hyp
     containers,
     bytestring,
     text,
-    tf-random,
     common-utils,
     common-interact,
-    aeson,
     hyp
 
   ghc-options: -Wall
   default-language: Haskell2010
-  default-extensions:
-    BlockArguments, OverloadedStrings, TemplateHaskell, RecordWildCards
+  default-extensions: BlockArguments, OverloadedStrings, TemplateHaskell
 
