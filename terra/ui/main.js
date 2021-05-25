@@ -27,6 +27,11 @@ const uiRedraw = (state) => {
   body.appendChild(metalToken())
   body.appendChild(stoneToken())
   body.appendChild(blockToken())
+
+
+  body.appendChild(tokenStack([cartToken("two"),cartToken("three"),cartToken('four')]))
+
+
   uiQuestions(state.questions)
 }
 
