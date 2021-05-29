@@ -36,13 +36,6 @@ const newQuestion = (el,q,fin) => {
   })
 }
 
-const uiQuestions = (qs0) => {
-  const q = qs0[0]
-  const qs = qs0[1]
-  for (let i = 0; i < qs.length; ++i) {
-    uiQuestion(qs[i])
-  }
-}
 
 const uiQuestion = (q) => {
   hsInput({

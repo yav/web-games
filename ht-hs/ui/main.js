@@ -290,53 +290,45 @@ function uiRedraw(state) {
   uiQuestions(state.questions)
 }
 
+const uiQuestion = (q) => {
+  const ui = {}
 
-function uiQuestions(q_qs) {
-  const qs = q_qs[1]
-  gui.turn.setQuestion(q_qs[0])
-
-  for (let i = 0; i < qs.length; ++i) {
-    const q = qs[i]
-    const ui = {}
-
-    // Player
-    ui.ChSetPreference = function(shape) {
-      gui.playerUI().askWorker('available',shape,q)
-      // gui.playerUI().askPreference(q)
-    }
-    ui.ChActiveWorker = function(shape) {
-      gui.playerUI().askWorker('available',shape,q)
-    }
-    ui.ChPassiveWorker = function(shape) {
-      gui.playerUI().askWorker('unavailable',shape,q)
-    }
-    ui.ChBonusToken = function(bonus) { gui.playerUI().askBonus(bonus,q) }
-    ui.ChUpgrade = function(stat) { gui.playerUI().askUpgrade(stat,q) }
-
-    // Edges
-    ui.ChEdgeEmpty = function(edge,spot,shape) {
-      gui.board.askEmptyEdgeSpot(edge,spot,shape,q)
-    }
-    ui.ChEdgeFull = function(edge,spot,mbShape,worker) {
-      gui.board.askFullEdgeSpot(edge,spot,mbShape,worker,q)
-    }
-    ui.ChEdge = function(edge) { gui.board.askEdge(edge,q) }
-
-    // Nodes
-    ui.ChNodeEmpty = function(node,shape) {
-      gui.board.askEmptyOffice(node,shape,q)
-    }
-    ui.ChNodeAnnex = function(node,shape) { gui.board.askAnnex(node,shape,q) }
-
-    ui.ChNodeFull = function(node,spot) { gui.board.askFullOffice(node,spot,q) }
-    ui.ChNodeUpgrade = function(node,stat) { gui.board.askUpgrade(node,stat,q) }
-    ui.ChEndVPSpot = function(level) { gui.board.askWorkerOnVP(level,q) }
-
-    // Button
-    ui.ChDone = function(text) { gui.turn.askDone(text,q) }
-
-    hsChoice(ui)(q.chChoice)
+  // Player
+  ui.ChSetPreference = function(shape) {
+    gui.playerUI().askWorker('available',shape,q)
   }
+  ui.ChActiveWorker = function(shape) {
+    gui.playerUI().askWorker('available',shape,q)
+  }
+  ui.ChPassiveWorker = function(shape) {
+    gui.playerUI().askWorker('unavailable',shape,q)
+  }
+  ui.ChBonusToken = function(bonus) { gui.playerUI().askBonus(bonus,q) }
+  ui.ChUpgrade = function(stat) { gui.playerUI().askUpgrade(stat,q) }
+
+  // Edges
+  ui.ChEdgeEmpty = function(edge,spot,shape) {
+    gui.board.askEmptyEdgeSpot(edge,spot,shape,q)
+  }
+  ui.ChEdgeFull = function(edge,spot,mbShape,worker) {
+    gui.board.askFullEdgeSpot(edge,spot,mbShape,worker,q)
+  }
+  ui.ChEdge = function(edge) { gui.board.askEdge(edge,q) }
+
+  // Nodes
+  ui.ChNodeEmpty = function(node,shape) {
+    gui.board.askEmptyOffice(node,shape,q)
+  }
+  ui.ChNodeAnnex = function(node,shape) { gui.board.askAnnex(node,shape,q) }
+
+  ui.ChNodeFull = function(node,spot) { gui.board.askFullOffice(node,spot,q) }
+  ui.ChNodeUpgrade = function(node,stat) { gui.board.askUpgrade(node,stat,q) }
+  ui.ChEndVPSpot = function(level) { gui.board.askWorkerOnVP(level,q) }
+
+  // Button
+  ui.ChDone = function(text) { gui.turn.askDone(text,q) }
+
+  hsChoice(ui)(q.chChoice)
 }
 
 

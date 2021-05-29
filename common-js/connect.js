@@ -2,7 +2,7 @@
 // Assumes the following to be in scope:
 //  hsOutMsg (from dynamic.hs)
 //  uiRedraw:     draw state from scratch
-//  uiQuestions:  present some quetsions
+//  uiQuestion:   present a quetsion
 //  uiUpdate      present an update
 const srvConnect = () => {
   const obj = new URL(window.location)
@@ -51,5 +51,12 @@ const srvConnect = () => {
   return conn
 }
 
+const uiQuestions = (qs0) => {
+  const q = qs0[0]
+  const qs = qs0[1]
+  for (let i = 0; i < qs.length; ++i) {
+    uiQuestion(qs[i])
+  }
+}
 
 
