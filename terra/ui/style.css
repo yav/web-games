@@ -20,3 +20,8 @@ svg.animal { fill: #f60; }
 svg.wood   { fill: #960; }
 svg.stone  { fill: #999; }
 svg.ore    { fill: #9cf; }
+
+.stack {
+  position: relative;
+  background-color: red;
+}

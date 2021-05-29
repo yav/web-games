@@ -25,6 +25,38 @@ const blockToken    = () => genericToken(['square','stone'],'stone-block')
 const oreToken      = () => genericToken(['round','ore'],'ore')
 const metalToken    = () => genericToken(['square','ore'],'metal-bar')
 
+const tokenStack    = (els) => {
+  const dom = html.div('stack')
+  let dx = 0
+  let delta = iconSize / 5
 
+  html.setDim(dom,iconSize,iconSize)
+  for (let i = 0; i < els.length; ++i) {
+    const el = els[i]
+    const w = iconSize / els.length
+    html.setDim(el,w,w)
+    el.style.position = 'absolute'
+    html.setSize(el, 'left', dx)
+    html.setSize(el, 'bottom', dx)
+    dom.appendChild(el)
+  }
+
+  dom.addEventListener('mouseenter',() => {
+    for (let i = 0; i < els.length; ++i) {
+      els[i].style.position = 'relative'
+      els[i].style.display = 'inline-block'
+    }
+  })
+
+  dom.addEventListener('mouseleave',() => {
+    for (let i = 0; i < els.length; ++i) {
+      els[i].style.position = 'absolute'
+    }
+  })
+
+ 
+
+  return dom
+}
 
 

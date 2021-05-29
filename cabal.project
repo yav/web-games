@@ -6,3 +6,5 @@ packages:
   ht-hs/
   hyp/
   terra/
+  anno/
+  template/
