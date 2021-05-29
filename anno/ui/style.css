@@ -1,0 +1,7 @@
+body {
+  background-color: red;
+}
+
+.big:hover {
+  transform: scale(2);
+}
