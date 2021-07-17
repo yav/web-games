@@ -53,6 +53,7 @@ const srvConnect = () => {
 
 const uiQuestions = (qs0) => {
   const q = qs0[0]
+  uiSetQuestion(q)
   const qs = qs0[1]
   for (let i = 0; i < qs.length; ++i) {
     uiQuestion(qs[i])

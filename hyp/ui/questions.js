@@ -36,6 +36,8 @@ const newQuestion = (el,q,fin) => {
   })
 }
 
+// XXX
+const uiSetQuestion = () => {}
 
 const uiQuestion = (q) => {
   hsInput({

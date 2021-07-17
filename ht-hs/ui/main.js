@@ -290,6 +290,11 @@ function uiRedraw(state) {
   uiQuestions(state.questions)
 }
 
+const uiSetQuestion = (q) => {
+  console.log(q)
+  gui.turn.setQuestion(q)
+}
+
 const uiQuestion = (q) => {
   const ui = {}
 
