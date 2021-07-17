@@ -5,6 +5,5 @@ packages:
   import-svg/
   ht-hs/
   hyp/
-  terra/
-  anno/
+  db/
   template/
