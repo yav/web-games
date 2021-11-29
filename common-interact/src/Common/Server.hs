@@ -59,7 +59,10 @@ newServer options k =
                    do conn <- WS.acceptRequest pending
                       WS.withPingThread conn 30 (pure ()) (newClient srv conn)
            )
-         , ("/dynamic.js", Snap.writeBS dyn)
+         , ("/dynamic.js",
+              do Snap.modifyResponse
+                    (Snap.setHeader "mime-type" "application/javascript")
+                 Snap.writeBS dyn)
          , ("/", Snap.serveDirectory "ui")
          ]
 
