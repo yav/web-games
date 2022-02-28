@@ -26,6 +26,7 @@ import Data.Maybe(isJust)
 import GHC.Generics
 
 import qualified Data.Aeson as JS
+import qualified Data.Aeson.Key as JS
 import Data.Aeson ((.=),ToJSON(..))
 
 import Common.Utils
@@ -299,7 +300,7 @@ computeScore game =
 instance ToJSON status => ToJSON (GameStatus status) where
   toJSON g = JS.object
     [ "players" .=
-        JS.object [ jsKey pId .= p
+        JS.object [ JS.fromText (jsKey pId) .= p
                   | (pId,p) <- Map.toList (getField gamePlayers g)
                   ]
     , "turnOrder" .= gameTurnOrder g

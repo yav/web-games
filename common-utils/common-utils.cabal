@@ -26,7 +26,8 @@ library
   default-language:    Haskell2010
   default-extensions:
     BlockArguments, OverloadedStrings, DeriveGeneric,
-    FlexibleContexts, MonoLocalBinds, GeneralizedNewtypeDeriving
+    FlexibleContexts, MonoLocalBinds, GeneralizedNewtypeDeriving,
+    TemplateHaskell
 
 
 

@@ -7,6 +7,7 @@ import qualified Data.Text as Text
 import Data.Aeson (ToJSON(toJSON),(.=))
 import qualified Data.Aeson as JS
 import qualified Data.Aeson.Types as JS
+import qualified Data.Aeson.Key as JS
 import GHC.Generics
 
 showText :: Show a => a -> Text
@@ -41,7 +42,7 @@ jsEnum :: JSKey a => a -> JS.Value
 jsEnum = toJSON . jsKey
 
 jsMap :: (JSKey a, ToJSON b) => Map a b -> JS.Value
-jsMap mp = JS.object [ jsKey a .= b | (a,b) <- Map.toList mp ]
+jsMap mp = JS.object [ JS.fromText (jsKey a) .= b | (a,b) <- Map.toList mp ]
 
 class JSKey a where
   jsKey :: a -> Text

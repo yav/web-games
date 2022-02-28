@@ -23,6 +23,7 @@ import qualified Data.Map as Map
 import GHC.Generics
 
 import qualified Data.Aeson as JS
+import qualified Data.Aeson.Key as JS
 import Data.Aeson ((.=))
 
 import Common.Utils
@@ -142,7 +143,7 @@ instance JS.ToJSON Edge where
      keys = [ 0 :: Int .. ]
 
      workerFields =
-       [ showText i .= w
+       [ JS.fromString (show i) .= w
        | (i, EdgeSpot { edgeSpotWorker = Just w }) <- keys `zip` edgeSpots e
        ]
 
