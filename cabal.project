@@ -5,5 +5,5 @@ packages:
   import-svg/
   ht-hs/
   hyp/
-  db/
+  ankh/
   template/
