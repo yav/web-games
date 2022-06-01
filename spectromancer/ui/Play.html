@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery.js"></script>
+<script src="ui.js"></script>
+<script src="drawEvent.js"></script>
+<script src="players.js"></script>
+<script>
+
+function dumpAllCards() {
+  var b = $('body')
+  jQuery.getJSON('getCards',null,function(cards) {
+    console.log(cards)
+    jQuery.each(cards, function(cat,cs) {
+      b.append($('<h3/>').text(cat))
+      jQuery.each(cs,function(ix,c) {
+        b.append(drawCard(c))
+      })
+    })
+  })
+}
+
+function playerBox() {
+  function val(x) { return $('<option/>').attr('value',x).text(x) }
+  var sel = $('<select/>')
+  jQuery.each(players, function(ix,p) {
+    sel.append(val(p))
+  })
+
+  return sel
+}
+
+var decks =
+   [ 'RANDOM'
+   , 'DEATH CARDS'
+   , 'HOLY CARDS'
+   , 'MECHANICAL CARDS'
+   , 'ILLUSION CARDS'
+   , 'BEAST CARDS'
+   , 'GOBLIN\'S CARDS'
+   , 'CHAOS CARDS'
+   , 'SORCERY CARDS'
+   , 'FOREST CARDS'
+   , 'DEMONIC CARDS'
+   , 'CONTROL CARDS'
+   , 'GOLEM CARDS'
+   , 'SPIRIT CARDS'
+   , 'VAMPIRIC CARDS'
+   ]
+
+function classBox() {
+  function val(x) { return $('<option/>').attr('value',x).text(x) }
+  return $('<select/>').append(decks.map(val))
+}
+
+function drawNewGame(finished) {
+
+  var helpBox = $('<div/>')
+                .attr('id','helpBox')
+                .css('height', '15ex')
+                .css('color','white')
+                .css('background-color','rgba(0,0,0,0.5)')
+                .css('border-radius','5px')
+                .css('width','60em')
+                .css('display','inline-block')
+                .css('padding','0.5em')
+                .css('overflow','auto')
+                .text(errMsg)
+
+  var helpBtn = fancyBtn('Click to see help') // $('<button/>').text('Click to see help')
+
+  helpBtn.click(function() {
+    helpMode = !helpMode
+    helpBtn.text(helpMode? 'Click to play' : 'Click to see help')
+  })
+
+  var skip
+  if (finished) {
+    skip = fancyBtn('Play again!')
+           .click(function() {
+              window.location.href = 'Cards.html'
+           })
+  } else {
+  skip = fancyBtn('Skip Turn')
+           .click(function() {
+               makeTurn("/skipTurn", {}, undefined)
+           })
+  }
+
+
+
+  return $('<div/>')
+         .css('color','white')
+         .append(helpBtn, skip, $('<br/>'), helpBox)
+}
+
+function newGame(m,opts) {
+  var b = $('body').empty()
+  b.append(drawNewGame())
+  jQuery.getJSON(m,opts,function(res) {
+    oldGame = res
+    gameID = res.gid
+    b.append(drawGame(res.game,res.history,res.winner))
+    scrollHist()
+  })
+}
+
+function drawNoGame() {
+  var p1Name = playerBox()
+  var p2Name = playerBox()
+  var p1 = classBox()
+  var p2 = classBox()
+  var gameList = $('<ul/>').css('list-style-type','none')
+
+  jQuery.getJSON("/listGames", {}, lst => {
+      jQuery.each(lst, (idx, elt) => {
+          var btn = fancyBtn(elt[1])
+          gameList.append($('<li/>').append(btn))
+          btn.click(() => {
+              newGame("getState", { gid: elt[0] })
+          })
+      })
+  })
+
+  function getDeck(who) {
+    var v = $(who).val()
+    if (v === 'RANDOM') {
+      deck = 1 + Math.floor(Math.random() * (decks.length - 1))
+      return decks[deck]
+    } else return v
+  }
+
+  var btn = fancyBtn('New game')
+            .click(function() {
+              newGame('newGame', { player1: $(p1Name).val()
+                                 , player2: $(p2Name).val()
+                                 , player1Class: getDeck(p1)
+                                 , player2Class: getDeck(p2)
+                                  })
+            })
+
+  $('body').append($('<div/>').append(p1Name,p1,p2,p2Name,btn, gameList))
+}
+
+
+$(document).ready(function() {
+  drawNoGame()
+})
+</script>
+<style>
+.selected { border: 2px solid #f63;
+            box-shadow: 0px 0px 20px white;
+          }
+.disabled { opacity: 0.5; }
+body {
+  color: white;
+  background-color: black;
+  background-image: url("img/background.jpg");
+  text-align: center;
+  background-repeat: no-repeat;
+ }
+</style>
+<head>
+<body>
+</body>
+</html>

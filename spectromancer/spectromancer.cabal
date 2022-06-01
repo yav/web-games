@@ -1,0 +1,69 @@
+cabal-version:       2.4
+name:                spectromancer
+version:             0.1.0.0
+-- synopsis:
+-- description:
+build-type:          Simple
+
+library
+  hs-source-dirs:      src
+  ghc-options:         -Wall
+  exposed-modules:     Cards,Deck,
+                       CardTypes,
+                       CardIds,
+                       Effects,
+                       EffectAPI,
+                       Game,
+                       GameMonad,
+                       Turn,
+                       ServerState,
+                       Replay,
+                       GameStats,
+
+                       Decks.Fire,
+                       Decks.Water,
+                       Decks.Air,
+                       Decks.Earth,
+                       Decks.Death,
+                       Decks.Holy,
+                       Decks.Mechanical,
+                       Decks.Illusion,
+                       Decks.Beast,
+                       Decks.Goblin,
+                       Decks.Forest,
+                       Decks.Demonic,
+                       Decks.Golem,
+                       Decks.Spirit,
+                       Decks.Vampiric,
+                       Decks.Control
+
+
+  build-depends:       base,
+                       random,
+                       array,
+                       containers,
+                       aeson,
+                       text,
+                       bytestring,
+                       vector,
+                       template-haskell,
+                       lens,
+                       time,
+                       game-utils
+  default-language:    Haskell2010
+
+executable spectromancer
+  hs-source-dirs:      .
+  main-is:             Main.hs
+  ghc-options:         -threaded
+  build-depends:       base,
+                       spectromancer,
+                       aeson,
+                       text,
+                       containers,
+                       snap-core,
+                       snap-server,
+                       game-utils
+
+  default-language:    Haskell2010
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery.js"></script>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+<script>
+
+
+function dumpAllCards() {
+  var b = $('body')
+  jQuery.getJSON('getCards',null,function(cards) {
+    jQuery.each(cards, function(cat,cs) {
+      b.append($('<h3/>').text(cat))
+      var tab = $('<table/>')
+                .css('width','100%')
+      var r = null
+      jQuery.each(cs,function(ix,c) {
+        if (ix % 2 == 0) {
+          if (r !== null) tab.append(r)
+          r = $('<tr/>')
+        }
+        r.append($('<td/>')
+                 .css('width','48%')
+                 .append(drawCardWithExplanation(c)))
+      })
+      if (r !== null) tab.append(r)
+      b.append(tab)
+    })
+  })
+}
+
+$(document).ready(function() {
+  dumpAllCards()
+})
+</script>
+<style>
+.selected { border: 2px solid red; }
+</style>
+<head>
+<body>
+</body>
+</html>
