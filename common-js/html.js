@@ -1,9 +1,17 @@
 const html = (() => {
 
-  const scale = 1
+  let scale = 1
   const setSize = (el,d,x) => { el.style[d] = (x * scale) + 'px' }
 
   return {
+
+    getBody: () => {
+      return document.getElementById('main')
+    },
+
+    setScale: (s) => {
+      scale = s
+    },
 
     div: (classes) => {
       const cs = classes.split(' ')
@@ -43,5 +51,11 @@ const html = (() => {
     setDim: (el,x,y) => {
       setSize(el,'width',x)
       setSize(el,'height',y)
+    },
+
+    setLoc: (el,x,y) => {
+      setSize(el,'left',x)
+      setSize(el,'top',y)
     }
+
   }})()
