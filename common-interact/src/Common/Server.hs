@@ -61,7 +61,7 @@ newServer options k =
            )
          , ("/dynamic.js",
               do Snap.modifyResponse
-                    (Snap.setHeader "mime-type" "application/javascript")
+                    (Snap.setHeader "Content-type" "application/javascript")
                  Snap.writeBS dyn)
          , ("/", Snap.serveDirectory "ui")
          ]
