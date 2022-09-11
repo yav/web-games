@@ -3,6 +3,7 @@ var players =
   , "Iavor"
   , "Daniel"
   , "Eric"
+  , "Henry"
   , "Guest"
   ]
 
