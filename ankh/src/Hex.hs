@@ -1,20 +1,19 @@
 module Hex where
 
 import GHC.Generics(Generic)
-import Data.Aeson(ToJSON,FromJSON,
-                    ToJSONKey(..),genericToJSONKey,defaultJSONKeyOptions)
+import Data.Aeson(ToJSON(..))
 import Data.Set(Set)
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 
 data Dir = N | NE | SE | S | SW | NW
-  deriving (Generic,ToJSON,FromJSON,Eq,Ord,Bounded,Enum,Show)
+  deriving (Generic,Eq,Ord,Bounded,Enum,Show)
+
+instance ToJSON Dir where
+  toJSON = toJSON . fromEnum
 
 data Loc = Loc Int Int
   deriving (Generic,ToJSON,Eq,Ord,Show)
-
-instance ToJSONKey Loc where
-  toJSONKey = genericToJSONKey defaultJSONKeyOptions
 
 allDirs :: [Dir]
 allDirs = [ minBound .. maxBound ]

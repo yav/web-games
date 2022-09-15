@@ -12,13 +12,12 @@ function main() {
 function uiRedraw(state) {
   uiQuestions(state.questions)
   const body = html.getBody()
-  for (let i = 0; i < 5; ++i)
-    for (let j = 0; j < 5; ++j)
-      body.appendChild(hex(i,j))
+  // body.appendChild(hexWall(3,2,0))
+  // body.appendChild(hexWall(3,2,1))
+  // body.appendChild(hexWall(3,2,2))
 
-  body.appendChild(hexWall(3,2,0))
-  body.appendChild(hexWall(3,2,1))
-  body.appendChild(hexWall(3,2,2))
+
+  body.appendChild(drawBoard(state.game._board))
 }
 
 // Set the explanation for what we are asking.

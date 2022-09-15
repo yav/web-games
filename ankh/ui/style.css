@@ -2,6 +2,11 @@ body {
   background: gray;
 }
 
+.board {
+  position: relative;
+  background-color: black;
+}
+
 .hex {
   position: absolute;
   pointer-events: none;
@@ -30,13 +35,19 @@ body {
   top: 0;
   background-size: cover;
   clip-path: polygon(0 50%, 25% 0, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
-  background-color: cyan;
   z-index: 2;
   pointer-events: none;
+  text-align: center;
+  color: black;
 }
+
+.hex.Water  .bg { background-color: blue; }
+.hex.Grass  .bg { background-color: green; }
+.hex.Desert .bg { background-color: yellow; }
 
 .hex-wall {
   position: absolute;
-  background-color: white;
+  background-color: cyan;
+  border-radius: 20%;
   z-index: 3;
 }
