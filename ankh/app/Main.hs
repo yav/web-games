@@ -1,7 +1,6 @@
 module Main where
 
-import Common.Main
-import Common.Interact(OutMsg)
+import Common.Interact
 import Common.CallJS(jsHandlers)
 import AppTypes
 

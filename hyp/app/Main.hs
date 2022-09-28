@@ -1,7 +1,5 @@
 module Main where
 
-import Common.Main
-
 import Common.CallJS(jsHandlers)
 import Common.Interact
 import Common.Options

@@ -14,7 +14,6 @@ import Game
 import Event(Event,EventElement)
 import Question(Choice)
 import Common.Interact
-import Common.Main
 
 main :: IO ()
 main = startApp App

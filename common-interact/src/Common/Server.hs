@@ -1,3 +1,4 @@
+-- | Create a web-socket based server to play a game.
 module Common.Server
   ( newServer
   , GameInfo(..)
@@ -23,7 +24,7 @@ import qualified Snap.Util.FileServe as Snap
 import qualified Network.WebSockets.Snap as WS
 
 import Common.Basics
-import Common.Interact
+import Common.InteractImpl
 
 import System.Console.GetOpt
 --------------------------------------------------------------------------------
@@ -38,8 +39,13 @@ data ServerState = ServerState
   , gameState :: InteractState
   }
 
+-- | Start a new server.
 newServer ::
-  Monoid a => [OptDescr a] -> (a -> IO (ByteString,InteractState )) -> IO ()
+  Monoid a =>
+  [OptDescr a] {- ^ Desciption of the server's command line options. -} ->
+  (a -> IO (ByteString,InteractState))
+  {- ^ Initialize the server.  The bytesting is served via `dynamic.js` -} ->
+  IO ()
 newServer options k =
   do let toCFG o = Just (Snap.setOther o Snap.emptyConfig)
          opts    = map (Snap.fmapOpt toCFG) options ++

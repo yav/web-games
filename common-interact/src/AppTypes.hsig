@@ -1,21 +1,33 @@
+-- | To use the interaction framework, games need to implement this signature.
 signature AppTypes where
 
 import Common.Basics(PlayerId)
 import Data.Aeson(ToJSON,FromJSON)
 
+-- | The state of a game in progress.
 data State
+
+-- | Information about a finished game.
 data Finished
 
 instance ToJSON State
 instance ToJSON Finished
 
+-- | Possible updates to a game's state.
 data Update
 
 instance ToJSON Update
+
+-- | Apply an update to a game in progress.
 doUpdate   :: Update -> State -> Either Finished State
+
+-- | The state of the game as seen by the given player.
 playerView :: PlayerId -> State -> State
+
+-- | An update to game state as seen by the given player.
 playerUpdateView :: PlayerId -> Update -> Update
 
+-- | Possible player inputs.
 data Input
 instance ToJSON   Input
 instance FromJSON Input

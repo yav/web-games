@@ -1,13 +1,8 @@
+-- | Generate a JavaScript consumer for Haskell sum types.
 module Common.CallJS (jsHandlers) where
 
 import Data.List(intercalate)
 import Language.Haskell.TH
-
-
-
-
-
-
 
 jsHandlers :: [Name] -> Q Exp
 jsHandlers xs =
