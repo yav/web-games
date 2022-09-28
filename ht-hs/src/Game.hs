@@ -18,6 +18,7 @@ module Game
   , computeScore
   ) where
 
+import Data.Text(Text)
 import Data.Map(Map)
 import qualified Data.Map as Map
 import Data.Set(Set)
@@ -315,7 +316,7 @@ instance ToJSON status => ToJSON (GameStatus status) where
 
 instance ToJSON FinalScore where
   toJSON (FinalScore score) = JS.object
-    [ jsTag "finished"
+    [ "tag"   .= ("finished" :: Text)
     , "score" .= score
     ]
 

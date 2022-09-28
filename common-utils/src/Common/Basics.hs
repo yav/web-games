@@ -22,8 +22,7 @@ playerAnnot (p :-> _) = p
 
 --------------------------------------------------------------------------------
 
--- instance ToJSONKey PlayerId where toJSONKey (PlayerId t) = toJSONKey t
-instance ToJSON PlayerId
+instance ToJSON   PlayerId
 instance FromJSON PlayerId
 
 instance JSKey PlayerId where
