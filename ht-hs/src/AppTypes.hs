@@ -4,14 +4,16 @@ import Common.Basics(PlayerId)
 import Game(Game,GameFinished,GameUpdate,doUpdate)
 import Question(Choice)
 
-type State    = Game
-type Finished = GameFinished
-type Update   = GameUpdate
-type Input    = Choice
+type State      = Game
+type StateView  = State
+type Finished   = GameFinished
+type Update     = GameUpdate
+type UpdateView = Update
+type Input      = Choice
 
-playerView :: PlayerId -> State -> State
+playerView :: PlayerId -> State -> StateView
 playerView _ = id
 
-playerUpdateView :: PlayerId -> Update -> Update
+playerUpdateView :: PlayerId -> Update -> UpdateView
 playerUpdateView _ = id
 

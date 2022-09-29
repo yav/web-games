@@ -33,7 +33,7 @@ import Data.Aeson (ToJSON(..), FromJSON(..), (.=), (.:?))
 import qualified Data.Aeson as JS
 
 import Common.Basics
-import AppTypes(State,Finished,Input,Update,doUpdate,
+import AppTypes(State,StateView,UpdateView,Finished,Input,Update,doUpdate,
                                   playerView,playerUpdateView)
 
 
@@ -64,7 +64,7 @@ data GameInfo = GameInfo
 data OutMsg =
     CurGameState CurState
   | AskQuestions (Text, [ChoiceHelp])
-  | GameUpdate Update
+  | GameUpdate UpdateView
     deriving Generic
 
 data ChoiceHelp = ChoiceHelp
@@ -295,7 +295,7 @@ save = Interact $ \k s os -> k () s { iShouldSave = True } os
 -- Input and output messages
 
 data CurState = CurState
-  { cGame       :: Either Finished State
+  { cGame       :: Either Finished StateView
   , cQuestions  :: (Text, [ChoiceHelp])
   }
 

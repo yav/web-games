@@ -18,10 +18,16 @@ data Input = Input
 doUpdate   :: Update -> State -> Either Finished State
 doUpdate  _ = Right
 
-playerView :: PlayerId -> State -> State
+
+type StateView = State
+
+playerView :: PlayerId -> State -> StateView
 playerView _ = id
 
-playerUpdateView :: PlayerId -> Update -> Update
+
+type UpdateView = Update
+
+playerUpdateView :: PlayerId -> Update -> UpdateView
 playerUpdateView _ = id
 
 

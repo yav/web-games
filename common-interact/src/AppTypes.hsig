@@ -10,7 +10,6 @@ data State
 -- | Information about a finished game.
 data Finished
 
-instance ToJSON State
 instance ToJSON Finished
 
 -- | Possible updates to a game's state.
@@ -21,11 +20,19 @@ instance ToJSON Update
 -- | Apply an update to a game in progress.
 doUpdate   :: Update -> State -> Either Finished State
 
+-- | A view of the current game state that can be sent to a player.
+data StateView
+instance ToJSON StateView
+
 -- | The state of the game as seen by the given player.
-playerView :: PlayerId -> State -> State
+playerView :: PlayerId -> State -> StateView
+
+-- | A view of an update that can be sent to a player.
+data UpdateView
+instance ToJSON UpdateView
 
 -- | An update to game state as seen by the given player.
-playerUpdateView :: PlayerId -> Update -> Update
+playerUpdateView :: PlayerId -> Update -> UpdateView
 
 -- | Possible player inputs.
 data Input

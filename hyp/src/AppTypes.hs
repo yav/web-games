@@ -88,6 +88,8 @@ data State = State
 
 declareFields ''State
 
+type StateView = State
+
 type Finished = State
 
 
@@ -123,12 +125,14 @@ currentPlayer state = (playerId,player)
 
 --------------------------------------------------------------------------------
 
-playerView :: PlayerId -> State -> State
+playerView :: PlayerId -> State -> StateView
 playerView pid = updField gamePlayers (Map.mapWithKey hide)
   where
   hide x s = if x == pid then s else hideTokens s
 
-playerUpdateView :: PlayerId -> Update -> Update
+type UpdateView = Update
+
+playerUpdateView :: PlayerId -> Update -> UpdateView
 playerUpdateView pid upd =
   case upd of
     SetRuinToken pid' ts | pid /= pid' -> SetRuinToken pid' (map hideToken ts)

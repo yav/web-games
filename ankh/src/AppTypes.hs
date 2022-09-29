@@ -6,6 +6,8 @@ import Data.Aeson(ToJSON,FromJSON)
 import Game
 
 type State = Game
+type StateView = State
+type UpdateView = Update
 
 type Finished = State
 
@@ -18,10 +20,10 @@ data Input = Input
 doUpdate   :: Update -> State -> Either Finished State
 doUpdate  _ = Right
 
-playerView :: PlayerId -> State -> State
+playerView :: PlayerId -> State -> StateView
 playerView _ = id
 
-playerUpdateView :: PlayerId -> Update -> Update
+playerUpdateView :: PlayerId -> Update -> UpdateView
 playerUpdateView _ = id
 
 
