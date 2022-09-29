@@ -1,0 +1,44 @@
+cabal-version:       3.0
+
+name:                the-south
+version:             0.1.0.0
+license-file:        LICENSE
+author:              Iavor Diatchki
+maintainer:          iavor.diatchki@gmail.com
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+library
+  hs-source-dirs: src
+  exposed-modules:
+    AppTypes,
+    Game
+
+  build-depends:
+    base, containers, text,
+    aeson,
+    common-utils
+
+  ghc-options: -Wall
+
+  default-language:    Haskell2010
+  default-extensions: DeriveGeneric, OverloadedStrings, TemplateHaskell,
+                      BlockArguments, DeriveAnyClass
+
+dakda
+executable the-south
+  hs-source-dirs: app
+  main-is: Main.hs
+  build-depends:
+    base,
+    containers,
+    bytestring,
+    text,
+    common-utils,
+    common-interact,
+    the-south
+
+  ghc-options: -Wall
+  default-language: Haskell2010
+  default-extensions: BlockArguments, OverloadedStrings, TemplateHaskell
+

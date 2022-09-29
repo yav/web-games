@@ -1,4 +1,4 @@
-{-# Language TemplateHaskell, OverloadedStrings #-}
+{-# Language TemplateHaskell #-}
 -- | A server to play a game.
 module Common.Interact
   ( -- * Starting a server
