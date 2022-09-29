@@ -1,3 +1,4 @@
+{-# Language TemplateHaskell, OverloadedStrings #-}
 -- | A server to play a game.
 module Common.Interact
   ( -- * Starting a server
@@ -23,9 +24,6 @@ module Common.Interact
 
     -- ** Save the game
   , Interact.save
-
-    -- ** Misc
-  , OutMsg
   ) where
 
 import Data.Text(Text)
@@ -34,6 +32,7 @@ import qualified Data.ByteString.Char8 as BS8
 import qualified Data.Set as Set
 
 import Common.Basics
+import Common.CallJS(jsHandlers)
 import Common.RNG
 import Common.Server
 import Common.InteractImpl hiding (save)
@@ -86,7 +85,8 @@ startApp app =
 begin :: App -> Save -> Either String (ByteString, InteractState)
 begin app save =
   do state <- appInitialState app rng (opts save) ps
-     pure ( cols <> BS8.pack (appJS app)
+     let outMsg = $(jsHandlers [''OutMsg])
+     pure ( BS8.unlines [ cols, outMsg, BS8.pack (appJS app) ]
           , startGame GameInfo
                   { gPlayers = Set.fromList ps
                   , gState   = state

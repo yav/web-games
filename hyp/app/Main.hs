@@ -12,7 +12,7 @@ main :: IO ()
 main = startApp App
   { appOptions = [ oFog, oLen ]
   , appColors = [ "red", "yellow", "blue", "orange", "purple", "green" ]
-  , appJS = $(jsHandlers [ ''OutMsg, ''Update, ''Input, ''BasicAction ])
+  , appJS = $(jsHandlers [ ''Update, ''Input, ''BasicAction ])
   , appInitialState =  \rng opts ps ->
       Right $ initialState  rng (getFog opts) (fromEnum (getLen opts) + 1) ps
   , appStart = setup

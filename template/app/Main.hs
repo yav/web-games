@@ -8,7 +8,7 @@ main :: IO ()
 main = startApp App
   { appOptions = []
   , appColors = [ "red", "green", "blue", "yellow" ]
-  , appJS = $(jsHandlers [ ''OutMsg, ''Update, ''Input ])
+  , appJS = $(jsHandlers [ ''Update, ''Input ])
   , appInitialState = \_rng _opts _ps -> Right State
   , appStart = pure ()
   }

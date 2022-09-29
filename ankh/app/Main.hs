@@ -12,7 +12,7 @@ main :: IO ()
 main = startApp App
   { appOptions = []
   , appColors = [ "red", "green", "blue", "yellow" ]
-  , appJS = $(jsHandlers [ ''OutMsg, ''Update, ''Input ])
+  , appJS = $(jsHandlers [ ''Update, ''Input ])
   , appInitialState = \_rng _opts ps -> Right (newGame (ps `zip` repeat Ra))
   , appStart = pure ()
   }

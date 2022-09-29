@@ -20,7 +20,6 @@ main = startApp App
   { appOptions = [ oBoard ]
   , appColors  = [ "red", "yellow", "blue", "purple", "green" ]
   , appJS      = $(jsHandlers [ ''EventElement,
-                                ''OutMsg,
                                 ''GameUpdate, ''Choice, ''Event])
   , appInitialState = \rng opts ps ->
       let pnum = length ps
