@@ -1,29 +1,23 @@
 module AppTypes where
 
-import GHC.Generics(Generic)
 import Common.Basics(PlayerId)
-import Data.Aeson(ToJSON,FromJSON)
 import qualified Game as App
 
 type State      = App.Game
 type StateView  = App.GameView
 type Finished   = State
-
-data Update = Update
-  deriving (Generic,ToJSON)
-
-data Input = Input
-  deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
+type Update     = App.Game
+type Input      = App.Input
 
 doUpdate   :: Update -> State -> Either Finished State
-doUpdate  _ = Right
+doUpdate new _ = Right new -- XXX: end
 
 playerView :: PlayerId -> State -> StateView
 playerView = App.gameView
 
-type UpdateView = Update
+type UpdateView = StateView
 
 playerUpdateView :: PlayerId -> Update -> UpdateView
-playerUpdateView _ = id
+playerUpdateView = playerView
 
 

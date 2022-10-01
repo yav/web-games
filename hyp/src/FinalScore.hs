@@ -35,7 +35,7 @@ pointsFromPlayer player =
     ]
   where
   countCubes = sum [ n | b <- Map.elems (getField playerBag player)
-                       , (a,n) <- bagToList b, a /= Gray ]
+                       , (a,n) <- bagToNumList b, a /= Gray ]
              + sum [ 1 | t <- Map.elems (getField playerTech player)
                        , a <- getField techAlts t
                        , (_,r) <- costFullSpots (getField techCost a)

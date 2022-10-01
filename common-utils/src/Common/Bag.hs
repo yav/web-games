@@ -22,14 +22,23 @@ bagChange x r (Bag b) =
       new = cur + x
   in if new > 0 then Map.insert r new b else Map.delete r b
 
+bagUnion :: Ord a => Bag a -> Bag a -> Bag a
+bagUnion (Bag a) (Bag b) = Bag (Map.unionWith (+) a b)
+
+bagSize :: Bag a -> Int
+bagSize (Bag mp) = Map.foldl' (+) 0 mp
+
 bagContains :: Ord a => a -> Bag a -> Int
 bagContains a (Bag b) = Map.findWithDefault 0 a b
 
 bagIsEmpty :: Bag a -> Bool
 bagIsEmpty (Bag b) = Map.null b
 
-bagToList :: Bag a -> [(a,Int)]
-bagToList (Bag mp) = Map.toList mp
+bagToNumList :: Bag a -> [(a,Int)]
+bagToNumList (Bag mp) = Map.toList mp
+
+bagToList :: Bag a -> [a]
+bagToList b = [ x | (a,n) <- bagToNumList b, x <- replicate n a ]
 
 bagFromNumList :: Ord a => [(a,Int)] -> Bag a
 bagFromNumList xs = Bag (Map.fromListWith (+) xs)
@@ -40,7 +49,7 @@ bagFromList = foldr (bagChange 1) bagEmpty
 bagPick :: Ord a => Bag a -> RNG -> Maybe (a, RNG)
 bagPick b rng
   | bagIsEmpty b = Nothing
-  | otherwise    = let (r,rng1) = pickWeighted (bagToList b) rng
+  | otherwise    = let (r,rng1) = pickWeighted (bagToNumList b) rng
                    in Just (r, rng1)
 
 bagRemoveAll :: Ord a => a -> Bag a -> (Int, Bag a)

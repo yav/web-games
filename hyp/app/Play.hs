@@ -198,7 +198,7 @@ actPlaceCube state =
                      pure r
          where
          avail = getField (playerBag .> mapAt BagReady) player
-         opts  = filter (/= Gray) (map fst (bagToList avail))
+         opts  = filter (/= Gray) (map fst (bagToNumList avail))
 
 
 actEnterCity :: Opts
@@ -466,7 +466,7 @@ actEndTurn state =
   (playerId,player) = currentPlayer state
 
   discardReady =
-    forM_ (bagToList (getField (playerBag .> mapAt BagReady) player)) \(r,n) ->
+    forM_ (bagToNumList (getField (playerBag .> mapAt BagReady) player)) \(r,n) ->
       replicateM_ n
       do update (ChangeBag playerId BagReady   r (-1))
          update (ChangeBag playerId BagDiscard r 1)
@@ -490,7 +490,7 @@ actUseAction state =
     , "Use acton"
     , performBasicAction playerId b
     )
-  | b <- map fst (bagToList (getField turnReady turn))
+  | b <- map fst (bagToNumList (getField turnReady turn))
   , clickable b
   ] ++
   [ ( playerId :-> AskIfAction n
@@ -564,7 +564,7 @@ doReset playerId =
                update (ChangeUnit playerId FreeUnit loc 1)
 
      -- discards to bag
-     let discarded = bagToList (getField (playerBag .> mapAt BagDiscard) player)
+     let discarded = bagToNumList (getField (playerBag .> mapAt BagDiscard) player)
      forM_ discarded \(r,n) ->
         replicateM_ n
         do update (ChangeBag playerId BagDiscard r (-1))

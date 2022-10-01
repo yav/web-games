@@ -17,6 +17,12 @@ module Common.InteractImpl
   , localUpdate
   , localUpdate_
   , getState
+
+  , the
+  , setThe
+  , updateThe
+  , updateThe_
+
   , save
   ) where
 
@@ -33,6 +39,7 @@ import Data.Aeson (ToJSON(..), FromJSON(..), (.=), (.:?))
 import qualified Data.Aeson as JS
 
 import Common.Basics
+import Common.Field
 import AppTypes(State,StateView,UpdateView,Finished,Input,Update,doUpdate,
                                   playerView,playerUpdateView)
 
@@ -261,6 +268,10 @@ view f = Interact $
              Right st -> k (f st) s os
              Left _   -> (s,os)
 
+-- | Get the value of the given field of the state
+the :: Field State a -> Interact a
+the f = view (getField f)
+
 -- | Access the current game state
 getState :: Interact State
 getState = view id
@@ -285,6 +296,16 @@ localUpdate f = Interact $
 -- | Updates that are not visible to the players
 localUpdate_ :: (State -> State) -> Interact ()
 localUpdate_ f = localUpdate \s -> ((),f s)
+
+setThe :: Field State a -> a -> Interact ()
+setThe x a = localUpdate_ (setField x a)
+
+updateThe :: Field State a -> (a -> (b,a)) -> Interact b
+updateThe x f = localUpdate (updField' x f)
+
+updateThe_ :: Field State a -> (a -> a) -> Interact ()
+updateThe_ x f = localUpdate_ (updField x f)
+
 
 -- | Save the current game state.
 save :: Interact ()

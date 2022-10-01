@@ -18,11 +18,18 @@ x .> y = Field
            , setField = updField x . setField y
            }
 
+viewField :: Field r a -> (a -> b) -> r -> b
+viewField f v = v . getField f
+
 infixr 4 `updField`
 
 -- | Update a field
 updField :: Field r a -> (a -> a) -> r -> r
 updField x f = \r -> setField x (f (getField x r)) r
+
+updField' :: Field r a -> (a -> (b,a)) -> r -> (b,r)
+updField' x f = \r -> let (b,a) = f (getField x r)
+                      in (b, setField x a r)
 
 -- | Effectful update to a field
 traverseField :: Functor m => Field r a -> (a -> m a) -> r -> m r

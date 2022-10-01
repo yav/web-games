@@ -92,7 +92,7 @@ removeCubeOpts :: PlayerState -> Maybe ResourceReq -> [ (Input,Text) ]
 removeCubeOpts player mbLim = zip (discard ++ ready ++ fromTech) (repeat help)
   where
   bags        = getField playerBag player
-  resources b = filter ok $ map fst $ bagToList $ getField (mapAt b) bags
+  resources b = filter ok $ map fst $ bagToNumList $ getField (mapAt b) bags
   ready       = map AskReady (resources BagReady)
   discard     = map AskDiscard (resources BagDiscard)
   fromTech    = map AskCubeLoc (techSpots player)

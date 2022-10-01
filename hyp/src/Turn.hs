@@ -108,6 +108,7 @@ turnAutoExecute t = ( concatMap rebuild exec
                     , setField turnReady (bagFromNumList stay) t
                     )
   where
-  (exec,stay) = partition (autoExecute . fst) (bagToList (getField turnReady t))
+  (exec,stay) = partition (autoExecute . fst)
+                          (bagToNumList (getField turnReady t))
   rebuild (a,n) = replicate n a
 

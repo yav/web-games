@@ -15,8 +15,6 @@ instance ToJSON Finished
 -- | Possible updates to a game's state.
 data Update
 
-instance ToJSON Update
-
 -- | Apply an update to a game in progress.
 doUpdate   :: Update -> State -> Either Finished State
 

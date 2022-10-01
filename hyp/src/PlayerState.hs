@@ -134,7 +134,7 @@ placeSpots ps = [ spot
                 , any (matches requires) available
                 ]
   where
-  available = map fst (bagToList (getField (playerBag .> mapAt BagReady) ps))
+  available = map fst (bagToNumList (getField (playerBag .> mapAt BagReady) ps))
 
 -- | Valid return spots on tech
 returnSpots :: PlayerState -> [CubeLoc]

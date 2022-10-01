@@ -197,7 +197,7 @@ tileCountUnits :: PlayerId -> Tile -> Int
 tileCountUnits pid t = free + fromMap citySpot tileCities +
                                   fromMap ruinSpot tileRuins
   where
-  free = sum $ map snd $ bagToList $ getField (playerUnits pid) t
+  free = sum $ map snd $ bagToNumList $ getField (playerUnits pid) t
 
   fromMap g f =
     sum $ map (countTileSpot . getField g) $ Map.elems $ getField f t

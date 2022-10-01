@@ -123,7 +123,7 @@ doGainResource playerId req =
      case req of
       Exact r -> doGainCube playerId r
       AnyNormal ->
-        case map fst (bagToList sup) of
+        case map fst (bagToNumList sup) of
           []  -> pure ()
           [r] -> doGainCube playerId r
           rs  ->
@@ -155,7 +155,7 @@ doSwapResource playerId inT outT =
                       pure (if yes then r else rIn)
                  AnyNormal ->
                    do let opt r  = (AskSupply r, "Replace with this")
-                      opts <- view (map (opt . fst) . bagToList
+                      opts <- view (map (opt . fst) . bagToNumList
                                                     . getField gameSupply)
                       mb <- chooseMaybe playerId
                                         "Choose replacement resource" opts

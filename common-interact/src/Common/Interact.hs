@@ -22,6 +22,13 @@ module Common.Interact
   , localUpdate
   , localUpdate_
 
+
+    -- ** Field based access to the state
+  , the
+  , setThe
+  , updateThe
+  , updateThe_
+
     -- ** Save the game
   , Interact.save
   ) where
