@@ -1,0 +1,71 @@
+.game {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.decks {
+  display: flex;
+}
+
+.deck {
+  margin: 1em;
+  position: relative;
+}
+
+.phrase {
+  display: inline-block;
+}
+
+.text-answer {
+  display: inline-block;
+}
+
+.answer {
+  border: 5px solid red;
+  cursor: pointer;
+}
+
+.deck.answer {
+}
+
+.counter {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: white;
+  background-color: black;
+  border-radius: 10%;
+  width: 2em;
+  text-align: center;
+}
+
+.discard {
+  margin: 1em;
+  position: relative;
+}
+
+.players {
+  display: flex;
+  flex-direction: column;
+}
+
+.player {
+  border: 1px solid black;
+  margin: 1em;
+  padding: 0.5em;
+}
+
+.player .label.current {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.hand {
+  margin: 1em;
+  display: flex;
+}
+
+.card {
+  margin: 1em;
+}

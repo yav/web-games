@@ -38,7 +38,10 @@ data Player =
     } deriving (Generic, JS.ToJSON)
 
 data Ancient = Bombarder | HeapTrawler | StiltLoper | PhaseSaber | VaultBot
-  deriving (Eq,Ord,Generic,JS.ToJSON,JS.ToJSONKey,Bounded,Enum)
+  deriving (Eq,Ord,Generic,JS.ToJSON,Bounded,Enum)
+
+instance JS.ToJSONKey Ancient where
+  toJSONKey = JS.genericToJSONKey JS.defaultJSONKeyOptions
 
 declareFields ''Player
 declareFields ''Game

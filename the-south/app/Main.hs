@@ -2,6 +2,7 @@ module Main where
 
 import Control.Monad(when,unless,guard)
 import qualified Data.Text as Text
+import Data.Maybe(mapMaybe)
 
 import Common.Basics
 import Common.Field
@@ -74,6 +75,69 @@ doActivateSalvos =
      n     <- the (player this .> playerSalvos)
      doLoosePoints n
 
+-- | Place the given number of copies of a card in the current player's vault.
+doPlaceInVault :: [Ancient] -> Interact ()
+doPlaceInVault cs =
+  do this <- the gameCurrentPlayer
+     updateThe_ (player this .> playerVault) (bagUnion (bagFromList cs))
+     cacheBonus (length cs)
+
+  where
+  cacheBonus n =
+    case n of
+      0 -> pure ()
+      1 -> cacheBonus1
+      2 -> cacheBonus2
+      3 -> cacheBonus3
+      _ -> anyCacheBonus >> anyCacheBonus
+
+  anyCacheBonus =
+    do this <- the gameCurrentPlayer
+       sync
+       askInputs "Choose cache bonus"
+          [ ( this :-> Text 0 ("Bonus " <> lab)
+            , "Gain bonus for " <> lab <> " cards"
+            , cacheBonus i
+            )
+          | i <- [ 1 .. 3 ]
+          , let lab = Text.pack (show i)
+          ]
+
+  cacheBonus1 =
+    do this <- the gameCurrentPlayer
+       ds   <- deckOptions
+       sync
+       mb   <- chooseMaybe this "Choose a deck to draw 2 cards"
+                 [ (i, "Draw 2 from this deck") | i <- ds ]
+       case mb of
+         Just (Deck i) -> doDrawCards i 2
+         _             -> pure ()
+
+  cacheBonus2 =
+    do this <- the gameCurrentPlayer
+       ds   <- deckOptions
+       sync
+       mb   <- chooseMaybe this "Use the CODE of which deck?"
+                 [ (i, "Use this CODE") | i <- ds ]
+       case mb of
+         Just (Deck i) -> useCode i
+         _             -> pure ()
+
+  cacheBonus3 =
+    do this <- the gameCurrentPlayer
+       cards <- bagToList <$> the (player this .> playerHand)
+       let cid = zip [ 0 .. ] cards
+       sync
+       mb   <- chooseMaybe this "Choose a card to play as a salvo"
+                 [ (Hand i, "Play this card as a salvo") | (i,_) <- cid ]
+       case mb of
+         Just (Hand i) | c : _ <- [ c | (j,c) <- cid, i == j ] ->
+           do updateThe_ (player this .> playerHand) (bagChange (-1) c)
+              doAddSalvo
+         _ -> pure ()
+
+
+
 --------------------------------------------------------------------------------
 
 
@@ -83,10 +147,10 @@ playerTurn =
      acquisitionAction
      escalateAction
      reduceHand
-     done <- checkGameEnd
-     unless done nextTurn
+     checkGameEnd
+     nextTurn
 
-checkGameEnd :: Interact Bool
+checkGameEnd :: Interact ()
 checkGameEnd =
   do this  <- the gameCurrentPlayer
      other <- the gameOtherPlayer
@@ -103,8 +167,9 @@ checkGameEnd =
                            )
 
      let end = or [ this == lastP && (pointsOf p1 <= 10 || pointsOf p2 <= 10)
-                  , (salvosOf p1 + salvosOf p2 >= 10) &&
-                    (valutFull p1 || valutFull p2)
+                  , salvosOf p1 + salvosOf p2 >= 10
+                  , valutFull p1
+                  , valutFull p2
                   ]
      when end
        do let score1 = score p1
@@ -116,8 +181,8 @@ checkGameEnd =
               LT -> EndWinner other
               EQ -> EndTie
               GT -> EndWinner this
+          update =<< getState
 
-     pure end
 
 nextTurn :: Interact ()
 nextTurn =
@@ -142,6 +207,7 @@ reduceHand =
      let n = bagSize hs
      when (n > 5) $
        do let cid = zip [ 0 .. ] (bagToList hs)
+          sync
           askInputs "Choose a card to discard"
             [ (this :-> Hand i, "Discard this card"
               , do updateThe_ (player this .> playerHand) (bagChange (-1) c)
@@ -164,6 +230,7 @@ drawCardExcept notThis =
      let is = case notThis of
                 Nothing -> is'
                 Just i  -> [ Deck j | Deck j <- is', i /= j ]
+     sync
      mb  <- chooseMaybe pid "Choose a card to draw"
                                         [ (i, "Draw this card") | i <- is ]
      case mb of
@@ -177,7 +244,8 @@ acquisitionAction =
   do pid <- the gameCurrentPlayer
      is  <- deckOptions
      unless (null is)
-       do ~(Text n _) <-
+       do sync
+          ~(Text n _) <-
              choose pid "Choose acquisition action"
                [ (Text 0 "Code", "Use the CODE of the top card of one deck")
                , (Text 1 "Draw", "Draw the top card of one deck and " <>
@@ -185,7 +253,8 @@ acquisitionAction =
                ]
           case n of
             0 ->
-              do mb <- chooseMaybe pid "Choose a card to use"
+              do sync
+                 mb <- chooseMaybe pid "Choose a card to use"
                           [ (i, "Use this CODE") | i <- is ]
                  case mb of
                    Just (Deck d) -> useCode d
@@ -233,13 +302,13 @@ useCode deckId =
 
                 this <- the gameCurrentPlayer
                 is   <- deckOptions
+                sync
                 mb   <- chooseMaybe this "Choose a card to add to your vault"
                           [ (i,"Add this cars to your vault") | i <- is ]
                 case mb of
                   Just (Deck i) ->
                     do cards <- doGetCards i 1
-                       updateThe_ (player this .> playerVault)
-                                  (bagUnion (bagFromList cards))
+                       doPlaceInVault cards
                   _ -> pure ()
 
 
@@ -250,9 +319,9 @@ escalateAction =
      let cids  = zip [ 0 .. ] cs
 
          selectCards selNum selected =
-           case optSalvo ++ optVault ++ map optCard cids of
+           case optSalvo ++ optVault ++ mapMaybe optCard cids of
              []   -> pure ()
-             opts -> askInputs "Choose escalation action" opts
+             opts -> sync >> askInputs "Choose escalation action" opts
            where
            optVault =
              do guard (1 <= selNum && selNum <= 4 && allSame selected)
@@ -262,20 +331,16 @@ escalateAction =
                      )
 
            optSalvo =
-             do guard (3 == selNum && allDifferent selected)
+             do guard (3 == selNum && allDifferent (map snd selected))
                 pure ( this :-> Text 0 "Salvo"
                      , "Place a salvo"
                      , placeSalvo selected
                      )
 
            optCard (i,c)
-             | i `elem` map fst selected =
-               ( this :-> Hand i
-               , "Deselect card"
-               , selectCards (selNum - 1)
-                             (filter ((/= i) . fst) selected)
-               )
+             | i `elem` map fst selected = Nothing
              | otherwise =
+               Just
                ( this :-> Hand i
                , "Select card"
                , selectCards (selNum + 1) ((i,c) : selected)
@@ -294,68 +359,20 @@ escalateAction =
 
   placeInVault n c =
     do this <- the gameCurrentPlayer
-       updateThe_ (player this .> playerHand)  (bagChange (-n) c)
-       updateThe_ (player this .> playerVault) (bagChange n c)
-       cacheBonus n
-
-  cacheBonus n =
-    case n of
-      1 -> cacheBonus1
-      2 -> cacheBonus2
-      3 -> cacheBonus3
-      _ -> anyCacheBonus >> anyCacheBonus
-
-  anyCacheBonus =
-    do this <- the gameCurrentPlayer
-       askInputs "Choose cache bonus"
-          [ ( this :-> Text 0 ("Bonus " <> lab)
-            , "Gain bonus for " <> lab <> " cards"
-            , cacheBonus i
-            )
-          | i <- [ 1 .. 3 ]
-          , let lab = Text.pack (show i)
-          ]
-
-  cacheBonus1 =
-    do this <- the gameCurrentPlayer
-       ds   <- deckOptions
-       mb   <- chooseMaybe this "Choose a deck to draw 2 cards"
-                 [ (i, "Draw 2 from this deck") | i <- ds ]
-       case mb of
-         Just (Deck i) -> doDrawCards i 2
-         _             -> pure ()
-
-  cacheBonus2 =
-    do this <- the gameCurrentPlayer
-       ds   <- deckOptions
-       mb   <- chooseMaybe this "Use the CODE of which deck?"
-                 [ (i, "Use this CODE") | i <- ds ]
-       case mb of
-         Just (Deck i) -> useCode i
-         _             -> pure ()
-
-  cacheBonus3 =
-    do this <- the gameCurrentPlayer
-       cs   <- bagToList <$> the (player this .> playerHand)
-       let cid = zip [ 0 .. ] cs
-       mb   <- chooseMaybe this "Choose a card to play as a salvo"
-                 [ (Hand i, "Play this card as a salvo") | (i,_) <- cid ]
-       case mb of
-         Just (Hand i) | c : _ <- [ c | (j,c) <- cid, i == j ] ->
-           do updateThe_ (player this .> playerHand) (bagChange (-1) c)
-              doAddSalvo
-         _ -> pure ()
+       updateThe_ (player this .> playerHand) (bagChange (- n) c)
+       doPlaceInVault (replicate n c)
 
 
   -- XXX: what's the best way to "reveal" the cards?
   placeSalvo cs =
     do this <- the gameCurrentPlayer
+       sync
        ~(Hand i) <-
           choose this "Select card to place, others will be discarded"
                     [ (Hand i, "Place this card") | (i,_) <- cs ]
        let disc = [ c | (j,c) <- cs, i /= j ]
        updateThe_ (player this .> playerHand)
-                  (bagUnion (bagFromList (map snd cs)))
+                  (`bagDifference` bagFromList (map snd cs))
        updateThe_ gameDiscard (disc ++)
        doAddSalvo
 

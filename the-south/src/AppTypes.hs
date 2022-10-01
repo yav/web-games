@@ -1,6 +1,7 @@
 module AppTypes where
 
 import Common.Basics(PlayerId)
+import Common.Field
 import qualified Game as App
 
 type State      = App.Game
@@ -10,7 +11,9 @@ type Update     = App.Game
 type Input      = App.Input
 
 doUpdate   :: Update -> State -> Either Finished State
-doUpdate new _ = Right new -- XXX: end
+doUpdate new _ = case getField App.gameStatus new of
+                   App.InProgress -> Right new
+                   _              -> Left new
 
 playerView :: PlayerId -> State -> StateView
 playerView = App.gameView
