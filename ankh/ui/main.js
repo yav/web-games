@@ -12,6 +12,8 @@ function main() {
 function uiRedraw(state) {
   uiQuestions(state.questions)
   const body = html.getBody()
+  const c = item('pyramid','red')
+  // body.appendChild(c)
   // body.appendChild(hexWall(3,2,0))
   // body.appendChild(hexWall(3,2,1))
   // body.appendChild(hexWall(3,2,2))

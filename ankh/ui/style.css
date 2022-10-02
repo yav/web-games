@@ -2,6 +2,10 @@ body {
   background: gray;
 }
 
+svg.red {
+  fill: red;
+}
+
 .board {
   position: relative;
   background-color: black;
