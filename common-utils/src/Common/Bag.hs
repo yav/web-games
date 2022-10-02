@@ -25,6 +25,10 @@ bagChange x r (Bag b) =
 bagUnion :: Ord a => Bag a -> Bag a -> Bag a
 bagUnion (Bag a) (Bag b) = Bag (Map.unionWith (+) a b)
 
+bagDifference :: Ord a => Bag a -> Bag a -> Bag a
+bagDifference (Bag a) (Bag b) = Bag (Map.differenceWith rm a b)
+  where rm x y = if x > y then Just (x - y) else Nothing
+
 bagSize :: Bag a -> Int
 bagSize (Bag mp) = Map.foldl' (+) 0 mp
 
