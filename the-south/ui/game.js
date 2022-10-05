@@ -1,137 +1,255 @@
+function questionClick(q) {
+  return () => {
+    sendJSON(q)
+    const n = gui.questions.length
+    for (let i = 0; i < n; ++i) gui.questions[i]()
+    gui.questions = []
+  }
+}
+
 
 function makeQuestion(dom,q) {
   dom.classList.add("answer")
+  const oldTitle = dom.getAttribute("title")
   dom.setAttribute("title",q.chHelp)
-  dom.addEventListener("click", () => sendJSON(q))
+
+  const click = questionClick(q)
+
+  gui.questions.push(() => {
+    dom.classList.remove("answer")
+    dom.setAttribute("title",oldTitle)
+    dom.removeEventListener("click", click)
+  })
+
+  dom.addEventListener("click", click)
 }
 
 function makeTextQuestion(txt,q) {
   const dom = html.div("text-answer answer")
   dom.textContent = txt
   dom.setAttribute("title",q.chHelp)
-  dom.addEventListener("click", () => sendJSON(q))
-  gui.question.appendChild(dom)
+  gui.questions.push(() => dom.remove())
+
+  dom.addEventListener("click", questionClick(q))
+  gui.question.append(dom)
 }
 
+
+function setGame(game) {
+  for (let i = 0; i < game.decks.length; ++i)
+    gui.decks[i].set(game.decks[i])
+
+  gui.discard(game.discard)
+
+  for (const p in game.players)
+    gui.players[p](game.players[p])
+}
 
 
 function drawGame(game) {
+  gui = {}
+  gui.questions = []
   const dom = html.div('game')
-  dom.appendChild(drawDecks(game))
-  dom.appendChild(drawPlayers(game))
+  dom.appendChild(drawQuestionArea())
+  dom.appendChild(drawDecks(game.decks))
+  dom.appendChild(drawPlayers(game.players))
+  return dom
+}
+
+function drawQuestionArea() {
+  let value = null
+  const dom = html.div("question")
+  const lab = html.div("phrase")
+  dom.appendChild(lab)
+
+  gui.question =
+    { set: (i) => {
+        if (value !== null && value.localeCompare(i) == 0) return
+        lab.textContent = i
+      }
+    , append: (d) => dom.appendChild(d)
+    }
 
   return dom
 }
 
-function drawDecks(state) {
-  const ds = state.decks
+
+// Assumes the players do not change
+function drawPlayers(ps) {
+  gui.players = {}
+  const dom = html.div("players")
+  for (const p in ps)
+    dom.appendChild(drawPlayer(p,ps[p]))
+  return dom
+}
+
+
+function drawPlayer(p,st) {
+  console.log(p)
+  const dom   = html.div("player")
+  const label = html.div("label")
+  label.textContent = p + (st.isLast ? "(2nd)" : "")  // Doesn't change
+
+
+  const stats  = html.div("stats")
+  const points = drawCounter()
+  const vault  = drawCounter()
+  const salvos = drawCounter()
+  const hand   = drawHand(st.hand)
+
+  dom.append( label
+            , "points: ", points.dom
+            , ", vault:  ", vault.dom
+            , ", salvos: ", salvos.dom
+            , hand.dom
+            )
+
+  let current = null
+
+  gui.players[p] = (s) => {
+    if (s.isCurrent !== current) {
+      current = s.isCurrent
+      if (current)
+        label.classList.add("current")
+      else
+        label.classList.remove("current")
+    }
+    points.set(s.points)
+    vault.set(s.vault)
+    salvos.set(s.salvos)
+    hand.set(s.hand)
+  }
+
+  return dom
+}
+
+
+function drawHand(st) {
+  gui.hand = []
+
+  const dom = html.div("hand")
+  const counter = drawCounter()
+
+  if (st.tag === "Opaque") dom.append("hand: ", counter.dom)
+
+  return { dom: dom
+         , set: (hs) => {
+             switch(hs.tag) {
+               case "Visible":
+                 const cs = hs.contents
+                 for (let i = 0; i < cs.length; ++i) {
+                   if (i >= gui.hand.length) {
+                      gui.hand[i] = drawCard()
+                      dom.appendChild(gui.hand[i].dom)
+                   }
+                   gui.hand[i].set(cs[i])
+                 }
+                 while(gui.hand.length > cs.length)
+                   gui.hand.pop().remove()
+                 return
+
+              case "Opaque":
+                counter.set(hs.contents)
+                return
+             }
+           }
+         }
+}
+
+
+
+
+// Assumes the number of decks does not change
+function drawDecks(ds) {
   const dom = html.div("decks")
   gui.decks = []
-  for (let i = 0; i < ds.length; ++i) {
-    dom.appendChild(drawDeck(i,ds[i]))
-  }
 
-  dom.appendChild(drawDiscard(state.discard))
+  for (let i = 0; i < ds.length; ++i)
+    dom.appendChild(drawDeck(i))
 
-  return dom
-}
-
-
-function drawDeck(i,d) {
-  const dom = html.div("deck")
-  switch (d.tag) {
-    case 'Empty':
-      dom.textContent = "(empty)"
-      break
-
-    case 'Card':
-      const ancient = drawCard(d.contents[0])
-      const counter = html.div("counter")
-      counter.textContent = (1 + d.contents[1]) + ""
-      dom.appendChild(ancient)
-      dom.appendChild(counter)
-      break
-  }
-  gui.decks[i] = dom
-  return dom
-}
-
-function drawDiscard(n) {
-  const dom = html.div("discard")
-  dom.setAttribute("title","Discard")
-  const d   = drawCard("Blank")
-  const c   = html.div("counter")
-  c.textContent = n + ""
-  dom.appendChild(d)
-  dom.appendChild(c)
-  return dom
-}
-
-
-function drawPlayers(game) {
-  const ps = game.players
-
-  const dom = html.div("players")
-
-  const players = []
-  for (const p in ps) {
-    players[p] = drawPlayer(p, ps[p])
-    dom.appendChild(players[p])
-  }
+  dom.appendChild(drawDiscard())
 
   return dom
 }
 
-function drawPlayer(p, state) {
-  const dom = html.div("player")
-  const label = html.div("label")
-  label.textContent = p + (state.isLast ? "(2nd)" : "")
-  if (state.isCurrent) {
-    label.classList.add("current")
-  }
 
-  const stats = html.div("stats")
-  stats.textContent = "points: " + state.points + ", valut: " + state.vault +
-                      ", salvos: " + state.salvos
+function drawDeck(i) {
+  const dom     = html.div("deck")
+  const card    = drawCard()
+  const counter = drawCounter()
+  dom.appendChild(card.dom)
+  dom.appendChild(counter.dom)
 
-  const hand = drawHand(state.hand)
+  gui.decks[i] =
+    { set: (v) => {
+        switch (v.tag) {
 
-  dom.appendChild(label)
-  dom.appendChild(stats)
-  dom.appendChild(hand)
+          case "Empty":
+            card.set('Blank')
+            counter.set(0)
+            return
 
-  return dom
-}
-
-function drawHand(hand) {
-  switch(hand.tag) {
-    case "Opaque": {
-      const dom = html.div("hand opaque")
-      dom.textContent = hand.contents + " cards in hand"
-      return dom
-    }
-
-    case "Visible": {
-      const dom = html.div("hand visible")
-      const cs = hand.contents
-      gui.cards = []
-      for (let i = 0; i < cs.length; ++i) {
-        gui.cards[i] = drawCard(cs[i])
-        dom.appendChild(gui.cards[i])
+          case "Card":
+            card.set(v.contents[0])
+            counter.set(v.contents[1])
+            return
+        }
       }
-      return dom
-    }
-    default:
-      const dom = html.div("error")
-      dom.textContent = "Unexpected: " + hand.tag
-      return dom
-  }
-}
 
-function drawCard(i) {
-  const dom = html.div("card")
-  const img = html.img("image/" + i + ".png")
-  html.setDim(img, 128, 196)
-  dom.appendChild(img)
+    , ask: (q) => makeQuestion(dom,q)
+    }
+
   return dom
 }
+
+
+
+function drawDiscard() {
+  const dom = html.div("deck")
+  dom.setAttribute("title","Discarded cards")
+  const card    = drawCard()
+  const counter = drawCounter()
+  dom.appendChild(card.dom)
+  dom.appendChild(counter.dom)
+
+  card.set("Blank")
+  gui.discard = counter.set
+  return dom
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Primitive components
+// -----------------------------------------------------------------------------
+
+function drawCard() {
+  let value = null
+  const dom = html.div("card")
+  html.setDim(dom, 132, 196)
+
+  return { dom: dom
+         , set: (i) => {
+                    if (i === value) return
+                    if (value) dom.classList.remove(value)
+                    value = i
+                    if (value) dom.classList.add(value)
+                  }
+         , remove: () => dom.remove()
+         , ask: (q) => makeQuestion(dom,q)
+         }
+}
+
+
+function drawCounter() {
+  let value = null
+  const dom = html.div("counter")
+
+  return { dom: dom
+         , set: (n) => { if (n !== value) { value = n; dom.textContent = n }}
+         }
+}
+
+
+

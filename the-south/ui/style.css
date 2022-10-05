@@ -1,17 +1,34 @@
 .game {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
 }
-
 
 .decks {
   display: flex;
+  border: 1px solid blue;
+  align-items: center;
 }
 
 .deck {
-  margin: 1em;
   position: relative;
+  margin-left: 1em;
 }
+
+.deck .counter {
+  position: absolute;
+  top: 0;
+  right: 5%;
+  color: white;
+  background-color: black;
+  border-radius: 10%;
+  width: 2em;
+  text-align: center;
+}
+
+
+
+
 
 .phrase {
   display: inline-block;
@@ -19,6 +36,7 @@
 
 .text-answer {
   display: inline-block;
+  margin-left: 1em;
 }
 
 .answer {
@@ -29,21 +47,6 @@
 .deck.answer {
 }
 
-.counter {
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: white;
-  background-color: black;
-  border-radius: 10%;
-  width: 2em;
-  text-align: center;
-}
-
-.discard {
-  margin: 1em;
-  position: relative;
-}
 
 .players {
   display: flex;
@@ -51,9 +54,14 @@
 }
 
 .player {
+  display: flex;
   border: 1px solid black;
   margin: 1em;
   padding: 0.5em;
+}
+
+.player > .counter {
+  display: inline-block;
 }
 
 .player .label.current {
@@ -62,10 +70,21 @@
 }
 
 .hand {
-  margin: 1em;
   display: flex;
 }
 
-.card {
-  margin: 1em;
+.hand .card {
+  margin-left: 1em;
 }
+
+.card {
+  border-radius: 5%;
+  background-size: cover;
+}
+
+.VaultBot     { background-image: url("image/VaultBot.png"); }
+.Bombarder    { background-image: url("image/Bombarder.png"); }
+.HeapTrawler  { background-image: url("image/HeapTrawler.png"); }
+.StiltLoper   { background-image: url("image/StiltLoper.png"); }
+.PhaseSaber   { background-image: url("image/PhaseSaber.png"); }
+.Blank        { background-image: url("image/Blank.png"); }

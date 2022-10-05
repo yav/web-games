@@ -11,37 +11,24 @@ function main() {
 
 // Redraw the whole state
 function uiRedraw (state) {
-  console.log("drew state")
-  uiUpdate(state.game)
+  const b = html.getBody()
+  b.appendChild(drawGame(state.game))
+  setGame(state.game)
   uiQuestions(state.questions)
 }
 
 // Set the explanation for what we are asking.
-function uiSetQuestion(q) {
-  const dom = html.div("phrase")
-  dom.textContent = q
-  gui.question.appendChild(dom)
-}
+function uiSetQuestion(q) { gui.question.set(q) }
 
 // Various things that can be used to answer the question.
 const uiQuestion = (q) => hsInput({
-  Deck: (i) => makeQuestion(gui.decks[i],q),
-  Hand: (i) => makeQuestion(gui.cards[i],q),
+  Deck: (i)   => gui.decks[i].ask(q),
+  Hand: (i)   => gui.hand[i].ask(q),
   Text: (i,j) => makeTextQuestion(j,q)
   })(q.chChoice)
 
 
 // Perform a partial update
-function uiUpdate(game) {
-
-  gui = {}
-
-  const b = html.getBody()
-  b.replaceChildren([])
-
-  gui.question = html.div("question")
-  b.appendChild(gui.question)
-  b.appendChild(drawGame(game))
-}
+const uiUpdate = setGame
 
 
