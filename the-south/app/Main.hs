@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Monad(when,unless,guard)
+import Data.Text(Text)
 import qualified Data.Text as Text
 import Data.Maybe(mapMaybe)
 
@@ -76,27 +77,29 @@ doActivateSalvos =
      doLoosePoints n
 
 -- | Place the given number of copies of a card in the current player's vault.
-doPlaceInVault :: [Ancient] -> Interact ()
-doPlaceInVault cs =
+doPlaceInVault :: Text -> [Ancient] -> Interact ()
+doPlaceInVault pref' cs =
   do this <- the gameCurrentPlayer
      updateThe_ (player this .> playerVault) (bagUnion (bagFromList cs))
      cacheBonus (length cs)
 
   where
+  pref = pref' <> " "
+
   cacheBonus n =
-    case n of
+    case n :: Int of
       0 -> pure ()
       1 -> cacheBonus1
       2 -> cacheBonus2
       3 -> cacheBonus3
-      _ -> anyCacheBonus >> anyCacheBonus
+      _ -> anyCacheBonus "1" >> anyCacheBonus "2"
 
-  anyCacheBonus =
+  anyCacheBonus n =
     do this <- the gameCurrentPlayer
        sync
-       askInputs "Choose cache bonus"
+       askInputs (pref <> "4 card cache bonus (" <> n <> "/2): ")
           [ ( this :-> Text 0 ("Bonus " <> lab)
-            , "Gain bonus for " <> lab <> " cards"
+            , "Gain " <> lab <> " card cache bonus"
             , cacheBonus i
             )
           | i <- [ 1 .. 3 ]
@@ -107,8 +110,8 @@ doPlaceInVault cs =
     do this <- the gameCurrentPlayer
        ds   <- deckOptions
        sync
-       mb   <- chooseMaybe this "Choose a deck to draw 2 cards"
-                 [ (i, "Draw 2 from this deck") | i <- ds ]
+       mb   <- chooseMaybe this (pref <> "1 card cache bonus: draw 2 cards from one deck")
+                 [ (i, "Draw 2 cards from this deck") | i <- ds ]
        case mb of
          Just (Deck i) -> doDrawCards i 2
          _             -> pure ()
@@ -117,7 +120,7 @@ doPlaceInVault cs =
     do this <- the gameCurrentPlayer
        ds   <- deckOptions
        sync
-       mb   <- chooseMaybe this "Use the CODE of which deck?"
+       mb   <- chooseMaybe this (pref <> "2 card cache bonus: use the CODE of te top card of one deck")
                  [ (i, "Use this CODE") | i <- ds ]
        case mb of
          Just (Deck i) -> useCode i
@@ -128,8 +131,9 @@ doPlaceInVault cs =
        cards <- bagToList <$> the (player this .> playerHand)
        let cid = zip [ 0 .. ] cards
        sync
-       mb   <- chooseMaybe this "Choose a card to play as a salvo"
-                 [ (Hand i, "Play this card as a salvo") | (i,_) <- cid ]
+       mb   <- chooseMaybe this
+                 (pref <> "3 card cache bonus: play one card from your hand as a SALVO")
+                 [ (Hand i, "Play this card as a SALVO") | (i,_) <- cid ]
        case mb of
          Just (Hand i) | c : _ <- [ c | (j,c) <- cid, i == j ] ->
            do updateThe_ (player this .> playerHand) (bagChange (-1) c)
@@ -143,7 +147,8 @@ doPlaceInVault cs =
 
 playerTurn :: Interact ()
 playerTurn =
-  do drawCard
+  do sync
+     drawCard "[Turn Phase] Draw a card from a deck"
      acquisitionAction
      escalateAction
      reduceHand
@@ -208,7 +213,7 @@ reduceHand =
      when (n > 5) $
        do let cid = zip [ 0 .. ] (bagToList hs)
           sync
-          askInputs "Choose a card to discard"
+          askInputs "Discard down to 5 cards"
             [ (this :-> Hand i, "Discard this card"
               , do updateThe_ (player this .> playerHand) (bagChange (-1) c)
                    reduceHand
@@ -218,21 +223,20 @@ reduceHand =
 
 
 -- | Draw any available card.
-drawCard :: Interact ()
-drawCard = drawCardExcept Nothing
+drawCard :: Text -> Interact ()
+drawCard q = drawCardExcept q Nothing
 
 
 -- | Draw a card from a deck, except the deck in the argument, if any.
-drawCardExcept :: Maybe DeckId -> Interact ()
-drawCardExcept notThis =
+drawCardExcept :: Text -> Maybe DeckId -> Interact ()
+drawCardExcept msg notThis =
   do pid <- the gameCurrentPlayer
      is' <- deckOptions
      let is = case notThis of
                 Nothing -> is'
                 Just i  -> [ Deck j | Deck j <- is', i /= j ]
      sync
-     mb  <- chooseMaybe pid "Choose a card to draw"
-                                        [ (i, "Draw this card") | i <- is ]
+     mb  <- chooseMaybe pid msg [ (i, "Draw this card") | i <- is ]
      case mb of
        Just (Deck n) -> doDrawCards n 1
        _             -> pure ()
@@ -246,7 +250,7 @@ acquisitionAction =
      unless (null is)
        do sync
           ~(Text n _) <-
-             choose pid "Choose acquisition action"
+             choose pid "[Turn Phase] Acquisition action:"
                [ (Text 0 "Code", "Use the CODE of the top card of one deck")
                , (Text 1 "Draw", "Draw the top card of one deck and " <>
                                  "the other player loses 2 points")
@@ -254,17 +258,18 @@ acquisitionAction =
           case n of
             0 ->
               do sync
-                 mb <- chooseMaybe pid "Choose a card to use"
+                 mb <- chooseMaybe pid
+                    "[CODE acquisiton] Use the CODE of the top card of one deck"
                           [ (i, "Use this CODE") | i <- is ]
                  case mb of
                    Just (Deck d) -> useCode d
                    _             -> pure ()
 
-            _ -> do drawCard
+            _ -> do drawCard "[DRAW acquisition] Draw the top card of one deck"
                     doLoosePoints 2
 
 
--- | Use the code of the top car dof a given deck.
+-- | Use the code of the top card of a given deck.
 useCode :: DeckId -> Interact ()
 useCode deckId =
   do cs <- the (gameDecks .> listAt deckId)
@@ -276,7 +281,9 @@ useCode deckId =
            HeapTrawler ->
              do doLoosePoints 2
                 doDrawCards deckId 1
-                drawCardExcept (Just deckId)
+                drawCardExcept
+                   "[HEAPTRAWLER CODE] Draw a card from another deck"
+                   (Just deckId)
 
            StiltLoper ->
              do this   <- the gameCurrentPlayer
@@ -287,7 +294,7 @@ useCode deckId =
            PhaseSaber ->
              do doLoosePoints 3
                 doDiscardFromDeck deckId
-                drawCard
+                drawCard "[PHASESABER CODE] Draw a card from one deck"
 
            Bombarder ->
              do this <- the gameCurrentPlayer
@@ -303,12 +310,13 @@ useCode deckId =
                 this <- the gameCurrentPlayer
                 is   <- deckOptions
                 sync
-                mb   <- chooseMaybe this "Choose a card to add to your vault"
-                          [ (i,"Add this cars to your vault") | i <- is ]
+                mb   <- chooseMaybe this
+                          "[VAULTBOT CODE] Add the top card of one deck to your vault"
+                          [ (i,"Add this card to your vault") | i <- is ]
                 case mb of
                   Just (Deck i) ->
                     do cards <- doGetCards i 1
-                       doPlaceInVault cards
+                       doPlaceInVault "[VAULTBOT CODE]" cards
                   _ -> pure ()
 
 
@@ -321,19 +329,21 @@ escalateAction =
          selectCards selNum selected =
            case optSalvo ++ optVault ++ mapMaybe optCard cids of
              []   -> pure ()
-             opts -> sync >> askInputs "Choose escalation action" opts
+             opts ->
+               do sync
+                  askInputs "[Turn Phase] Escalation action: play cards from your hand" opts
            where
            optVault =
              do guard (1 <= selNum && selNum <= 4 && allSame selected)
-                pure ( this :-> Text 1 "Vault"
-                     , "Place in vault"
+                pure ( this :-> Text 1 "to VAULT"
+                     , "Place selected cards in your VAULT"
                      , placeInVault selNum (snd (head selected))
                      )
 
            optSalvo =
              do guard (3 == selNum && allDifferent (map snd selected))
-                pure ( this :-> Text 0 "Salvo"
-                     , "Place a salvo"
+                pure ( this :-> Text 0 "as SALVO"
+                     , "Play one of the selected cards as a SALVO, discard the rest"
                      , placeSalvo selected
                      )
 
@@ -360,7 +370,7 @@ escalateAction =
   placeInVault n c =
     do this <- the gameCurrentPlayer
        updateThe_ (player this .> playerHand) (bagChange (- n) c)
-       doPlaceInVault (replicate n c)
+       doPlaceInVault "[VAULT Escalation]" (replicate n c)
 
 
   -- XXX: what's the best way to "reveal" the cards?
@@ -368,7 +378,7 @@ escalateAction =
     do this <- the gameCurrentPlayer
        sync
        ~(Hand i) <-
-          choose this "Select card to place, others will be discarded"
+          choose this "[SALVO Escalation] Select a card to place, the rest will be discarded"
                     [ (Hand i, "Place this card") | (i,_) <- cs ]
        let disc = [ c | (j,c) <- cs, i /= j ]
        updateThe_ (player this .> playerHand)
