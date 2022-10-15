@@ -195,7 +195,7 @@ nextTurn =
      when (any null ds)
        do disc <- the gameDiscard
           newCs <- updateThe gameRNG (shuffle (concat ds ++ disc))
-          let each  = length newCs
+          let each  = length newCs `div` 3
               newDs = takes (replicate 3 each) newCs
           setThe gameDecks (init newDs)
           setThe gameDiscard (last newDs)
