@@ -4,6 +4,7 @@ function questionClick(q) {
     const n = gui.questions.length
     for (let i = 0; i < n; ++i) gui.questions[i]()
     gui.questions = []
+    gui.question.set('')
   }
 }
 
@@ -191,7 +192,7 @@ function drawDeck(i) {
 
           case "Card":
             card.set(v.contents[0])
-            counter.set(v.contents[1])
+            counter.set(v.contents[1] + 1)
             return
         }
       }
