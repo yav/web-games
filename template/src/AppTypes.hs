@@ -7,16 +7,17 @@ import Data.Aeson(ToJSON,FromJSON)
 data State = State
   deriving (Generic,ToJSON)
 
-type Finished = State
-
 data Update = Update
   deriving (Generic,ToJSON)
 
 data Input = Input
   deriving (Eq,Ord,Show,Read,Generic,ToJSON,FromJSON)
 
-doUpdate   :: Update -> State -> Either Finished State
-doUpdate  _ = Right
+doUpdate   :: Update -> State -> State
+doUpdate  _ = id
+
+finalState :: State -> Bool
+finalState = const False
 
 
 type StateView = State

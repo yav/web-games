@@ -7,16 +7,14 @@ import Data.Aeson(ToJSON,FromJSON)
 -- | The state of a game in progress.
 data State
 
--- | Information about a finished game.
-data Finished
-
-instance ToJSON Finished
-
 -- | Possible updates to a game's state.
 data Update
 
 -- | Apply an update to a game in progress.
-doUpdate   :: Update -> State -> Either Finished State
+doUpdate   :: Update -> State -> State
+
+-- | Does this state represent a finished game
+finalState :: State -> Bool
 
 -- | A view of the current game state that can be sent to a player.
 data StateView

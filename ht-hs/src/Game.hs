@@ -1,6 +1,6 @@
 {-# Language TemplateHaskell #-}
 module Game
-  ( Game, GameFinished, GameStatus
+  ( Game
   , initialGame
   , playerAfter
   , gameTurnOrder
@@ -13,6 +13,7 @@ module Game
   , gameEndVPSpot
   , gameTokenRemaining
   , gameCompletedBonusRoute
+  , gameIsFinished
   , GameUpdate(..)
   , doUpdate
   , computeScore
@@ -80,26 +81,31 @@ data GameUpdate =
 
   deriving (Show,Generic)
 
-data GameStatus s = Game
+data Game = Game
   { _gamePlayers  :: Map PlayerId Player
   , gameTurnOrder :: [PlayerId]
   , _gameTokens   :: [BonusToken]
   , _gameTokenRemaining :: Int
   , _gameBoard    :: Board
   , _gameLog      :: [Event]
-  , _gameStatus   :: s
+  , _gameStatus   :: Turn
+  , _gameFinished :: !(Maybe FinalScore)
   , _gameEndVPSpots :: Map Level Worker
   , _gameCompletedBonusRoute :: Set PlayerId
   } deriving (Show,Read,Generic)
 
 
-declareFields ''GameStatus
-
-type Game = GameStatus Turn
-type GameFinished = GameStatus FinalScore
-
 newtype FinalScore = FinalScore Score
   deriving (Show,Read)
+
+declareFields ''Game
+
+gameIsFinished :: Game -> Bool
+gameIsFinished s = case getField gameFinished s of
+                     Just _ -> True
+                     Nothing -> False
+
+
 
 gamePlayer :: PlayerId -> Field Game Player
 gamePlayer playerId = gamePlayers .> mapAt playerId
@@ -113,108 +119,98 @@ gameCurrentPlayer = currentPlayer . getField gameTurn
 gameEndVPSpot :: Level -> Game -> Maybe Worker
 gameEndVPSpot lvl = getField (gameEndVPSpots .> mapAtMaybe lvl)
 
-doUpdate :: GameUpdate -> Game -> Either GameFinished Game
+doUpdate :: GameUpdate -> Game -> Game
 doUpdate upd =
   case upd of
 
     -- Player
 
     SetWorkerPreference Worker {..} ->
-      Right .
         (gamePlayer owner `updField` setWorkerPreference shape)
 
     ChangeAvailble Worker{..} n ->
-      Right .
         (gamePlayer owner `updField` changeWorker Active shape n)
 
     ChangeUnavailable Worker{..} n ->
-      Right .
         (gamePlayer owner `updField` changeWorker Passive shape n)
 
     ChangeVP playerId n ->
-      Right . (gamePlayer playerId `updField` addVP n)
+      (gamePlayer playerId `updField` addVP n)
 
     Upgrade playerId act ->
-      Right . (gamePlayer playerId `updField` levelUp act)
+      (gamePlayer playerId `updField` levelUp act)
 
     GainBonusToken playerId bonus ->
-      Right . (gamePlayer playerId `updField` gainBonus bonus)
+      (gamePlayer playerId `updField` gainBonus bonus)
 
     UseBonusToken playerId bonus ->
-      Right . (gamePlayer playerId `updField` useBonus bonus)
+      (gamePlayer playerId `updField` useBonus bonus)
 
 
     -- nodes
     PlaceWorkerInOffice nodeId worker ->
-      Right .
       (gameBoard .> boardNode nodeId `updField` nodeAddWorker worker)
 
     PlaceWorkerInAnnex nodeId worker ->
-      Right .
       (gameBoard .> boardNode nodeId `updField` nodeAddExtra worker)
 
     SwapWorkers nodeId spot ->
-      Right . (gameBoard .> boardNode nodeId `updField` nodeSwap spot)
+      (gameBoard .> boardNode nodeId `updField` nodeSwap spot)
 
     SetEndVPAt lvl worker ->
-      Right .
         (setField (gameEndVPSpots .> mapAtMaybe lvl) (Just worker))
 
     -- edges
 
     PlaceWorkerOnEdge edgeId spot w ->
-      Right .
         (gameBoard .> boardEdge edgeId `updField` edgeSetWorker spot (Just w))
 
     RemoveWorkerFromEdge edgeId spot ->
-      Right .
         (gameBoard .> boardEdge edgeId `updField` edgeSetWorker spot Nothing)
 
     EdgeRemoveBonus edgeId ->
-      Right .
         (gameBoard .> boardEdge edgeId `updField` edgeRemoveBonus)
 
     EdgeSetBonus edgeId bonus ->
-      Right .
         (gameBoard .> boardEdge edgeId `updField` edgeSetBonus bonus)
 
-    SetFull _ -> Right . id
+    SetFull _ -> id
 
     -- turn
 
-    NewTurn turn -> Right . setField gameTurn turn
+    NewTurn turn -> setField gameTurn turn
 
     UseGateway g ->
-      Right . (gameTurn `updField` useGateway g)
+      (gameTurn `updField` useGateway g)
 
     ChangeDoneActions n ->
-      Right . (gameTurn .> actionsDone `updField` (+n))
+      (gameTurn .> actionsDone `updField` (+n))
 
     ChangeActionLimit n ->
-      Right . (gameTurn .> currentActionLimit `updField` (+n))
+      (gameTurn .> currentActionLimit `updField` (+n))
 
     AddWorkerToHand prov w ->
-      Right . (gameTurn `updField` addWorkerToHand prov w)
+      (gameTurn `updField` addWorkerToHand prov w)
 
     RemoveWorkerFromHand ->
-      Right . (gameTurn `updField` removeWorkerFromHand)
+      (gameTurn `updField` removeWorkerFromHand)
 
     DrawBonusToken ->
-      Right . (gameTokenRemaining `updField` subtract 1)
+      (gameTokenRemaining `updField` subtract 1)
 
     PlacingBonus b ->
-      Right . (if isJust b then (gameTokens `updField` drop 1) else id)
-            . (gameTurn .> turnPlacing   `setField` b)
+      (if isJust b then (gameTokens `updField` drop 1) else id)
+      . (gameTurn .> turnPlacing   `setField` b)
 
     AchieveBonusRoute playerId ->
-      Right . (gameCompletedBonusRoute `updField` Set.insert playerId)
+      (gameCompletedBonusRoute `updField` Set.insert playerId)
 
     -- events
     Log e ->
-      Right . (gameLog `updField` (e:))
+      (gameLog `updField` (e:))
 
     EndGame ->
-      Left . \g -> g { _gameStatus = FinalScore (computeScore g) }
+      \g -> g { _gameFinished = Just (FinalScore (computeScore g)) }
 
 playerAfter :: PlayerId -> Game -> PlayerId
 playerAfter playerId state =
@@ -234,6 +230,7 @@ initialGame rng0 board playerIds =
     , _gameTokenRemaining = length otherTokens
     , _gameBoard     = foldr addToken board startToks
     , _gameStatus    = newTurn firstPlayer (getLevel Actions firstPlayerState)
+    , _gameFinished  = Nothing
     , _gameLog       = [ EvSay [ EvPlayer firstPlayer, "' turn" ]
                        , StartTurn
                        ]
@@ -260,7 +257,7 @@ initialGame rng0 board playerIds =
 
 -- Score breakdown
 
-computeScore :: GameStatus s -> Score
+computeScore :: Game -> Score
 computeScore game =
   fmap complete
   $ endVPscore
@@ -298,7 +295,7 @@ computeScore game =
 
 --------------------------------------------------------------------------------
 
-instance ToJSON status => ToJSON (GameStatus status) where
+instance ToJSON Game where
   toJSON g = JS.object
     [ "players" .=
         JS.object [ JS.fromText (jsKey pId) .= p
@@ -309,7 +306,9 @@ instance ToJSON status => ToJSON (GameStatus status) where
     , "endVP"     .= jsMap (getField gameEndVPSpots g)
     , "log"       .= getField gameLog g
     , "tokens"    .= getField gameTokenRemaining g
-    , "status"    .= getField gameStatus g
+    , "status"    .= case getField gameFinished g of
+                       Nothing -> toJSON (getField gameStatus g)
+                       Just f  -> toJSON f
     , "score"     .= computeScore g
     ]
 

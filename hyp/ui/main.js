@@ -43,7 +43,7 @@ const uiRedraw = (state) => {
   gui = {}
   gui.questions = []
 
-  const game = state.game || state.finished
+  const game = state.game
   const body = document.getElementById('main')
   body.innerHTML = ""
 

@@ -40,7 +40,7 @@ import qualified Data.Aeson as JS
 
 import Common.Basics
 import Common.Field
-import AppTypes(State,StateView,UpdateView,Finished,Input,Update,doUpdate,
+import AppTypes(State,StateView,UpdateView,Input,Update,doUpdate,finalState,
                                   playerView,playerUpdateView)
 
 
@@ -53,7 +53,7 @@ startGame ginfo moves = foldl' step state0 moves
            InteractState { iInit    = ginfo
                          , iLog     = []
                          , iName    = 0
-                         , iGame    = Right (gState ginfo)
+                         , iGame    = gState ginfo
                          , iAsk     = Map.empty
                          , iQuestion = ""
                          , iShouldSave = False
@@ -129,7 +129,7 @@ handleMessage (p :-> req) =
 reload :: InteractState -> PlayerId -> WithPlayer OutMsg
 reload s p =
   p :-> CurGameState
-        CurState { cGame = fmap (playerView p) (iGame s)
+        CurState { cGame = playerView p (iGame s)
                  , cQuestions =
                       ( iQuestion s
                       , [ ChoiceHelp { chChoice = q
@@ -152,7 +152,7 @@ data InteractState =
 
     , iName   :: !Int
 
-    , iGame   :: Either Finished State
+    , iGame   :: State
       -- ^ The current game state.
       -- Should be reproducable by replyaing the log file on the initial state
 
@@ -265,8 +265,8 @@ view :: (State -> a) -> Interact a
 view f = Interact $
   \k ->
   \s os -> case iGame s of
-             Right st -> k (f st) s os
-             Left _   -> (s,os)
+             st | finalState st -> (s,os)
+                | otherwise -> k (f st) s os
 
 -- | Get the value of the given field of the state
 the :: Field State a -> Interact a
@@ -281,17 +281,17 @@ update :: Update -> Interact ()
 update o = Interact $
   \k    ->
   \s os -> case iGame s of
-             Left _  -> (s,os)
-             Right a -> k () s { iGame = doUpdate o a } (o : os)
+             a | finalState a -> (s,os)
+               | otherwise    -> k () s { iGame = doUpdate o a } (o : os)
 
 -- | Updates that are not visible to the players
 localUpdate :: (State -> (a,State)) -> Interact a
 localUpdate f = Interact $
   \k ->
   \s os -> case iGame s of
-             Left _  -> (s,os)
-             Right a -> case f a of
-                          (x,b) -> k x s { iGame = Right b } os
+             a | finalState a -> (s,os)
+               | otherwise    -> case f a of
+                                   (x,b) -> k x s { iGame = b } os
 
 -- | Updates that are not visible to the players
 localUpdate_ :: (State -> State) -> Interact ()
@@ -316,7 +316,7 @@ save = Interact $ \k s os -> k () s { iShouldSave = True } os
 -- Input and output messages
 
 data CurState = CurState
-  { cGame       :: Either Finished StateView
+  { cGame       :: StateView
   , cQuestions  :: (Text, [ChoiceHelp])
   }
 
@@ -325,9 +325,7 @@ instance ToJSON OutMsg
 
 instance ToJSON CurState where
   toJSON g = JS.object
-    [ case cGame g of
-        Right a -> "game" .= a
-        Left a  -> "finished" .= a
+    [ "game"      .= cGame g
     , "questions" .= cQuestions g
     ]
 

@@ -173,7 +173,7 @@ function newGUI(container) {
 function uiRedraw(state) {
   gui = newGUI(document.getElementById('main'))
 
-  const game = state.game ? state.game : state.finished
+  const game = state.game
 
   { // Colors
     gui.colors = {}

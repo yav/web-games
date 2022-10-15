@@ -90,9 +90,6 @@ declareFields ''State
 
 type StateView = State
 
-type Finished = State
-
-
 initialState :: RNG -> Bool -> Int -> [PlayerId] -> State
 initialState rng useFog len ps = State
   { gameTurnOrder = ps
@@ -138,90 +135,94 @@ playerUpdateView pid upd =
     SetRuinToken pid' ts | pid /= pid' -> SetRuinToken pid' (map hideToken ts)
     _ -> upd
 
-doUpdate :: Update -> State -> Either Finished State
+finalState :: State -> Bool
+finalState s = case getField gameFinished s of
+                 Just {} -> True
+                 Nothing -> False
+
+doUpdate :: Update -> State -> State
 doUpdate upd =
   case upd of
     PlaceCube playerId loc r ->
-      Right . setField (playerState playerId .> costSpot loc .> spotResource)
-                       (Just r)
+      setField (playerState playerId .> costSpot loc .> spotResource)
+               (Just r)
 
     RemoveCube playerId loc ->
-      Right . setField (playerState playerId .> costSpot loc .> spotResource)
-                       Nothing
+      setField (playerState playerId .> costSpot loc .> spotResource)
+               Nothing
 
     ChangeBag playerId nm r n ->
-      Right . updField (playerState playerId .> playerBag .> mapAt nm)
-                       (bagChange n r)
+      updField (playerState playerId .> playerBag .> mapAt nm)
+               (bagChange n r)
 
     ChangeGems playerId n ->
-      Right . updField (playerState playerId .> playerGems) (+n)
+      updField (playerState playerId .> playerGems) (+n)
 
     ChangeGhosts playerId n ->
-      Right . updField (playerState playerId .> playerGhosts) (+n)
+      updField (playerState playerId .> playerGhosts) (+n)
 
     ChangeWorkers playerId n ->
-      Right . updField (playerState playerId .> playerWorkers) (+n)
+      updField (playerState playerId .> playerWorkers) (+n)
 
     Capture playerId capturedId ->
-      Right . updField (playerState playerId .> playerCaptured)
-                       (Set.insert capturedId)
+      updField (playerState playerId .> playerCaptured)
+               (Set.insert capturedId)
 
     SetRuinToken playerId mb ->
-      Right . setField (playerState playerId .> playerToken) mb
+      setField (playerState playerId .> playerToken) mb
 
     GainAchievement playerId a ->
-      Right . updField (playerState playerId .> playerAchievements)
-                       (Set.insert a)
+      updField (playerState playerId .> playerAchievements)
+               (Set.insert a)
 
     SetTurn t ->
-      Right . setField gameTurn t
+      setField gameTurn t
 
     Upgrade playerId r n ->
-      Right . updField (playerState playerId .> playerDevel .> mapAt r) (+n)
+      updField (playerState playerId .> playerDevel .> mapAt r) (+n)
 
     ResetUpgrade playerId r ->
-      Right . setField (playerState playerId .> playerDevel .> mapAt r) 0
+      setField (playerState playerId .> playerDevel .> mapAt r) 0
 
     ChangeUnit playerId ty loc n ->
-      Right . updField (gameBoard .> tileAt loc .> playerUnits playerId)
-                       (bagChange n ty)
+      updField (gameBoard .> tileAt loc .> playerUnits playerId)
+               (bagChange n ty)
 
     SetUnithighlight loc p yes ->
-      Right . setField (gameBoard .> tileAt loc .> playerUnitsHighlight p) yes
+      setField (gameBoard .> tileAt loc .> playerUnitsHighlight p) yes
 
     SetCity loc cityId val ->
-      Right . setField (gameBoard .> tileAt loc
-                                  .> tileCities .> mapAt cityId .> citySpot)
-                       val
+      setField (gameBoard .> tileAt loc
+                          .> tileCities .> mapAt cityId .> citySpot)
+               val
 
     SetRuin loc ruinId val ->
-      Right . setField (gameBoard .> tileAt loc
-                                  .> tileRuins .> mapAt ruinId .> ruinSpot)
-                       val
+      setField (gameBoard .> tileAt loc
+                          .> tileRuins .> mapAt ruinId .> ruinSpot)
+               val
 
     DropToken loc ruinId ->
-      Right . updField (gameBoard .> tileAt loc
-                                  .> tileRuins .> mapAt ruinId .> ruinTokens)
-                       (drop 1)
+      updField (gameBoard .> tileAt loc
+                          .> tileRuins .> mapAt ruinId .> ruinTokens)
+               (drop 1)
 
     ChangeTile loc t ->
-      Right . setField (gameBoard .> tileAt loc) t
+      setField (gameBoard .> tileAt loc) t
 
     ChangeSupply r n ->
-      Right . updField gameSupply (bagChange n r)
+      updField gameSupply (bagChange n r)
 
     SetMarket d m ->
-      Right . setField (gameMarkets .> mapAt d) m
+      setField (gameMarkets .> mapAt d) m
 
     AddTech playerId techId tech ->
-      Right . updField (playerState playerId .> playerTech)
-                       (Map.insert techId tech)
+      updField (playerState playerId .> playerTech) (Map.insert techId tech)
 
     SetEndOn playerId ->
-      Right . setField gameEndOn (Just playerId)
+      setField gameEndOn (Just playerId)
 
     AddLog ev ->
-      Right . updField gameLog (ev:)
+      updField gameLog (ev:)
 
     EndGame fs ->
-      Left . setField gameFinished (Just fs)
+      setField gameFinished (Just fs)

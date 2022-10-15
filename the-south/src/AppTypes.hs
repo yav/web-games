@@ -6,14 +6,16 @@ import qualified Game as App
 
 type State      = App.Game
 type StateView  = App.GameView
-type Finished   = State
 type Update     = App.Game
 type Input      = App.Input
 
-doUpdate   :: Update -> State -> Either Finished State
-doUpdate new _ = case getField App.gameStatus new of
-                   App.InProgress -> Right new
-                   _              -> Left new
+doUpdate   :: Update -> State -> State
+doUpdate new _ = new
+
+finalState :: State -> Bool
+finalState s = case getField App.gameStatus s of
+                 App.InProgress {} -> False
+                 _                 -> True
 
 playerView :: PlayerId -> State -> StateView
 playerView = App.gameView
