@@ -18,6 +18,7 @@ const srvConnect = () => {
 
   const handler = hsOutMsg(
                     { CurGameState: uiRedraw
+                    , SetQuestion:  uiSetQuestion
                     , AskQuestions: uiQuestions
                     , GameUpdate:   uiUpdate
                     })

@@ -70,6 +70,7 @@ data GameInfo = GameInfo
 
 data OutMsg =
     CurGameState CurState
+  | SetQuestion Text
   | AskQuestions (Text, [ChoiceHelp])
   | GameUpdate UpdateView
     deriving Generic
@@ -110,6 +111,7 @@ handleMessage (p :-> req) =
   askQuestions (s,os) =
     ( s { iShouldSave = False }
     , reverse os ++
+      [ q :-> SetQuestion (iQuestion s) | q <- iPlayers s ] ++
       [ q :-> AskQuestions (iQuestion s, qs)
       | (q,qs) <- Map.toList
                 $ Map.fromListWith (++)
@@ -146,11 +148,14 @@ reload s p =
 data InteractState =
   InteractState
     { iInit   :: GameInfo
+      -- ^ Information about how the game was initialized.
 
     , iLog    :: [WithPlayer Input]
       -- ^ A record of all responses made by the players
 
     , iName   :: !Int
+      -- ^ An identifier for the state.  Used to check that the anser match
+      -- the question.
 
     , iGame   :: State
       -- ^ The current game state.
@@ -160,8 +165,10 @@ data InteractState =
       -- ^ Choices avialable to the players.
 
     , iQuestion :: Text
+      -- ^ A desicription of what we are doing.
 
     , iShouldSave :: Bool
+      -- ^ Indicates if this is a save point.
     }
 
 iPlayers :: InteractState -> [PlayerId]
