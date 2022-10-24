@@ -29,8 +29,15 @@
 
 
 
+.text {
+  display: inline-block;
+}
 
 .phrase {
+  display: inline-block;
+}
+
+.cur-player {
   display: inline-block;
 }
 

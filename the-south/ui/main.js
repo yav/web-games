@@ -12,6 +12,7 @@ function main() {
 // Redraw the whole state
 function uiRedraw (state) {
   const b = html.getBody()
+  b.innerHTML=''
   b.appendChild(drawGame(state.game))
   setGame(state.game)
   uiQuestions(state.questions)

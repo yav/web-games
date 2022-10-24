@@ -46,7 +46,6 @@ function setGame(game) {
     gui.players[p](game.players[p])
 }
 
-
 function drawGame(game) {
   gui = {}
   gui.questions = []
@@ -58,16 +57,16 @@ function drawGame(game) {
 }
 
 function drawQuestionArea() {
-  let value = null
-  const dom = html.div("question")
-  const lab = html.div("phrase")
-  dom.appendChild(lab)
+  let value   = null
+  const dom   = html.div("question")
+  const curP  = drawText()
+  const lab   = drawText()
+  dom.appendChild(curP.dom)
+  dom.appendChild(lab.dom)
 
   gui.question =
-    { set: (i) => {
-        if (value !== null && value.localeCompare(i) == 0) return
-        lab.textContent = i
-      }
+    { set: lab.set
+    , setPlayer: curP.set
     , append: (d) => dom.appendChild(d)
     }
 
@@ -110,8 +109,10 @@ function drawPlayer(p,st) {
   gui.players[p] = (s) => {
     if (s.isCurrent !== current) {
       current = s.isCurrent
-      if (current)
+      if (current) {
         label.classList.add("current")
+        gui.question.setPlayer(p)
+      }
       else
         label.classList.remove("current")
     }
@@ -249,6 +250,18 @@ function drawCounter() {
 
   return { dom: dom
          , set: (n) => { if (n !== value) { value = n; dom.textContent = n }}
+         }
+}
+
+function drawText() {
+  let value = null
+  const dom = html.div("text")
+  return { dom: dom
+         , set: (i) => {
+                  if (value !== null && value.localeCompare(i) === 0) return
+                  value = i
+                  dom.textContent = i
+                }
          }
 }
 
