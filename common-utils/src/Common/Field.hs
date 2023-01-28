@@ -4,6 +4,7 @@ module Common.Field where
 import Data.Map(Map)
 import qualified Data.Map as Map
 import Language.Haskell.TH
+import Language.Haskell.TH.Datatype.TyVarBndr
 
 -- | Describes a field in @r@ of type @a@
 data Field r a = Field
@@ -76,9 +77,7 @@ declareFields tyName =
   do info <- reify tyName
      case info of
        TyConI (DataD [] d as _ [RecC _ fs]  _) ->
-          do let paramT a = case a of
-                              PlainTV x -> VarT x
-                              KindedTV x _ -> VarT x
+          do let paramT = VarT . tvName
                  valT = foldl AppT (ConT d) (map paramT as)
              concat <$> mapM (declareField as valT) fs
        _ -> fail $ unlines

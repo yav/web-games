@@ -21,7 +21,7 @@ library
     Common.Options
   build-depends:
     base >=4.13, containers, text, tf-random, aeson, vector, template-haskell,
-    bytestring, zlib, base64-bytestring
+    bytestring, zlib, base64-bytestring, th-abstraction
   ghc-options:         -Wall
   default-language:    Haskell2010
   default-extensions:
