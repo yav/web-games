@@ -114,7 +114,7 @@ handleMessage (p :-> req) =
       [ q :-> SetQuestion (iQuestion s) | q <- iPlayers s ] ++
       [ q :-> AskQuestions (iQuestion s, qs)
       | (q,qs) <- Map.toList
-                $ Map.fromListWith (++)
+                $ Map.fromListWith (flip (++))
                   [ (q,[ChoiceHelp { chChoice = ch
                                    , chHelp = help
                                    , chStateName = iName s
