@@ -6,7 +6,6 @@ import Data.Text(Text)
 import qualified Data.Text as Text
 import Data.Aeson (ToJSON,(.=))
 import qualified Data.Aeson as JS
-import qualified Data.Aeson.Types as JS
 import qualified Data.Aeson.Key as JS
 import GHC.Generics
 
