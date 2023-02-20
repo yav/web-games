@@ -1,6 +1,7 @@
 module Common.Bag where
 
 import Data.Maybe(fromMaybe)
+import Data.Set(Set)
 import Data.Map(Map)
 import qualified Data.Map as Map
 import GHC.Generics(Generic)
@@ -15,12 +16,25 @@ newtype Bag a = Bag (Map a Int)
 bagEmpty :: Bag a
 bagEmpty = Bag Map.empty
 
+-- | Change the amount of something in the bag.
+-- If the change is negative and there is not enough,
+-- then remove as much as possible.
 bagChange :: Ord a => Int -> a -> Bag a -> Bag a
 bagChange x r (Bag b) =
   Bag
   let cur = Map.findWithDefault 0 r b
       new = cur + x
   in if new > 0 then Map.insert r new b else Map.delete r b
+
+-- | Change the amount of something in the bag.
+-- Fails if the change is negative and there isn't enough.
+bagChangeMaybe :: Ord a => Int -> a -> Bag a -> Maybe (Bag a)
+bagChangeMaybe x r (Bag b) =
+  let cur = Map.findWithDefault 0 r b
+      new = cur + x
+  in if new > 0 then Just (Bag (Map.insert r new b)) else Nothing
+
+
 
 bagUnion :: Ord a => Bag a -> Bag a -> Bag a
 bagUnion (Bag a) (Bag b) = Bag (Map.unionWith (+) a b)
@@ -43,6 +57,9 @@ bagToNumList (Bag mp) = Map.toList mp
 
 bagToList :: Bag a -> [a]
 bagToList b = [ x | (a,n) <- bagToNumList b, x <- replicate n a ]
+
+bagToSet :: Bag a -> Set a
+bagToSet (Bag mp) = Map.keysSet mp
 
 bagFromNumList :: Ord a => [(a,Int)] -> Bag a
 bagFromNumList xs = Bag (Map.fromListWith (+) xs)
