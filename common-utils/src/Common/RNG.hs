@@ -15,6 +15,9 @@ newtype RNG = RNG TFGen
 instance ToJSON RNG where
   toJSON _ = JS.object []
 
+instance Show RNG where
+  show _ = "RNG"
+
 newRNG :: IO RNG
 newRNG = RNG <$> newTFGen
 

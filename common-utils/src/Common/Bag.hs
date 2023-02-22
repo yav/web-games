@@ -11,7 +11,7 @@ import Common.RNG
 
 
 newtype Bag a = Bag (Map a Int)
-  deriving (Generic,ToJSON)
+  deriving (Generic,ToJSON,Show)
 
 bagEmpty :: Bag a
 bagEmpty = Bag Map.empty
@@ -32,9 +32,10 @@ bagChangeMaybe :: Ord a => Int -> a -> Bag a -> Maybe (Bag a)
 bagChangeMaybe x r (Bag b) =
   let cur = Map.findWithDefault 0 r b
       new = cur + x
-  in if new > 0 then Just (Bag (Map.insert r new b)) else Nothing
-
-
+  in case compare new 0  of
+       GT -> Just (Bag (Map.insert r new b))
+       EQ -> Just (Bag (Map.delete r b))
+       LT -> Nothing
 
 bagUnion :: Ord a => Bag a -> Bag a -> Bag a
 bagUnion (Bag a) (Bag b) = Bag (Map.unionWith (+) a b)
