@@ -2,6 +2,8 @@ const html = (() => {
 
   let scale = 1
   const setSize = (el,d,x) => { el.style[d] = (x * scale) + 'px' }
+  const setSize2 = (el,d,x,y) => { el.style[d] = (x * scale) + 'px ' +
+                                                 (y * scale) + 'px' }
 
   return {
 
@@ -47,6 +49,7 @@ const html = (() => {
     },
 
     setSize: setSize,
+    setSize2: setSize2,
 
     setDim: (el,x,y) => {
       setSize(el,'width',x)
