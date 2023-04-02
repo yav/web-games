@@ -33,14 +33,20 @@ jsData nm cons = defFun <$> mapM jsCon cons
 jsCon :: Con -> Maybe String
 jsCon con =
   case con of
-    NormalC c ts ->
-      Just (unlines [ "    case " <> show (nameBase c) <> ":"
-                    , "      return self." <> nameBase c <> "(" <> params <> ")"
-                    ])
-      where
-      params = case length ts of
-                 0 -> ""
-                 1 -> "msg.contents"
-                 n -> intercalate "," [ "msg.contents[" ++ show i ++ "]"
-                                      | i <- take n [ 0 :: Int .. ] ]
+    NormalC c ts -> doCon c ts
+    RecC c vbs -> doCon c [ (b,t) | (_,b,t) <- vbs ]
+    InfixC b1 c b2 -> doCon c [b1,b2]
     _ -> Nothing
+
+  where
+  doCon c ts =
+    Just (unlines [ "    case " <> show (nameBase c) <> ":"
+                  , "      return self." <> nameBase c <> "(" <> params <> ")"
+                  ])
+    where
+    params = case length ts of
+               0 -> ""
+               1 -> "msg.contents"
+               n -> intercalate "," [ "msg.contents[" ++ show i ++ "]"
+                                    | i <- take n [ 0 :: Int .. ] ]
+ 
