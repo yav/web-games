@@ -33,8 +33,7 @@ jsData nm cons = defFun <$> mapM jsCon cons
 jsCon :: Con -> Maybe String
 jsCon con =
   case con of
-    NormalC c ts -> doCon c ts
-    RecC c vbs -> doCon c [ (b,t) | (_,b,t) <- vbs ]
+    NormalC c ts   -> doCon c ts
     InfixC b1 c b2 -> doCon c [b1,b2]
     _ -> Nothing
 
