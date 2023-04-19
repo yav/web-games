@@ -79,5 +79,5 @@ bagRemoveAll r (Bag b) = (fromMaybe 0 mb, Bag b1)
   where
   (mb, b1) = Map.updateLookupWithKey (\_ _ -> Nothing) r b
 
-bagMap :: (Ord a, Ord b) => (a -> b) -> Bag a -> Bag b
-bagMap f m = bagFromNumList [ (f a, n) | (a,n) <- bagToNumList m ]
+bagMap :: Ord b => (a -> b) -> Bag a -> Bag b
+bagMap f xs = bagFromNumList [ (f a, n) | (a,n) <- bagToNumList xs ]

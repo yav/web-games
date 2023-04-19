@@ -15,6 +15,7 @@ library
     Common.Field,
     Common.Bag,
     Common.CallJS,
+    Common.Enum,
     Common.RNG,
     Common.RNGM,
     Common.SaveLoad,
