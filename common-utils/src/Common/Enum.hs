@@ -1,10 +1,6 @@
-module Common.Enum
-  ( EnumText(..)
-  , declareEnumText
-  , enumTextToJSKey
-  , enumTextFromJSKey
-  ) where
+module Common.Enum ( EnumText(..), declareEnumText) where
 
+import Control.Applicative((<|>))
 import Data.Text(Text)
 import qualified Data.Text as Text
 import Data.List(partition)
@@ -50,8 +46,24 @@ declareEnumText tcon =
      [d| instance EnumText $(pure (tiTy info)) where
             enumToText x   = $(toTextDef   info [| x |])
             enumFromText x = $(fromTextDef info [| x |])
+
+         instance JS.ToJSON $(pure (tiTy info)) where
+           toJSON = JS.toJSON . enumToText
+
+         instance JS.FromJSON $(pure (tiTy info)) where
+           parseJSON = JS.withText nameStr \x ->
+                       case enumFromText x of
+                         Just a  -> pure a
+                         Nothing -> fail "Invalid value"
+
+         instance JS.ToJSONKey $(pure (tiTy info)) where
+           toJSONKey = enumTextToJSKey
+
+         instance JS.FromJSONKey $(pure (tiTy info)) where
+           fromJSONKey = enumTextFromJSKey
        |]
   where
+  nameStr = nameBase tcon
   v = mkName "v"
 
   alt p e = match p (normalB e) []
@@ -73,7 +85,7 @@ declareEnumText tcon =
        , let s = nameBase n
        ] ++
        [ alt (conP n [ varP v ]) [| enumToText $(varE v) |]
-       | (n,_) <- tiSubDirect info
+       | n <- tiSubDirect info
        ]
 
   fromTextDef info x =
@@ -87,21 +99,22 @@ declareEnumText tcon =
         , let s = nameBase n
               l = length s + Text.length sep
         ] ++
-        case tiSubDirect info of
-          [(n,_)] ->
-            [ alt [p| _ |] [| $(conE n) <$> enumFromText $x |] ]
-          _ -> [ alt (litP (stringL c)) [| $(conE n) <$> enumFromText $x |]
-               | (n,cs) <- tiSubDirect info
-               , c <- cs
-               ] ++ [ alt [p| _ |] [| Nothing |] ]
-
+        [ alt [p| _ |]
+          let opts = [ [| $(conE n) <$> enumFromText $x |]
+                     | n <- tiSubDirect info
+                     ]
+              jn l r = [| $l <|> $r |]
+          in case opts of
+               [] -> [| Nothing |]
+               _  -> foldr1 jn opts
+        ]
 
 data TInfo = TInfo
   { tiTy        :: Type
   , tiVals      :: [String]
   , tiDirect    :: [Name]
   , tiSubQual   :: [Name]
-  , tiSubDirect :: [(Name,[String])]
+  , tiSubDirect :: [Name]
   }
 
 
@@ -146,8 +159,7 @@ repsOfTC tcon =
                     qs    = [ mkQualS (nameBase c) x | x <- q ]
                 in i { tiVals = d ++ qs ++ tiVals i
                      , tiSubQual = [ c | not (null qs) ] ++ tiSubQual i
-                     , tiSubDirect = [ (c,d) | not (null d) ] ++
-                                                tiSubDirect i
+                     , tiSubDirect = [ c | not (null d) ] ++ tiSubDirect i
                      }
 
      pure (foldr addC blank subNames)
