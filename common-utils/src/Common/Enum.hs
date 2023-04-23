@@ -94,7 +94,7 @@ declareEnumText tcon =
         | n <- tiDirect info
         , let s = nameBase n
         ] ++
-        [ grd s [| $(conE n) <$> enumFromText (drop $[| l |] $(varE v))|]
+        [ grd s [| $(conE n) <$> enumFromText (Text.drop $[| l |] $(varE v))|]
         | n <- tiSubQual info
         , let s = nameBase n
               l = length s + Text.length sep

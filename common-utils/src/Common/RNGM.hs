@@ -3,6 +3,7 @@ module Common.RNGM
   , Gen
   , withRNG
   , withRNG_
+  , runRNG
   , splitRNG
   , pickOne
   , pickWeighted
@@ -53,3 +54,8 @@ withRNG r (Gen m) =
 
 withRNG_ :: RNG -> Gen a -> a
 withRNG_ r (Gen m) = fst (m r)
+
+runRNG :: RNG -> Gen a -> (a, RNG)
+runRNG g (Gen m) = m g
+
+

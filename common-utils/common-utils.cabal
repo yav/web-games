@@ -20,6 +20,7 @@ library
     Common.RNGM,
     Common.SaveLoad,
     Common.ColorPicker,
+    Test,
     Common.Options
   build-depends:
     base >=4.13, containers, text, tf-random, aeson, vector, template-haskell,
