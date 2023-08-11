@@ -426,7 +426,7 @@ randomPower = random (oneOf allElements)
 -- Export to JS
 
 
-tag :: JS.KeyValue kv => Text -> kv
+tag :: JS.KeyValue e kv => Text -> kv
 tag x = "tag" .= (x :: Text) 
 
 instance ToJSON LogEvent where
