@@ -38,19 +38,19 @@ components :: [ (ByteString, Component) ]
 components =
   [ ("ht-hs", simple "ht-hs")
   , ("hyp", simple "hyp")
+  , ("concordia", simple "concordia")
   ]
   where
-  validP p = p `elem` [ "player", "board", "fog", "length" ]
-  simple c = \params ->
-               do unless (all validP (Map.keys params))
-                    $ Left "Invliad parameter"
-                  pure CreateSession
-                          { component = c
-                          , arguments = [ BS8.unpack ("--" <> x <> "=" <> y)
-                                        | (x,ys) <- Map.toList params
-                                        , y      <- ys
-                                        ]
-                          }
+  validP p = p `elem` [ "player", "board", "fog", "salt", "length" ]
+  simple c params =
+    do unless (all validP (Map.keys params)) (Left "Invliad parameter")
+       pure CreateSession
+               { component = c
+               , arguments = [ BS8.unpack ("--" <> x <> "=" <> y)
+                             | (x,ys) <- Map.toList params
+                             , y      <- ys
+                             ]
+               }
 
 
 data State = State

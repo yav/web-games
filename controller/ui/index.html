@@ -19,8 +19,21 @@ const main = () => {
                     ]
                   )
 
+  const concordia =
+    settings( "Concordia", "concordia"
+            , [ "yellow", "red", "green", "blue", "black" ]
+            , [ [ "board", [ "Italia", "Ionium", "Crete", "Cyprus"
+                           , "Hellas", "Hispania"
+                           ]
+                , "Italia"
+                ]
+              , [ 'salt', [ 'yes', 'no'], 'no' ]
+              ]
+            )
+
   body.appendChild(hansa_teutonica)
   body.appendChild(hyperborea)
+  body.appendChild(concordia)
 }
 </script>
 </head>
