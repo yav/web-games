@@ -41,7 +41,8 @@ components =
   , ("concordia", simple "concordia")
   ]
   where
-  validP p = p `elem` [ "player", "board", "fog", "salt", "length" ]
+  validP p = p `elem`
+    [ "player", "board", "fog", "salt", "wine-market", "length" ]
   simple c params =
     do unless (all validP (Map.keys params)) (Left "Invliad parameter")
        pure CreateSession
